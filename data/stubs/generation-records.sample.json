@@ -1,0 +1,61 @@
+[
+  {
+    "id": "gr_0001",
+    "generation_number": 1,
+    "created_at": "2026-06-06T09:10:00.000Z",
+    "trend_context_id": "tc_0001",
+    "concept": {
+      "id": "cc_0001",
+      "generation_number": 1,
+      "trend_context_id": "tc_0001",
+      "harness_state_version": "v0",
+      "hook": "Your AI startup isn't a wrapper problem. It's a taste problem.",
+      "format": "contrarian_hook",
+      "angle": "Distribution and taste are the real moats, not the model.",
+      "script": "Everyone says you're just a GPT wrapper. Cool - so was every SaaS a 'database wrapper.' The moat was never the model. It's taste, distribution, and the thousand product decisions nobody screenshots. Here's how to tell if yours is real...",
+      "visual_prompt": "A clean, modern talking-head explainer for ai-founders. Visual style: minimal, high-contrast, on-screen captions. Scene reflects: distribution and taste as moats.",
+      "elements": ["contrarian_hook"],
+      "created_by": "content-generator"
+    },
+    "score": {
+      "id": "rs_0001",
+      "concept_id": "cc_0001",
+      "generation_number": 1,
+      "harness_state_version": "v0",
+      "dimensions": {
+        "hook_strength": 0.82,
+        "trend_fit": 0.78,
+        "brand_fit": 0.7,
+        "novelty": 0.68,
+        "clarity": 0.74,
+        "cringe_risk": 0.18,
+        "policy_risk": 0.05,
+        "visual_feasibility": 0.8
+      },
+      "weighted_total": 0.71,
+      "predicted_win_prob": 0.5,
+      "policy_flag": false,
+      "judge_rationale": "Strong contrarian hook with clear trend fit and good clarity; novelty is moderate. Low cringe and policy risk. Baseline generation, so the win probability is anchored at 0.5."
+    },
+    "harness_state_version_before": "v0",
+    "harness_state_version_after": "v1",
+    "harness_diff": {
+      "id": "hd_0001",
+      "from_version": "v0",
+      "to_version": "v1",
+      "element_weight_changes": { "contrarian_hook": 0.1, "generic_listicle": -0.1 },
+      "script_prompt_change": "Add an explicit instruction to name the consensus view before subverting it.",
+      "rationale": "The contrarian hook scored highest on hook_strength and trend_fit; reinforce it and suppress generic listicles.",
+      "accepted": true
+    },
+    "lesson": {
+      "id": "ls_0001",
+      "generation_number": 1,
+      "observation": "The contrarian hook outscored generic framings on hook_strength and trend_fit for the AI-founder audience.",
+      "rule": "For founder-facing AI content, prefer contrarian or diagnostic hooks over generic listicles.",
+      "evidence": "Generation 1: contrarian_hook concept scored 0.82 hook_strength and 0.78 trend_fit, weighted_total 0.71.",
+      "harness_change": "Increase contrarian_hook weight (+0.1) and decrease generic_listicle (-0.1); reinforce in script_prompt.",
+      "expected_effect": "Later generations open with sharper, consensus-subverting hooks and avoid generic listicles, lifting the predicted win probability."
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "name": "harnesswiki-city",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Self-improving content-ops harness: trend context -> content concept -> reward score -> generation record -> harness update, traced in W&B Weave.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "node -e \"console.log('HarnessWiki City: loop + dashboard not implemented yet - see docs/STATUS.md (current status) and docs/HARNESS_LOOP.md (planned loop).')\""
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
