@@ -3,13 +3,29 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Dashboard stack
+
+### D6. Dashboard: Vite + React (supersedes the framework note in D1)
+
+The dashboard is a client-only proof artifact with no SSR, routing, or server
+needs, so it is built with **Vite + React 19 + Tailwind v4 + Motion** under
+`src/ui/`, type-isolated from the contracts typecheck by its own
+`src/ui/tsconfig.json` (the root `tsconfig.json` excludes `src/ui`, and
+`pnpm typecheck` stays green). This supersedes D1's "Next.js App Router on
+Vercel" note: Vite is the leanest path here, and the static build still deploys
+to Vercel. Data reaches every view through a single seam, `src/ui/lib/data.ts`,
+returning the canonical `GenerationRecord[]` — synthetic demo data now, real
+`runLoop` output later with no component changes.
+
 ## 2026-06-06 — Initial decisions
 
 ### D1. Stack: TypeScript + pnpm
 
 The shared contracts and function shapes are expressed in TypeScript, so the
 codebase is TS and the package manager is pnpm. The dashboard targets Next.js
-App Router on Vercel when the UI is built (not scaffolded yet).
+App Router on Vercel when the UI is built (not scaffolded yet). _(The
+dashboard-framework portion of this decision is superseded by D6: the UI ships
+on Vite + React.)_
 
 ### D2. Contracts are canonical in code, mirrored in the doc
 

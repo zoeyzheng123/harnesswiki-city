@@ -19,7 +19,7 @@ _Last updated: 2026-06-06._
 | Content generator | `src/content/generateConcept.ts`, `src/content/trendScout.ts`, `src/content/seedancePrompt.ts` | ⬜ Not started |
 | Memory | `src/memory/generationRecords.ts`, `src/memory/lessons.ts` | ⬜ Not started |
 | Weave tracing | `src/weave/trace.ts` | ⬜ Not started |
-| Dashboard | `src/ui/` | ⬜ Not started |
+| Dashboard | `src/ui/` | 🟦 In progress — control-room UI built (score curve, weight shift, generation table + detail, living memory). Runs on synthetic data; binds real `GenerationRecord[]` via the `src/ui/lib/data.ts` seam. |
 
 ## Next up (to make the demo loop run)
 
@@ -32,5 +32,6 @@ _Last updated: 2026-06-06._
 
 ## Known placeholders
 
-- `pnpm dev` prints a "not implemented yet" message until the loop/dashboard exist.
+- `pnpm dev` points at `pnpm dev:ui`; the generation loop itself is still not implemented.
+- The dashboard renders a synthetic 5-generation arc (`src/ui/lib/synthetic.ts`) until the real loop writes records.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.

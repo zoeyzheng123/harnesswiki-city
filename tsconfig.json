@@ -13,5 +13,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": []
   },
-  "include": ["src/**/*.ts", "data/**/*.json"]
+  "include": ["src/**/*.ts", "data/**/*.json"],
+  "exclude": ["src/ui", "node_modules", "dist"]
 }

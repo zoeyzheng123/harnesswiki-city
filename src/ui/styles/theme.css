@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────────────────
+   HarnessWiki City — control-room design tokens.
+   Canonical values mirror DESIGN.md. Authored in OKLCH on a dark
+   environmental base: the surface recedes so the signal lights carry the mood.
+   ────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Type — three families on a contrast axis (grotesk / sans / mono) */
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+
+  /* Surfaces & text */
+  --color-bg: oklch(0.13 0.018 250);
+  --color-surface-0: oklch(0.16 0.02 250);
+  --color-surface-1: oklch(0.205 0.022 250);
+  --color-surface-2: oklch(0.25 0.024 250);
+  --color-line: oklch(0.3 0.02 250);
+  --color-ink: oklch(0.96 0.008 240);
+  --color-muted: oklch(0.72 0.015 240);
+  --color-faint: oklch(0.61 0.015 245);
+
+  /* Brand signals */
+  --color-primary: oklch(0.64 0.15 242);
+  --color-primary-bright: oklch(0.72 0.16 244);
+  --color-accent: oklch(0.82 0.13 200);
+
+  /* District hues — the city's four agents, siblings at matched lightness */
+  --color-scout: oklch(0.8 0.13 195);
+  --color-generator: oklch(0.7 0.15 285);
+  --color-critic: oklch(0.8 0.14 85);
+  --color-meta: oklch(0.72 0.17 330);
+
+  /* Semantics — never hue-only; always paired with a sign or direction */
+  --color-positive: oklch(0.8 0.17 150);
+  --color-negative: oklch(0.68 0.16 25);
+  --color-flag: oklch(0.74 0.19 38);
+
+  /* Easing — ease-out only, no bounce */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+}
+
+/* Motion durations + named glows. Plain custom props (driven from CSS and
+   mirrored in styles/motion.ts for the Motion library). The reduced-motion
+   block below collapses the durations to near-instant. */
+:root {
+  --duration-fast: 180ms;
+  --duration-settle: 460ms;
+  --duration-climb: 640ms;
+  --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --glow-primary: 0 0 0 1px oklch(0.64 0.15 242 / 0.35), 0 0 28px -6px oklch(0.64 0.15 242 / 0.55);
+  --glow-soft: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 14px 40px -24px oklch(0 0 0 / 0.8);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  background-color: var(--color-bg);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv05" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* A faint signal-grid wash so the dark room reads as an instrument panel,
+   not a flat void. Sits behind all content, never animates. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 78% -8%, oklch(0.64 0.15 242 / 0.1), transparent 70%),
+    radial-gradient(700px 460px at 6% 4%, oklch(0.82 0.13 200 / 0.06), transparent 68%),
+    linear-gradient(oklch(0.3 0.02 250 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.3 0.02 250 / 0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: oklch(0.64 0.15 242 / 0.4);
+  color: var(--color-ink);
+}
+
+/* Dark, unobtrusive scrollbars for the instrument feel */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-2) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* ── Reduced motion: collapse durations and kill keyframed motion ──────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 1ms;
+    --duration-settle: 1ms;
+    --duration-climb: 1ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
