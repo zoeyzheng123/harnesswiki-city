@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import type { CurvePoint } from "../lib/selectors";
 import { dec, pct } from "../lib/format";
 import { CountUp, MetricLabel } from "./primitives";
@@ -45,6 +45,7 @@ export function HeroCurve({
   total: number;
 }) {
   const gid = useId().replace(/:/g, "");
+  const reduce = useReducedMotion();
   const shown = points.slice(0, revealed);
   const latest = shown[shown.length - 1];
 
@@ -89,17 +90,37 @@ export function HeroCurve({
           </div>
           <div className="flex flex-col gap-1.5">
             <span className="flex items-center gap-2 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
-              <span className="h-0.5 w-4 rounded-full bg-primary-bright" /> win prob
+              <svg width="18" height="6" aria-hidden="true">
+                <line x1="0" y1="3" x2="18" y2="3" stroke="var(--color-primary-bright)" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              win prob
             </span>
             <span className="flex items-center gap-2 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
-              <span className="h-0.5 w-4 rounded-full bg-accent" /> weighted total
+              <svg width="18" height="6" aria-hidden="true">
+                <line x1="0" y1="3" x2="18" y2="3" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 3" />
+              </svg>
+              weighted total
             </span>
           </div>
         </div>
       </div>
 
       {/* Chart */}
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full" style={{ height: "auto" }} role="img" aria-label={`Score curve across ${total} generations. Win probability now ${pct(winLatest)}.`}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="mt-4 w-full"
+        style={{ height: "auto" }}
+        role="img"
+        aria-label={
+          `Score curve across ${total} generations. ` +
+          (latest
+            ? `Generation ${latest.generation_number}: win probability ${pct(latest.predicted_win_prob)} (solid line), weighted total ${dec(latest.weighted_total)} (dashed line), versus a 0.50 baseline.`
+            : "Awaiting the first generation.") +
+          (shown.some((p) => p.policy_flag)
+            ? " One generation was policy-flagged and its harness change was refused."
+            : "")
+        }
+      >
         <defs>
           <linearGradient id={`area-${gid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.28" />
@@ -161,19 +182,18 @@ export function HeroCurve({
         {/* area under win-prob */}
         {winCoords.length > 0 && <path d={areaPath(winCoords)} fill={`url(#area-${gid})`} />}
 
-        {/* weighted_total line (accent) */}
+        {/* weighted_total line (accent, dashed — distinct from win-prob by line style,
+            not hue alone, so the two series read apart for colorblind viewers) */}
         {wtCoords.length > 0 && (
-          <motion.path
+          <path
             d={linePath(wtCoords)}
             fill="none"
             stroke="var(--color-accent)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeOpacity={0.85}
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: DURATION.climb, ease: EASE_OUT_EXPO }}
+            strokeDasharray="7 5"
+            strokeOpacity={0.9}
           />
         )}
 
@@ -186,7 +206,7 @@ export function HeroCurve({
             strokeWidth={2.5}
             strokeLinecap="round"
             strokeLinejoin="round"
-            initial={{ pathLength: 0 }}
+            initial={reduce ? false : { pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ duration: DURATION.climb, ease: EASE_OUT_EXPO }}
             style={{ filter: "drop-shadow(0 0 6px oklch(0.64 0.15 242 / 0.55))" }}
@@ -225,8 +245,8 @@ export function HeroCurve({
               cx={c.x}
               cy={c.y}
               r={isLatest ? 4.5 : 3}
-              fill="var(--color-accent)"
-              stroke="var(--color-bg)"
+              fill="var(--color-bg)"
+              stroke="var(--color-accent)"
               strokeWidth={2}
               initial={isLatest ? { scale: 0 } : false}
               animate={{ scale: 1 }}
@@ -234,6 +254,30 @@ export function HeroCurve({
             />
           );
         })}
+        {/* direct end-labels: name each series at its leading point so the
+            encoding never depends on matching colors to the corner legend */}
+        {latest && (
+          <>
+            <text
+              x={wt(latest).x - 9}
+              y={wt(latest).y - 9}
+              textAnchor="end"
+              className="fill-accent font-mono"
+              style={{ fontSize: 11, fontWeight: 600, paintOrder: "stroke", stroke: "var(--color-bg)", strokeWidth: 3 }}
+            >
+              wt {dec(latest.weighted_total)}
+            </text>
+            <text
+              x={win(latest).x - 9}
+              y={win(latest).y + 16}
+              textAnchor="end"
+              className="fill-primary-bright font-mono"
+              style={{ fontSize: 11, fontWeight: 600, paintOrder: "stroke", stroke: "var(--color-bg)", strokeWidth: 3 }}
+            >
+              win {pct(latest.predicted_win_prob)}
+            </text>
+          </>
+        )}
       </svg>
     </div>
   );

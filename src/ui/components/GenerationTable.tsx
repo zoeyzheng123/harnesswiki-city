@@ -24,6 +24,7 @@ function Row({
         type="button"
         onClick={() => onSelect(record)}
         aria-pressed={selected}
+        aria-label={`Generation ${record.generation_number}, "${truncate(record.concept.hook, 48)}". ${elementLabel(record.concept.format)}, weighted total ${dec(record.score.weighted_total)}, win probability ${pct(record.score.predicted_win_prob ?? 0.5)}${flagged ? ", policy flagged" : ""}. Open details.`}
         className="grid w-full grid-cols-[2.25rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors sm:grid-cols-[2.25rem_1fr_7rem_3.5rem_3.5rem]"
         style={{
           borderColor: selected ? "var(--color-primary)" : "var(--color-line)",

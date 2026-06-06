@@ -11,6 +11,7 @@ import {
   stateAtGeneration,
 } from "./lib/selectors";
 import { useDemoLoop } from "./lib/useDemoLoop";
+import { dec, pct } from "./lib/format";
 import { staggerContainer } from "./styles/motion";
 import { DistrictsHeader } from "./components/DistrictsHeader";
 import { HeroCurve } from "./components/HeroCurve";
@@ -74,8 +75,20 @@ export function App() {
     .slice(0, step)
     .filter((r) => r.harness_diff && !r.harness_diff.accepted).length;
 
+  // Announced to assistive tech on each generation (the visual update is silent otherwise).
+  const liveMessage = currentRecord
+    ? `Generation ${currentRecord.generation_number} of ${total}. ` +
+      `Weighted total ${dec(currentRecord.score.weighted_total)}, win probability ${pct(currentRecord.score.predicted_win_prob ?? 0.5)}. ` +
+      (currentRecord.score.policy_flag
+        ? "Policy flag raised; the proposed harness change was refused."
+        : `Harness updated to ${state.version}.`)
+    : "Idle. Run the loop to generate the first concept.";
+
   return (
     <div className="min-h-dvh">
+      <div role="status" aria-live="polite" className="sr-only">
+        {liveMessage}
+      </div>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Top bar */}
         <header className="flex flex-wrap items-end justify-between gap-4">
@@ -90,6 +103,7 @@ export function App() {
           <DemoLoopControls loop={loop} version={state.version} />
         </header>
 
+        <main>
         {/* Districts */}
         <div className="mt-5">
           <DistrictsHeader record={currentRecord} trend={currentTrend} />
@@ -131,6 +145,7 @@ export function App() {
           />
           <LessonsPanel lessons={lessons} />
         </motion.div>
+        </main>
 
         <footer className="mt-8 border-t border-line/60 pt-4 font-mono text-xs text-faint">
           Every generation, reward score, and harness rewrite is traced in W&amp;B Weave.
