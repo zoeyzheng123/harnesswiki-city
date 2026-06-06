@@ -10,10 +10,21 @@
   },
   "script_prompt": "Write a 30-second short-form video script for a founder-facing AI audience. Open with a scroll-stopping hook, deliver one sharp insight, and close with a memorable takeaway. Avoid generic listicles and hype.",
   "seedance_prompt_template": "A clean, modern talking-head explainer for {{audience}}. Visual style: minimal, high-contrast, on-screen captions. Scene reflects: {{angle}}.",
-  "judge_rubric": "Score hook_strength, trend_fit, brand_fit, novelty, and clarity (higher is better), plus cringe_risk and policy_risk (higher is worse) and visual_feasibility. Penalize the risk dimensions in the weighted total. See docs/JUDGE_RUBRIC.md for the authoritative definition.",
+  "judge_rubric": "Score hook_strength, trend_fit, brand_fit, novelty, and clarity (higher is better), plus cringe_risk and policy_risk (higher is worse) and visual_feasibility. Penalize the risk dimensions in the weighted total. See docs/JUDGE_RUBRIC.md.",
   "policy_rules": [
     "No medical, legal, or financial advice presented as fact.",
     "Do not target or identify private individuals.",
     "No unverifiable claims about named companies."
-  ]
+  ],
+  "generation": 0,
+  "tools": [],
+  "element_taxonomy": [
+    "contrarian_hook",
+    "diagnostic_hook",
+    "founder_story",
+    "data_drop",
+    "generic_listicle"
+  ],
+  "few_shot_examples": [],
+  "rubric_version": "v1"
 }

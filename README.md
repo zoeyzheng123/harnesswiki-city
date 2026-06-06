@@ -19,24 +19,39 @@ that get better every generation.
 
 ## What's in this repo
 
-- **Shared data contracts** as real, type-checked TypeScript (`src/contracts/index.ts`) with validated stubs in `data/stubs/`.
+- **Canonical data contracts** as Pydantic (`harness/contracts.py`), mirrored in TypeScript (`src/contracts/index.ts`) for the dashboard, with stubs generated from the models.
+- **A control-room dashboard** (Vite + React) that renders the generation arc: score curve, element-weight shift, generation history, and living memory.
 - **The full harness design** as docs that double as coordination state for humans and coding agents (see `docs/`).
 
 ## The build (tracked in `docs/STATUS.md`)
 
-- Multi-agent generation loop
+- Multi-agent generation loop (Python)
 - Reward critic
 - Living-memory rows + harness mutation
 - Weave tracing
-- Dashboard: score curve, element weights, generation history
+- Dashboard wired to real `GenerationRecord[]`
 
 ## Quickstart
 
 ```bash
+# Contracts + stubs (Python backend)
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/dump_stubs.py     # generate + validate data/stubs/
+
+# Dashboard (TypeScript UI)
 pnpm install
-pnpm typecheck   # validates the shared contracts + stubs — works today
-pnpm dev         # placeholder until the loop + dashboard land (see docs/STATUS.md)
+pnpm dev:ui                                 # the control-room dashboard
+
+# Checks
+pnpm typecheck && pnpm typecheck:ui         # contracts mirror + UI
 ```
+
+## Stack
+
+Polyglot (DECISIONS.md D7): **Python** backend (Pydantic contracts + loop) and
+a **TypeScript** dashboard (Vite + React 19 + Tailwind v4 + Motion). Sponsors /
+tools: **W&B Weave** (tracing), **Tavily** (trends), **Seedance** (video),
+**Anthropic** (generation + critic).
 
 ## Docs
 
@@ -49,7 +64,7 @@ decision has exactly one owner file — see the ownership table in `AGENTS.md`.
 | `docs/ARCHITECTURE.md` | `docs/DATA_CONTRACTS.md` |
 | `docs/DEMO_SCRIPT.md` | `docs/HARNESS_LOOP.md` |
 | `docs/WEAVE_TRACING.md` | `docs/JUDGE_RUBRIC.md` |
-| | `docs/AGENT_ROLES.md` · `docs/HARNESS_MEMORY.md` · `docs/STATUS.md` |
+| `DESIGN.md` · `PRODUCT.md` (dashboard) | `docs/AGENT_ROLES.md` · `docs/HARNESS_MEMORY.md` · `docs/STATUS.md` |
 
 ## Sponsor Usage
 
@@ -58,9 +73,9 @@ and memory update. See `docs/WEAVE_TRACING.md`.
 
 ## Team
 
-| Eng | Area |
-|-----|------|
-| Eng 1 | Loop Core |
-| Eng 2 | Reward Critic |
-| Eng 3 | Content Pipeline |
-| Eng 4 | Frontend / Demo |
+| Eng | Area | Workstream |
+|-----|------|------------|
+| Eng 1 | Loop Core + Meta-agent | A |
+| Eng 2 | Reward Critic | B |
+| Eng 3 | Content Pipeline (scout · generator · renderer) | C |
+| Eng 4 | Frontend / Demo | D |

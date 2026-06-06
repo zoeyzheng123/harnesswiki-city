@@ -1,7 +1,7 @@
 [
   {
     "id": "tc_0001",
-    "captured_at": "2026-06-06T09:00:00.000Z",
+    "captured_at": "2026-06-06T09:00:00Z",
     "platform": "x",
     "audience": "ai-founders",
     "trend_summary": "Founders are pushing back on 'AI wrapper' criticism, arguing distribution and taste are the real moats.",
@@ -11,21 +11,37 @@
         "strength": 0.8,
         "note": "high engagement on threads challenging the consensus"
       },
-      { "label": "topic: moats vs wrappers", "strength": 0.7 },
-      { "label": "tone: confident, first-person", "strength": 0.6 }
+      {
+        "label": "topic: moats vs wrappers",
+        "strength": 0.7
+      },
+      {
+        "label": "tone: confident, first-person",
+        "strength": 0.6
+      }
     ],
-    "source": "stub"
+    "source": "stub",
+    "source_urls": [],
+    "raw_signals": {}
   },
   {
     "id": "tc_0002",
-    "captured_at": "2026-06-06T09:05:00.000Z",
+    "captured_at": "2026-06-06T09:05:00Z",
     "platform": "linkedin",
     "audience": "ai-founders",
     "trend_summary": "Diagnostic 'why your launch flopped' posts are outperforming celebratory launch announcements.",
     "signals": [
-      { "label": "format: diagnostic teardown", "strength": 0.75 },
-      { "label": "emotion: useful discomfort", "strength": 0.65 }
+      {
+        "label": "format: diagnostic teardown",
+        "strength": 0.75
+      },
+      {
+        "label": "emotion: useful discomfort",
+        "strength": 0.65
+      }
     ],
-    "source": "stub"
+    "source": "stub",
+    "source_urls": [],
+    "raw_signals": {}
   }
 ]

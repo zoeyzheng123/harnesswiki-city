@@ -1,0 +1,9 @@
+# HarnessWiki City — Python backend (canonical contracts + loop).
+# Install:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+pydantic>=2,<3
+
+# Planned (added when the real loop lands — see docs/STATUS.md):
+#   weave            # W&B Weave tracing (sponsor)
+#   tavily-python    # trend scouting
+#   anthropic        # content generator + reward critic

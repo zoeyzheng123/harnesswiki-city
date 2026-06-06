@@ -3,25 +3,25 @@
 Owner of *instrumentation*. Makes W&B Weave central and reliable — the demo
 should never depend on hunting through Weave live.
 
-Project name: `WEAVE_PROJECT` (default `harnesswiki-city`). Auth via
-`WANDB_API_KEY`. See `.env.example`.
+Init `weave.init(WEAVE_PROJECT)` (default `harnesswiki-city`); auth via
+`WANDB_API_KEY`. See `.env.example`. Each loop function is a `@weave.op()` in
+`harness/weave_trace.py` (wrappers) / the module that owns it.
 
 ## Required traced ops
 
-Every loop function is a Weave op. TypeScript function → Weave op name:
+Python function → Weave op (snake_case matches the function name):
 
-| Function (`src/...`) | Weave op |
-|----------------------|----------|
-| `runLoop` | `run_loop` |
-| `generateConcept` | `generate_concept` |
-| `scoreConcept` | `score_concept` |
-| `rewriteHarness` | `rewrite_harness` |
-| `applyHarnessDiff` | `apply_harness_diff` |
-| `recordGeneration` | `record_generation` |
-| `renderWinner` | `render_winner` *(optional / out of MVP — Seedance render)* |
-
-`trendScout` is not traced in the MVP because it reads a stub file; trace it if
-it becomes a live fetch.
+| Function (`harness/...`) | Weave op |
+|--------------------------|----------|
+| `run_loop` | `run_loop` |
+| `trend_scout` | `trend_scout` |
+| `generate_concept` | `generate_concept` |
+| `score_concept` | `score_concept` |
+| `update_weights` (inner loop) | `update_weights` |
+| `rewrite_harness` | `rewrite_harness` |
+| `apply_harness_diff` | `apply_harness_diff` |
+| `record_generation` | `record_generation` |
+| `render_concept` | `render_concept` *(optional / Seedance)* |
 
 ## Required logged fields
 
@@ -30,12 +30,14 @@ Across the loop, these must appear in the trace:
 - `generation_number`
 - `trend_context_id`
 - `concept_id`
-- `reward_score` (the `weighted_total`, plus the dimensions)
-- `element_weights_before`
-- `element_weights_after`
-- `harness_diff`
-- `judge_rationale`
-- `memory_lesson`
+- `weighted_total` (and `predicted_score`) + the `dimensions`
+- `predicted_win_prob` (≡ `pairwise_winprob`)
+- `element_weights` before and after (inner loop)
+- `harness_diff` (and `diff_summary`) + `parent_harness_id`
+- `judge_rationale` (≡ `rationale`) + `rubric_version`
+- `policy_flag`
+- `lesson`
+- `actual_engagement` (once a concept is posted)
 
 ## Demo trace links
 

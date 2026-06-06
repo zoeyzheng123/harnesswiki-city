@@ -2,7 +2,7 @@
   {
     "id": "gr_0001",
     "generation_number": 1,
-    "created_at": "2026-06-06T09:10:00.000Z",
+    "created_at": "2026-06-06T09:10:00Z",
     "trend_context_id": "tc_0001",
     "concept": {
       "id": "cc_0001",
@@ -14,8 +14,15 @@
       "angle": "Distribution and taste are the real moats, not the model.",
       "script": "Everyone says you're just a GPT wrapper. Cool - so was every SaaS a 'database wrapper.' The moat was never the model. It's taste, distribution, and the thousand product decisions nobody screenshots. Here's how to tell if yours is real...",
       "visual_prompt": "A clean, modern talking-head explainer for ai-founders. Visual style: minimal, high-contrast, on-screen captions. Scene reflects: distribution and taste as moats.",
-      "elements": ["contrarian_hook"],
-      "created_by": "content-generator"
+      "elements": [
+        "contrarian_hook"
+      ],
+      "created_by": "content-generator",
+      "element_weights": {
+        "contrarian_hook": 0.5
+      },
+      "storyboard": [],
+      "duration_sec": 30
     },
     "score": {
       "id": "rs_0001",
@@ -35,7 +42,11 @@
       "weighted_total": 0.71,
       "predicted_win_prob": 0.5,
       "policy_flag": false,
-      "judge_rationale": "Strong contrarian hook with clear trend fit and good clarity; novelty is moderate. Low cringe and policy risk. Baseline generation, so the win probability is anchored at 0.5."
+      "judge_rationale": "Strong contrarian hook with clear trend fit and good clarity; novelty is moderate. Low cringe and policy risk. Baseline generation, so the win probability is anchored at 0.5.",
+      "predicted_score": 0.71,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.6,
+      "scored_by": "stub-critic"
     },
     "harness_state_version_before": "v0",
     "harness_state_version_after": "v1",
@@ -43,7 +54,10 @@
       "id": "hd_0001",
       "from_version": "v0",
       "to_version": "v1",
-      "element_weight_changes": { "contrarian_hook": 0.1, "generic_listicle": -0.1 },
+      "element_weight_changes": {
+        "contrarian_hook": 0.1,
+        "generic_listicle": -0.1
+      },
       "script_prompt_change": "Add an explicit instruction to name the consensus view before subverting it.",
       "rationale": "The contrarian hook scored highest on hook_strength and trend_fit; reinforce it and suppress generic listicles.",
       "accepted": true
@@ -56,6 +70,10 @@
       "evidence": "Generation 1: contrarian_hook concept scored 0.82 hook_strength and 0.78 trend_fit, weighted_total 0.71.",
       "harness_change": "Increase contrarian_hook weight (+0.1) and decrease generic_listicle (-0.1); reinforce in script_prompt.",
       "expected_effect": "Later generations open with sharper, consensus-subverting hooks and avoid generic listicles, lifting the predicted win probability."
-    }
+    },
+    "harness_id": "hs_0001",
+    "predicted_score": 0.71,
+    "rubric_version": "v1",
+    "selected": true
   }
 ]

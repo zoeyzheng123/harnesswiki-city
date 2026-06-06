@@ -3,11 +3,18 @@
 Owner of *living-memory rules*. Keeps "living memory" from becoming a pile of
 vague notes.
 
-## Memory row
+## The wiki = generation records + harness lineage
 
-Each generation writes one **GenerationRecord** (see `docs/DATA_CONTRACTS.md`).
-That row is the memory. It carries the concept, the score, the harness diff that
-followed, and an optional distilled `Lesson`.
+Living memory is two things, both persisted as JSON:
+
+1. The **GenerationRecord** rows (the "wiki") — one per generation, each
+   embedding the concept, score, harness diff, and a distilled `Lesson`.
+2. The **harness lineage** — the chain of `HarnessState` versions linked by
+   `parent_harness_id`, each carrying a `diff_summary` of what the meta-agent
+   changed.
+
+The meta-agent reads these to rewrite the harness; the dashboard reads them to
+draw the curve, the weight shift, and the lessons panel.
 
 ## What counts as a lesson
 
@@ -19,13 +26,16 @@ A `Lesson` must include all five parts (enforced by the `Lesson` type):
 - **harness_change** — the change made to HarnessState (which weights/prompts).
 - **expected_effect** — what we expect to improve next.
 
-A note missing any of these is not a lesson; do not write it.
+A note missing any of these is not a lesson; do not write it. (The terse
+`diff_summary` on a `HarnessDiff`/`HarnessState` is a one-line companion, not a
+substitute for a `Lesson`.)
 
 ## Element weights live here, conceptually
 
 Lessons mutate `HarnessState.element_weights` (e.g. raise `contrarian_hook`,
-lower `generic_listicle`). These are *generation biases*, not rubric dimensions
-— see `docs/DATA_CONTRACTS.md` → "Two vocabularies".
+lower `generic_listicle`) over the `element_taxonomy` (the action space). These
+are *generation biases*, not rubric dimensions — see `docs/DATA_CONTRACTS.md` →
+"Three vocabularies".
 
 ## Example
 
