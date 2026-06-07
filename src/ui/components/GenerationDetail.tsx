@@ -6,6 +6,7 @@ import { Badge, MetricLabel } from "./primitives";
 import { ScoreDimensions } from "./ScoreDimensions";
 import { HarnessDiffView } from "./HarnessDiffView";
 import { LessonCard } from "./LessonCard";
+import { CriticLearning } from "./CriticLearning";
 import { VideoPlayer } from "./VideoPlayer";
 import { videoForRecord } from "../lib/videos";
 import { DURATION, EASE_OUT_EXPO } from "../styles/motion";
@@ -191,10 +192,16 @@ export function GenerationDetail({
                 <ScoreDimensions score={record.score} />
               </section>
 
+              {/* Critic learning signal */}
+              <section>
+                <SectionHeading index="03">Critic learning signal</SectionHeading>
+                <CriticLearning score={record.score} diff={record.harness_diff} />
+              </section>
+
               {/* Diff */}
               {record.harness_diff && (
                 <section>
-                  <SectionHeading index="03">Harness rewrite</SectionHeading>
+                  <SectionHeading index="04">Harness rewrite</SectionHeading>
                   <HarnessDiffView diff={record.harness_diff} />
                 </section>
               )}
@@ -202,7 +209,7 @@ export function GenerationDetail({
               {/* Lesson */}
               {record.lesson && (
                 <section>
-                  <SectionHeading index="04">Living-memory lesson</SectionHeading>
+                  <SectionHeading index="05">Living-memory lesson</SectionHeading>
                   <LessonCard lesson={record.lesson} />
                 </section>
               )}
