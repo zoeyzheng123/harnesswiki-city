@@ -15,19 +15,16 @@ tracing: `pip install weave` (now in `requirements.txt`) + log in.
 
 ## Required traced ops
 
-Python function → Weave op (snake_case matches the function name):
+The ops **actually traced today** (everything else below is the target interface, not yet a standalone op):
 
-| Function (`harness/...`) | Weave op |
-|--------------------------|----------|
-| `run_loop` | `run_loop` |
-| `trend_scout` | `trend_scout` |
-| `generate_concept` | `generate_concept` |
-| `score_concept` | `score_concept` |
-| `update_weights` (inner loop) | `update_weights` |
-| `rewrite_harness` | `rewrite_harness` |
-| `apply_harness_diff` | `apply_harness_diff` |
-| `record_generation` | `record_generation` |
-| `render_concept` | `render_concept` *(optional / Seedance)* |
+| Traced op | Where | Status |
+|-----------|-------|--------|
+| `run_generation_loop` | `loop_core/loop.py` | ✅ traced |
+| `traced_generate` (wraps the generator callable) | `loop_core/loop.py` | ✅ traced |
+| `traced_score` (wraps the critic callable) | `loop_core/loop.py` | ✅ traced |
+| `traced_meta` (wraps the meta-agent callable) | `loop_core/loop.py` | ✅ traced |
+| `score_concept` · `judge_concept` | `harness/critic.py` | ✅ traced |
+| `trend_scout` · `update_weights` · `rewrite_harness` · `apply_harness_diff` · `record_generation` · `render_concept` | — | ⬜ planned (not yet standalone ops) |
 
 ## Required logged fields
 
@@ -36,7 +33,7 @@ Across the loop, these must appear in the trace:
 - `generation_number`
 - `trend_context_id`
 - `concept_id`
-- `weighted_total` (and `predicted_score`) + the `dimensions`
+- `weighted_total` (and `predicted_score`)
 - `total_score` (0–100), `distribution_tier`, `category_breakdown`, `auto_fails_triggered` (ACOE)
 - `predicted_win_prob` (≡ `pairwise_winprob`)
 - `element_weights` before and after (inner loop)
@@ -44,7 +41,7 @@ Across the loop, these must appear in the trace:
 - `judge_rationale` (≡ `rationale`) + `rubric_version`
 - `policy_flag`
 - `lesson`
-- `actual_engagement` (once a concept is posted)
+- `outcome` (the typed posting result, once a concept is posted; `actual_engagement` deprecated, D17)
 
 ## Demo trace links
 

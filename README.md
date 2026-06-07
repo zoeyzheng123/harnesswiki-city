@@ -2,7 +2,7 @@
 
 HarnessWiki City is a self-improving content-ops harness for **AI YouTube Shorts
 dance videos**. It turns a trend into a dance-Short concept, scores it with a
-reward critic (ACOE-YT-SHORTS-v1.0), records every generation in Weave, and
+reward critic (ACOE-YT-SHORTS-v2.0), records every generation in Weave, and
 updates a living harness memory so future generations climb from Seed-Jail to
 Viral.
 
@@ -21,14 +21,14 @@ that get better every generation.
 ## What's in this repo
 
 - **Canonical data contracts** as Pydantic (`harness/contracts.py`), mirrored in TypeScript (`src/contracts/index.ts`) for the dashboard, with stubs generated from the models.
-- **The evaluation policy** — `data/policies/ACOE-YT-SHORTS-v1.0.json`: a 100-point rubric (6 weighted categories, viral/growing/seed-jail tiers, auto-fails) that the Reward Critic scores against.
+- **The evaluation policy** — `data/policies/ACOE-YT-SHORTS-v2.0.json` (v1.0 retained for history): a 100-point rubric (6 weighted categories, viral/growing/seed-jail tiers, auto-fails) that the Reward Critic scores against.
 - **A control-room dashboard** (Vite + React) that renders the generation arc; migrating to ACOE's 0–100 + tiers (see `docs/DASHBOARD_MIGRATION.md`).
 - **The full harness design** as docs that double as coordination state for humans and coding agents (see `docs/`).
 
 ## The build (tracked in `docs/STATUS.md`)
 
 - Multi-agent generation loop (Python)
-- Reward critic applying ACOE-YT-SHORTS-v1.0
+- Reward critic applying ACOE-YT-SHORTS-v2.0
 - Living-memory rows + harness mutation
 - Weave tracing
 - Dashboard migrated to ACOE scoring + wired to real `GenerationRecord[]`
@@ -68,7 +68,7 @@ decision has exactly one owner file — see the ownership table in `AGENTS.md`.
 | `docs/WEAVE_TRACING.md` | `docs/JUDGE_RUBRIC.md` (ACOE) |
 | `DESIGN.md` · `PRODUCT.md` (dashboard) | `docs/AGENT_ROLES.md` · `docs/HARNESS_MEMORY.md` · `docs/STATUS.md` · `docs/DECISIONS.md` · `docs/DASHBOARD_MIGRATION.md` |
 
-`docs/DECISIONS.md` is the ADR log (D1–D11) — read it to see why the stack,
+`docs/DECISIONS.md` is the ADR log (D1–D18) — read it to see why the stack,
 contracts, merge, and short-form pivot landed where they did.
 
 ## Sponsor Usage

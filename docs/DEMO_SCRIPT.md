@@ -19,12 +19,12 @@ Meta-Agent (see `docs/AGENT_ROLES.md`).
 
 Trend + a rising track in. A dance Short is generated — peak motion in frame 1,
 stark background, a seamless loop, comment bait on screen. The Reward Critic
-scores it with **ACOE-YT-SHORTS-v1.0**: total **76 → Growing**, with a full
+scores it with **ACOE-YT-SHORTS-v2.0**: total **76 → Growing**, with a full
 category breakdown. (One pass of `docs/HARNESS_LOOP.md`.)
 
 ## 1:30–2:10 — Improvement (the ceiling, then the climb)
 
-The breakdown shows the ceiling: `engagement_bait` at 11/20 — the comment-bait
+The breakdown shows the ceiling: `engagement_bait` at 5/10 — the comment-bait
 question was too easy to answer with an emoji. The meta-agent rewrites the harness
 (raise `comment_bait_question` + `polarizing_angle`, demand a typed-answer
 question). Next generation: `engagement_bait` jumps, the total crosses **85 →

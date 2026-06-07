@@ -10,7 +10,7 @@ generates AI **YouTube Shorts dance videos** and climbs from Seed-Jail to Viral.
 
 ## Core Claim
 
-Trend intelligence plus a concrete reward policy (ACOE-YT-SHORTS-v1.0) can improve
+Trend intelligence plus a concrete reward policy (ACOE-YT-SHORTS-v2.0) can improve
 the content *harness* over generations — updating prompts, element weights, and
 living memory so each generation scores higher and reaches a better distribution
 tier, not just producing one-off videos.
@@ -19,7 +19,7 @@ tier, not just producing one-off videos.
 
 1. Scout the trend + a rising track from the approved audio pool (Tavily).
 2. Generate a dance-Short ContentConcept (peak-motion hook, seamless loop, comment bait) from TrendContext + HarnessState.
-3. Score it with the Reward Critic against **ACOE-YT-SHORTS-v1.0** → `total_score` (0–100), `distribution_tier`, `category_breakdown`, auto-fails.
+3. Score it with the Reward Critic against **ACOE-YT-SHORTS-v2.0** → `total_score` (0–100), `distribution_tier`, `category_breakdown`, auto-fails.
 4. Inner loop: nudge element weights from the score (toward the lowest category).
 5. Store a GenerationRecord.
 6. Outer loop: the Meta-Agent rewrites HarnessState; auto-fails force a regenerate.

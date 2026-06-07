@@ -137,7 +137,8 @@ _Done, no action:_ ACOE v2 rubric, 23-criterion preflight, AF-01..05, the learni
 
 ## Eng 3 — Content Pipeline (`harness/generator.py`, `harness/scout.py`, `harness/seedance.py`)
 
-**Not started — and the #1 bottleneck.** The loop is stuck in seed_jail until these exist.
+**Partially done:** the scout is **landed**; the generator squad + renderer are pending. The
+**generator** is the #1 bottleneck — the loop stays in seed_jail until it exists.
 
 1. 🔴 **`harness/generators/` — the 4-agent squad** (L) — full spec:
    **`docs/INNER_LOOP_SPEC.md`**. Four specialized agents (`hook_architect` /
@@ -156,8 +157,8 @@ _Done, no action:_ ACOE v2 rubric, 23-criterion preflight, AF-01..05, the learni
    `pip install tavily-python` + `TAVILY_API_KEY`) + a **deterministic offline fallback**;
    audio is gated to the critic's approved pool (AF-04) and prefers rising (AA-03), reusing
    `harness.critic.PRIORITY_AUDIO_TITLES` as the source of truth. Tests: `tests/test_scout.py`
-   (offline). **Remaining:** wire `trend_source=make_scout()` into `loop_core/loop.py __main__`
-   (one line — that's Eng-3 #3 below).
+   (offline). **Not yet wired** — `loop_core/loop.py __main__` still defaults to
+   `stub_trend_source()`; wiring `trend_source=make_scout()` is Eng-3 #3 below (one line).
 
 3. 🔴 **Wire scout + generator into the loop** (S) — pass the real callables into
    `run_generation_loop` in `loop_core/loop.py __main__` (mirror how `make_acoe_critic()`

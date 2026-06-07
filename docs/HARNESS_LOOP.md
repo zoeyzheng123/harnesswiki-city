@@ -1,7 +1,10 @@
 # Harness Loop
 
 Owner of *runtime behavior*. If you want to know what the loop does, this file
-decides — not the code comments, not the README. Implemented in `harness/loop.py`.
+decides — not the code comments, not the README. Implemented in
+`loop_core/loop.py::run_generation_loop`; the `harness/` package provides the composable
+critic / scout / bridge passed into it (the `generate_concept` / `trend_scout` / etc. names
+below are the *conceptual* steps, not standalone top-level functions).
 
 ## Two loops
 

@@ -69,7 +69,7 @@ class RewardScore(BaseModel):
     weighted_total: float                          # scalar 0..1 — the stable target
     predicted_win_prob: float | None = None; policy_flag: bool = False; judge_rationale: str
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
-    # + ACOE (rubric ACOE-YT-SHORTS-v1.0): total_score (0–100), distribution_tier,
+    # + ACOE (rubric ACOE-YT-SHORTS-v2.0): total_score (0–100), distribution_tier,
     #   auto_fails_triggered, category_breakdown, lowest_scoring_category, recommended_fix_priority
     # + critic learning signal (PR #2): winning_elements, weak_elements,
     #   suggested_policy_updates, rubric_breakdown (full criterion-level detail)
@@ -137,8 +137,8 @@ shape.
 
 ## ACOE score outputs
 
-The rubric is **ACOE-YT-SHORTS-v1.0** (`data/policies/ACOE-YT-SHORTS-v1.0.json`),
-referenced by `HarnessState.rubric_version`. `RewardScore` carries its outputs
+The rubric is **ACOE-YT-SHORTS-v2.0** (`data/policies/ACOE-YT-SHORTS-v2.0.json`; v1.0
+retained for history), referenced by `HarnessState.rubric_version`. `RewardScore` carries its outputs
 additively: `total_score` (0–100), `distribution_tier` (viral/growing/seed_jail),
 `category_breakdown` (the 6 ACOE categories), `auto_fails_triggered`,
 `lowest_scoring_category`, `recommended_fix_priority`. `weighted_total`

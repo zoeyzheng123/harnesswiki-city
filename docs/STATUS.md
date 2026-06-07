@@ -19,7 +19,8 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 | Meta-agent v2 levers | `loop_core/meta_agent.py` | ✅ Done — 6 v2 candidates (you_hook_opening, curiosity_gap_payoff, conflict_phrasing, visual_cut_rhythm, rising_audio_early, polarizing_comment_bait); v2-biased `_SYS` prompt; meaningful `_V2_PROMPT_SNIPPETS` |
 | HarnessState + meta-agent (canonical) | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
 | Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2; v2 rubric) — applies ACOE-YT-SHORTS-v2.0 → total_score/tier/category_breakdown + learning signal; emits `score_type`/`evidence_coverage` (D17); offline preflight + optional LLM judge |
-| Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
+| Trend scout | `harness/scout.py` · `tests/test_scout.py` | ✅ Done — Tavily live path + deterministic offline fallback; audio pool-gated (AF-04) + rising (AA-03). **Not yet wired** into the loop (`stub_trend_source` is still the default) — Eng-3 wiring below. |
+| Content generator + renderer | `harness/generator.py` (the 4-agent squad — `docs/INNER_LOOP_SPEC.md`), `harness/seedance.py` | ⬜ Not started — the **#1 demo bottleneck** (loop plateaus in seed_jail) |
 | Weave tracing | `harness/weave_trace.py` · `loop_core/loop.py` | ✅ Done — `op` + idempotent `init_weave()`, offline-safe; the loop (generate/score/meta) + critic (`score_concept`/`judge_concept`) trace. Enable: `pip install weave` + `wandb login` (`WEAVE_PROJECT`, default `sia-social-loop`). |
 | Dashboard | `src/ui/` | ✅ Done — ACOE v2 control room (0–100, tiers, 6 categories, auto-fail badges, critic-learning panel); data seam reads `VITE_GENERATIONS_URL` with synthetic fallback (DECISIONS D15). Stage-1 UI panels (outcome / candidates batch / provenance badges) pending Eng-1 producers. |
 
@@ -29,8 +30,8 @@ The loop runs end-to-end (real ACOE critic → `data/generations.latest.json`) b
 **plateaus in seed_jail** because the stub generator emits 8s / no-on-screen-text
 concepts (AF-02/AF-03). Per-engineer TO-DOs are in **`docs/TODO.md`**; the critical path:
 
-1. **`harness/generator.py`** (Eng 3) — a real dance-Short `ContentConcept` that escapes the auto-fails and scores ≥ growing. **This is the bottleneck** — without it the loop can't climb.
-2. **`harness/scout.py`** (Eng 3) — live `TrendContext` + a rising approved-pool track (Tavily).
+1. **`harness/generator.py`** (Eng 3) — the 4-agent squad (`docs/INNER_LOOP_SPEC.md`): real dance-Short `ContentConcept`s that escape the auto-fails and score ≥ growing. **This is the bottleneck** — without it the loop can't climb.
+2. **Wire `make_scout()` into the loop** (Eng 3) — `harness/scout.py` is landed; pass it as `trend_source=` in `loop_core/loop.py __main__` (one line, mirrors `make_acoe_critic()`).
 3. **Candidate-batch capture** (Eng 1) — ~5-line `on_generation` extension → `GenerationRecord.candidates` (the contrastive signal).
 4. **Wire `VITE_GENERATIONS_URL`** (Eng 4) — point the dashboard at the real bridge output (1-line; today it falls back to synthetic).
 5. **Stage 2 (ground truth):** outcome ingestion (render→post→metrics → `Outcome`, Eng 1/3) + real-data calibration & the LLM judge (Eng 2).

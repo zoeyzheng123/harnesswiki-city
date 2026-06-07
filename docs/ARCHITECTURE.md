@@ -2,7 +2,7 @@
 
 How the pieces connect. Kept deliberately simple. Polyglot: Python backend, TS
 dashboard (DECISIONS.md D7). Vertical: AI YouTube Shorts dance videos scored by
-ACOE-YT-SHORTS-v1.0.
+ACOE-YT-SHORTS-v2.0.
 
 ## Components
 
@@ -19,7 +19,7 @@ ACOE-YT-SHORTS-v1.0.
 
 - Harness loop (`run_loop`) — inner-loop weights + outer-loop rewrite
 - Trend scout (Tavily + approved audio pool), dance-Short generator
-- Reward critic — applies `data/policies/ACOE-YT-SHORTS-v1.0.json`
+- Reward critic — applies `data/policies/ACOE-YT-SHORTS-v2.0.json`
 - Meta-agent (harness rewriter)
 - Weave tracing
 
@@ -41,7 +41,7 @@ flowchart LR
   HarnessState --> Generator
   Generator --> ContentConcept
   ContentConcept --> RewardCritic
-  ACOE[ACOE-YT-SHORTS-v1.0] --> RewardCritic
+  ACOE[ACOE-YT-SHORTS-v2.0] --> RewardCritic
   RewardCritic --> RewardScore
   RewardScore --> LoopCore
   LoopCore -->|inner loop: lift lowest category| Generator

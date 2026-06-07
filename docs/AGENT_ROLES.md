@@ -20,6 +20,8 @@ A **parallel squad of 4 specialized agents** (not one generator) — each emits 
 auto-fail-safe dance-Short `ContentConcept` specialized to a v2 lever: `hook_architect`,
 `retention_engineer`, `audio_anchor`, `visual_stylist`. Full spec: **`docs/INNER_LOOP_SPEC.md`**.
 
+> **STATUS: specced, not built** — the loop still runs a single `stub_generator`; no `harness/generators/` package exists yet (Eng 3).
+
 - **Inputs:** `TrendContext`, `HarnessState` (`script_prompt`, `element_weights`); each runs `generator(trend, harness, policy) -> ContentConcept`.
 - **Outputs:** 4 `ContentConcept`s per generation (tagged `created_by`), scored by the critic → winner + the contrastive batch.
 - **Allowed tools:** OpenAI (`OPENAI_API_KEY`, `OPENAI_MODEL`) + a deterministic template fallback when no key.

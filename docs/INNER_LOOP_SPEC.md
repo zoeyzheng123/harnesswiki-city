@@ -6,6 +6,10 @@ loop in seed_jail) with **four specialized generator agents** that each produce 
 auto-fail-safe dance-Short `ContentConcept`. Owners: **Eng 3** (the generators), **Eng 1**
 (loop wiring + `strategy_weights`). Scored by the existing **ACOE-YT-SHORTS-v2.0** critic.
 
+> **STATUS: specced, not built.** The loop still runs a single `stub_generator` (seed_jail);
+> there is no `harness/generators/` package, and `HarnessState.strategy_weights` does not
+> exist yet. This is the design Eng 3 (generators) + Eng 1 (wiring + `strategy_weights`) build from.
+
 ## 1. Decisions
 
 | Decision | Choice |

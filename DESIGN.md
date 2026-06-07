@@ -120,8 +120,8 @@ mono labels (≤ 4 words) may use tracked small caps for the telemetry register.
   hook, critic signal, rewrite state, and delta. Opens the detail drawer.
 - **Video evidence** — baseline/current/best generated clips are promoted as the
   human proof layer, with score delta and tier movement between them.
-- **Detail drawer** — right-side panel: concept, the eight dimensions (risk dims
-  as penalties), the diff with an ACCEPTED / REJECTED badge, the five-part lesson.
+- **Detail drawer** — right-side panel: concept, the six ACOE v2 categories
+  (`category_breakdown`), the diff with an ACCEPTED / REJECTED badge, the five-part lesson.
 - **Lesson card** — five labeled fields (observation, rule, evidence, change,
   expected effect), the change field tinted `--positive`.
 - **Stat** — a mono count-up number with a small label; the atomic readout.
