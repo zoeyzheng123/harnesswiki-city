@@ -60,6 +60,13 @@ Loop, meta-agent, inner-loop policy, and bridge are **landed and working**. Rema
    candidate-capture). Keep 0–100 for the dashboard. The offline prototype + benchmark are
    in `scripts/calibrate.py` (`fit_bradley_terry`).
 
+6. 🔴 **Parallel generator squad + `strategy_weights`** (M) — per `docs/INNER_LOOP_SPEC.md`:
+   make `run_generation_loop` accept `generators: list[Callable]` (run all 4 per generation
+   → score each → winner = max `total_score` → pass the strategy-tagged batch to
+   `on_generation`), and add `HarnessState.strategy_weights` (4 arms, additive) with a
+   strategy-level update. *Why:* turns the inner loop into the parallel multi-agent search
+   the architecture describes; pairs with #1 (candidate capture) and #5 (preference reward).
+
 _Done, no action:_ inner-loop RL fixes (eta 0.4, moving-mean baseline, auto-fail shield,
 `suggested_policy_updates` consumption), the bridge + `make_acoe_critic`, wiki persistence.
 
@@ -110,18 +117,17 @@ _Done, no action:_ ACOE v2 rubric, 23-criterion preflight, AF-01..05, the learni
 
 **Not started — and the #1 bottleneck.** The loop is stuck in seed_jail until these exist.
 
-1. 🔴 **`harness/generator.py`** (L) — `generator(trend, harness, policy) -> ContentConcept`.
-   Read `HarnessState.element_taxonomy` + the `policy` weights and produce a dance-Short
-   concept that **escapes every auto-fail and scores ≥ growing**:
-   - 13–15s `duration_sec` (AF-03), peak-motion frame 1 (AF-01);
-   - `on_screen_text` in the first 2s, second-person "You/Your" (AF-02 / HQ-03 / HQ-05);
-   - `audio` from the **approved pool**, `is_rising_sound=True` (AF-04 / AA-01 / AA-03);
-   - seamless loop + delayed payoff (~0:13) + conflict phrasing (RL-02 / RL-04 / RL-05);
-   - `cut_frequency` ≥ ~0.4 (VP-04), a `comment_bait_question` (EB-01);
-   - `execution` (hashtags + posting_time), `elements` + the `element_weights` snapshot.
-   *Why:* the stub scores **0.06 (seed_jail)**; this is the single change that lets the
-   loop climb. Exemplar shape: `data/stubs/generation-records.sample.json`. Verify with
-   `harness.critic.score_concept`.
+1. 🔴 **`harness/generators/` — the 4-agent squad** (L) — full spec:
+   **`docs/INNER_LOOP_SPEC.md`**. Four specialized agents (`hook_architect` /
+   `retention_engineer` / `audio_anchor` / `visual_stylist`), each
+   `generator(trend, harness, policy) -> ContentConcept` via OpenAI (`OPENAI_API_KEY`,
+   default `OPENAI_MODEL=gpt-5.4-mini`) + a deterministic template fallback. Every concept
+   must **escape all auto-fails and score ≥ growing**: 13–15s (AF-03), peak-motion frame 1
+   (AF-01), `on_screen_text` first-2s + second-person (AF-02 / HQ-05), approved rising
+   `audio` (AF-04 / AA-01 / AA-03), delayed payoff + conflict phrasing (RL-04 / RL-05),
+   `cut_frequency ≥ ~0.4` (VP-04), `comment_bait_question` (EB-01), `execution` hashtags;
+   tag `created_by=<agent>`. *Why:* the stub scores 0.06 (seed_jail); the squad is the
+   single change that lets the loop climb. Verify with `harness.critic.score_concept`.
 
 2. 🔴 **`harness/scout.py`** (M) — `trend_source() -> TrendContext` via Tavily (fallback
    to a curated file if no key). MUST select `audio` from the approved pool (AF-04) and

@@ -8,25 +8,27 @@ with the dashboard districts (`scout` / `generator` / `critic` / `meta`).
 
 Produces TrendContext.
 
-- **Inputs:** trending dances + the approved trending-audio pool (`data/policies/ACOE-YT-SHORTS-v1.0.json` → `audio_alignment`); stub data today, Tavily later.
+- **Inputs:** trending dances + the approved trending-audio pool (`data/policies/ACOE-YT-SHORTS-v2.0.json` → `audio_alignment`); stub data today, Tavily later.
 - **Outputs:** `TrendContext` (with a rising track in `audio`).
 - **Allowed tools:** Tavily search; file read (MVP).
 - **Failure modes:** stale trend; picks a non-pool or controversy-adjacent track (AF-04 / `avoid` list).
 - **Owner:** Eng 3 (C — Content Pipeline)
 
-## Content Generator
+## Content Generators (the squad)
 
-Produces a dance-Short ContentConcept from TrendContext + HarnessState (snapshotting the inner-loop weights).
+A **parallel squad of 4 specialized agents** (not one generator) — each emits a complete,
+auto-fail-safe dance-Short `ContentConcept` specialized to a v2 lever: `hook_architect`,
+`retention_engineer`, `audio_anchor`, `visual_stylist`. Full spec: **`docs/INNER_LOOP_SPEC.md`**.
 
-- **Inputs:** `TrendContext`, `HarnessState` (`script_prompt`, `element_weights`, `seedance_prompt_template`)
-- **Outputs:** `ContentConcept` (dance_style, audio, on-screen comment bait, hashtag set, seamless-loop framing)
-- **Allowed tools:** Anthropic; the seedance prompt builder.
-- **Failure modes:** static frame 1 (AF-01); missing on-screen text (AF-02); off-pool audio (AF-04); generic question.
+- **Inputs:** `TrendContext`, `HarnessState` (`script_prompt`, `element_weights`); each runs `generator(trend, harness, policy) -> ContentConcept`.
+- **Outputs:** 4 `ContentConcept`s per generation (tagged `created_by`), scored by the critic → winner + the contrastive batch.
+- **Allowed tools:** OpenAI (`OPENAI_API_KEY`, `OPENAI_MODEL`) + a deterministic template fallback when no key.
+- **Failure modes:** static frame 1 (AF-01); missing on-screen text (AF-02); off-pool audio (AF-04); a concept that's complete but not specialized.
 - **Owner:** Eng 3 (C)
 
 ## Reward Critic
 
-Produces RewardScore by applying **ACOE-YT-SHORTS-v1.0**. **Owns the rubric** (referenced elsewhere only by `rubric_version`).
+Produces RewardScore by applying **ACOE-YT-SHORTS-v2.0**. **Owns the rubric** (referenced elsewhere only by `rubric_version`).
 
 - **Inputs:** `ContentConcept`, the policy (`docs/JUDGE_RUBRIC.md` / the JSON)
 - **Outputs:** `RewardScore` (`total_score`, `distribution_tier`, `category_breakdown`, `auto_fails_triggered`, `lowest_scoring_category`, `recommended_fix_priority`)

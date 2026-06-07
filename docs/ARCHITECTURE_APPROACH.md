@@ -2,6 +2,8 @@
 
 This document outlines the architectural philosophy and execution strategy for the Harness Loop. It resolves the limitations of single-agent self-reflection by combining parallel creative search with sequential meta-learning.
 
+> **Status / scope:** this is the *philosophy* (the why). The **concrete, buildable spec** for the parallel inner loop — the 4 v2-derived generator agents, their interfaces, the OpenAI engine, and the policy — is **`docs/INNER_LOOP_SPEC.md`**. The live rubric is **ACOE-YT-SHORTS-v2.0**; this doc predates v2, so the strategy table in §3 is the original v1-era framing (the v2-derived set lives in the spec). Today the loop runs a single stub generator (seed_jail); the squad replaces it.
+
 ## 1. The Core Philosophy: Why Multi-Agent?
 
 A single, self-improving agent is sufficient for narrow tasks and linear optimization. However, generating viral short-form content is a **probabilistic search problem under uncertainty**. 
@@ -65,11 +67,13 @@ Instead of asking one agent to write "a good script," we instantiate four specia
 
 These agents independently consume the `TrendContext` and generate a `ContentConcept`.
 
+> The **v2-derived** strategy set actually built — Hook Architect / Retention Engineer / Audio-Anchor / Visual Stylist, aligned to where ACOE v2 points — is specified in **`docs/INNER_LOOP_SPEC.md`**. The table above is the original v1-era framing.
+
 ---
 
 ## 4. The Evaluation Pipeline: The Critic
 
-The evaluation pipeline applies the **ACOE-YT-SHORTS-v1.0** policy. It is a two-stage process that removes subjectivity.
+The evaluation pipeline applies the **ACOE-YT-SHORTS-v2.0** policy. It is a two-stage process that removes subjectivity.
 
 ### Stage 1: Brand / Policy Critic (The Bouncer)
 This stage evaluates the four candidates strictly against the ACOE **Auto-Fail Conditions**.
