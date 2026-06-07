@@ -29,10 +29,17 @@ Produces ContentConcept from TrendContext + HarnessState (and the inner-loop wei
 
 Produces RewardScore. **Owns the rubric** (referenced elsewhere only by `rubric_version`) — generation is kept separate from evaluation.
 
-- **Inputs:** `ContentConcept`, the rubric (`docs/JUDGE_RUBRIC.md`, `rubric_version`)
-- **Outputs:** `RewardScore` (`dimensions`, `weighted_total`, `predicted_win_prob`/`pairwise_winprob`, `confidence`)
+- **Inputs:** `ContentConcept`, the rubric (`docs/JUDGE_RUBRIC.md`,
+  `rubric_version`), optional `TrendContext` / `HarnessState`, and prompt,
+  rendered-video, or publishing evidence.
+- **Outputs:** `RewardScore` (`dimensions`, `weighted_total`,
+  `predicted_win_prob`/`pairwise_winprob`, `confidence`) plus optional
+  element-level learning signals (`winning_elements`, `weak_elements`,
+  `suggested_policy_updates`).
 - **Allowed tools:** Anthropic as judge.
-- **Failure modes:** inconsistent scoring; rewards cringe; misses policy risk.
+- **Failure modes:** inconsistent scoring; invents missing video evidence;
+  rewards verbosity or engagement manipulation; misses policy risk; updates
+  weights from prompt predictions rather than rendered outcomes.
 - **Owner:** Eng 2 (B — Reward Critic)
 
 ## Loop Core (inner loop)

@@ -3,6 +3,21 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Dance reward critic
+
+### D11. ACOE is rubric v2 and maps into the existing eight dimensions
+
+The first dance-video judge is implemented in `harness/critic.py` using the
+ACOE-YT-SHORTS-v1.0 policy. Its criterion/category breakdown remains available
+in `RewardScore.rubric_breakdown`, but it maps to the existing eight
+`RewardDimensions` so the dashboard contract does not expand.
+
+Element-level learning is additive and optional:
+`winning_elements`, `weak_elements`, and `suggested_policy_updates`. The Critic
+proposes bounded deltas; the Loop Core remains responsible for applying them.
+Prompt preflight may project quality but cannot mutate policy. Only rendered
+evidence with sufficient confidence can unlock policy updates.
+
 ## 2026-06-06 — Short-form-video contract fields
 
 ### D10. Eng 1's short-form-video features land on ContentConcept + the rubric

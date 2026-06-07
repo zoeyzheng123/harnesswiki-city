@@ -14,7 +14,7 @@ _Last updated: 2026-06-06._
 | Documentation pack | `README.md`, `AGENTS.md`, `docs/*` | ✅ Done — reconciled to the merged contracts |
 | Harness loop | `harness/loop.py` | ⬜ Not started |
 | HarnessState + meta-agent | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
-| Reward critic | `harness/critic.py` | ⬜ Not started |
+| Reward critic | `harness/critic.py`, `tests/test_critic.py` | ✅ Done — ACOE dance rubric, deterministic preflight, injected structured-output LLM path, canonical RewardScore mapping |
 | Content generator | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
 | Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
 | Dashboard | `src/ui/` | 🟦 In progress — control-room UI built (score curve, weight shift, generation table + detail, living memory). Runs on synthetic data; binds real `GenerationRecord[]` via the `src/ui/lib/data.ts` seam. |
@@ -24,7 +24,7 @@ _Last updated: 2026-06-06._
 1. `harness/weave_trace.py` — `weave.init` + `@weave.op` wrappers.
 2. `harness/scout.py` — TrendContext (Tavily).
 3. `harness/generator.py` — ContentConcept from TrendContext + HarnessState.
-4. `harness/critic.py` — RewardScore on the rubric.
+4. Connect an Anthropic adapter to the implemented `harness/critic.py` judge callable.
 5. `harness/{state,meta,loop}.py` — wire the loop (inner-loop weights + outer-loop rewrite).
 6. Point `src/ui/lib/data.ts` at the loop's `generation-records` JSON output.
 

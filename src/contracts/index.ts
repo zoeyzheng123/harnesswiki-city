@@ -107,6 +107,11 @@ export type RewardScore = {
   scored_by?: string;
   rationale?: string; // ≡ judge_rationale
   scored_at?: string;
+  // optional critic learning signal, consumed by the inner loop
+  winning_elements?: string[];
+  weak_elements?: string[];
+  suggested_policy_updates?: Record<string, number>;
+  rubric_breakdown?: Record<string, unknown>;
 };
 
 export type HarnessState = {

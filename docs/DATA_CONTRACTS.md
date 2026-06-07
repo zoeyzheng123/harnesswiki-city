@@ -71,6 +71,8 @@ class RewardScore(BaseModel):
     dimensions: RewardDimensions; weighted_total: float
     predicted_win_prob: float | None = None; policy_flag: bool = False; judge_rationale: str
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
+    # + critic learning: winning_elements, weak_elements,
+    #                    suggested_policy_updates, rubric_breakdown
 
 class HarnessState(BaseModel):
     id: str; version: str; element_weights: dict; script_prompt: str
@@ -108,6 +110,17 @@ field on one model:
 | audio (BPM, recency, is-rising-sound) | `ContentConcept.audio` (`Audio`); a trend's sound is `TrendContext.audio` + `signals` |
 | hook strength in first 1–3s; trend-alignment | the rubric — `RewardDimensions.hook_strength` / `trend_fit` (see `docs/JUDGE_RUBRIC.md`) |
 | posting result (engagement, url) | `GenerationRecord.actual_engagement` / `post_url` |
+
+The Critic may also return element-level learning signals on `RewardScore`:
+
+- `winning_elements` — sampled generation elements supported by the evidence.
+- `weak_elements` — sampled elements associated with a likely or observed failure.
+- `suggested_policy_updates` — bounded deltas for the inner loop; the loop still
+  decides whether to apply them.
+- `rubric_breakdown` — optional structured evidence from the active rubric.
+
+These fields do not replace `RewardDimensions`. They connect rubric evidence to
+the separate element-weight vocabulary.
 
 The two scoring criteria refine existing rubric dimensions and are referenced by
 `rubric_version`; they are **not** added as new `RewardDimensions` keys, because

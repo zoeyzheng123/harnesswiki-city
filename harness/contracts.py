@@ -144,6 +144,11 @@ class RewardScore(BaseModel):
     scored_by: Optional[str] = None
     rationale: Optional[str] = None  # ≡ judge_rationale
     scored_at: Optional[datetime] = None
+    # ── critic learning signal (optional; consumed by the inner loop) ──
+    winning_elements: Optional[list[str]] = None
+    weak_elements: Optional[list[str]] = None
+    suggested_policy_updates: Optional[dict[str, float]] = None
+    rubric_breakdown: Optional[dict] = None
 
 
 # 4. HarnessState — the mutable scaffold. Read by C (Generator). Rewritten by A (Meta-agent).
