@@ -3,6 +3,44 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-07 — Bridge + inner-loop + v2 meta-agent (Eng 1)
+
+### D16. Bridge landed + inner loop fixed + meta-agent v2 levers
+
+The Eng 1 tasks from D15 are done:
+
+- **Bridge (`harness/bridge.py`):** One-way adapter maps the loop's lean output
+  (`loop_core/contracts.py`) to canonical `GenerationRecord[]` → writes
+  `data/generations.latest.json`. Also provides `make_acoe_critic()` — wraps
+  `harness.critic.score_concept()` so the loop can call the real ACOE critic
+  with lean types and get canonical `RewardScore` back (with `total_score`,
+  `distribution_tier`, `auto_fails_triggered`, `category_breakdown`,
+  `suggested_policy_updates`). A `BridgeCollector` accumulates records across
+  generations via the loop's new `on_generation` hook. Validated via
+  `GenerationRecord.model_validate()`.
+
+- **Inner-loop policy (`loop_core/loop.py` `update_policy`):** Replaced the
+  crude Hedge (eta=2.0, fixed 0.5 baseline, rich-get-richer) with:
+  1. Exploration floor (min 0.03) on every element
+  2. Auto-fail shield — don't learn from auto-failed generations
+  3. Evidence-based `suggested_policy_updates` from the critic (preferred)
+  4. Fallback Hedge with moving-mean baseline (EMA) and low eta (0.4)
+
+- **Meta-agent v2 levers (`loop_core/meta_agent.py`):**
+  - Stub candidate list replaced with 6 v2 elements: `you_hook_opening` (HQ-05),
+    `curiosity_gap_payoff` (RL-04), `conflict_phrasing` (RL-05),
+    `visual_cut_rhythm` (VP-04), `rising_audio_early` (AA-03),
+    `polarizing_comment_bait` (EB-03)
+  - `_V2_PROMPT_SNIPPETS` injects meaningful prompt additions per element
+  - `_SYS` system prompt biased toward v2 levers (micro-curiosity gap,
+    second-person hook, conflict phrasing, visual rhythm, rising audio,
+    polarizing bait)
+  - LLM `return_schema` extended with `v2_mechanic` + `expected_acoe_impact`
+
+The loop now runs with the real ACOE critic by default (falling back to stub).
+The stub generator still produces generic concepts that score seed_jail —
+`harness/generator.py` is the next bottleneck.
+
 ## 2026-06-07 — ACOE v2
 
 ### D15. ACOE-YT-SHORTS-v2.0 — rebalanced weights + new criteria

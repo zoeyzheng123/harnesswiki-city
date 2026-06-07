@@ -13,9 +13,11 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 | Evaluation policy | `data/policies/ACOE-YT-SHORTS-v2.0.json` (v1 retained) | ✅ Done — v2 rebalanced (audio↑, engagement↓) + HQ-05/RL-04/RL-05/VP-04/AA-03 + AF-05; validated (DECISIONS D15) |
 | Stub data | `data/stubs/*.json` via `scripts/dump_stubs.py` | ✅ Done — dance-vertical, ACOE-scored, generated + validated |
 | Documentation pack | `README.md`, `AGENTS.md`, `docs/*` | ✅ Done — re-themed to the short-form pivot |
-| Harness loop (Workstream A) | `loop_core/` (PR #1) | 🟦 Landed — lean internal model + meta-agent; needs the canonical bridge (`docs/LOOP_CORE_BRIDGE.md`) |
-| Loop → canonical bridge | `harness/bridge.py` (planned) | ⬜ Not started — spec in `docs/LOOP_CORE_BRIDGE.md` (Eng 1) |
-| HarnessState + meta-agent | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
+| Harness loop (Workstream A) | `loop_core/` (PR #1) | 🟦 Landed — lean internal model + meta-agent with v2 lever bias |
+| Loop → canonical bridge | `harness/bridge.py` | ✅ Done — translates lean → canonical GenerationRecord[] (DECISIONS D16); writes `data/generations.latest.json`; provides `make_acoe_critic()` adapter; validates against canonical contracts |
+| Inner-loop policy | `loop_core/loop.py` `update_policy()` | ✅ Done — critic signal (suggested_policy_updates preferred), auto-fail shield, moving-mean baseline, low eta (0.4), exploration floor |
+| Meta-agent v2 levers | `loop_core/meta_agent.py` | ✅ Done — 6 v2 candidates (you_hook_opening, curiosity_gap_payoff, conflict_phrasing, visual_cut_rhythm, rising_audio_early, polarizing_comment_bait); v2-biased `_SYS` prompt; meaningful `_V2_PROMPT_SNIPPETS` |
+| HarnessState + meta-agent (canonical) | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
 | Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2; v2 rubric) — applies ACOE-YT-SHORTS-v2.0 → total_score/tier/category_breakdown + learning signal; offline preflight + optional LLM judge |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
 | Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
@@ -26,14 +28,14 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 1. `src/ui` ACOE migration (Eng 4) — `docs/DASHBOARD_MIGRATION.md`.
 2. `harness/weave_trace.py` — `weave.init` + `@weave.op` wrappers.
 3. `harness/scout.py` — TrendContext + a rising approved track (Tavily).
-4. `harness/generator.py` — dance-Short ContentConcept.
-5. `harness/critic.py` — apply ACOE → RewardScore (`total_score`/tier/`category_breakdown`/auto-fails).
-6. `harness/{state,meta,loop}.py` — wire the loop; point `src/ui/lib/data.ts` at its `generation-records` output.
+4. `harness/generator.py` — dance-Short ContentConcept (needed to get the ACOE critic out of seed_jail with the stub generator).
+5. Point `src/ui/lib/data.ts` at the bridge output (`data/generations.latest.json`).
 
 ## Known placeholders
 
-- `pnpm dev` points at `pnpm dev:ui`; the Python generation loop is not implemented.
+- `pnpm dev` points at `pnpm dev:ui`; the Python generation loop writes `data/generations.latest.json` but the dashboard still reads synthetic data (`src/ui/lib/data.ts`).
+- The loop's stub generator produces generic concepts that score low against the v2 dance rubric (seed_jail); the real `harness/generator.py` is needed to climb out.
 - The 8 `RewardScore.dimensions` are **demoted to optional + deprecated** (DECISIONS.md D14) — the dashboard migrated to ACOE `category_breakdown`/tiers; the critic and stubs no longer emit them. Follow-up (Eng 4): drop `legacyDims()` from `src/ui/lib/synthetic.ts`. Full `RewardDimensions` removal is post-demo.
 - **ACOE v2** is the active rubric (DECISIONS.md D15): audio↑ / engagement↓ + 5 new criteria + AF-05 + `ExecutionMetadata`. Eng 4 follow-up: rebalance `CATEGORY_MAX` to v2 (audio 15, engagement 10) — `docs/DASHBOARD_MIGRATION.md`.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
-- `loop_core/` (Eng 1) runs against its own lean internal contracts; the canonical bridge adapter (`docs/LOOP_CORE_BRIDGE.md`) maps its output to `data/generations.latest.json` for the dashboard (DECISIONS.md D12).
+- `loop_core/` (Eng 1) runs against its own lean internal contracts; the bridge adapter (`harness/bridge.py`, DECISIONS D16) maps its output to canonical `GenerationRecord[]` → `data/generations.latest.json`.

@@ -2,8 +2,8 @@
 
 For Eng 1 (Workstream A). Maps the loop's **lean** output (`loop_core/contracts.py`)
 to the **canonical render-ready** `GenerationRecord[]` (`harness/contracts.py`) that
-the dashboard reads. One-way, no refactor of the tested loop — the "next PR" the
-loop_core PR described. Rationale: DECISIONS.md **D12**.
+the dashboard reads. One-way, no refactor of the tested loop. **Implemented** in
+`harness/bridge.py` (DECISIONS.md **D16**). Rationale: DECISIONS.md **D12**.
 
 ## The two contracts
 

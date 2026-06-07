@@ -19,11 +19,16 @@ For each generation:
 1. Read the current **HarnessState**.
 2. Scout the **TrendContext** + a rising approved track (`trend_scout`, Tavily).
 3. Generate a dance-Short **ContentConcept** (`generate_concept`); snapshot the inner-loop weights onto it.
-4. Score it (`score_concept`) against **ACOE-YT-SHORTS-v1.0** → **RewardScore** (`total_score`, `distribution_tier`, `category_breakdown`, `auto_fails_triggered`).
-5. Inner loop: `update_weights` from the score (lift the lowest category).
+4. Score it (`score_concept`) against **ACOE-YT-SHORTS-v2.0** → **RewardScore** (`total_score`, `distribution_tier`, `category_breakdown`, `auto_fails_triggered`).
+5. Inner loop: `update_policy` from the score:
+   - **Auto-fail shield:** do not learn from auto-failed generations.
+   - **Critic signal preferred:** apply evidence-based `suggested_policy_updates` (bounded ±0.10 each) directly.
+   - **Fallback Hedge:** multiplicative weights with moving-mean baseline (EMA) and low eta (0.4).
+   - **Exploration floor:** every element ≥ 0.03 so new candidates get tried.
 6. Write a **GenerationRecord** (`record_generation`) embedding the concept + score (+ a distilled `Lesson`).
 7. Outer loop: `rewrite_harness` → **HarnessDiff**; if accepted, `apply_harness_diff` → new HarnessState.
-8. Continue until `generations` is reached. Optionally `render_concept` (Seedance); once posted, `actual_engagement`/`post_url` fill in.
+8. The bridge hook (`on_generation`) captures the winning `(concept, reward)` → translates lean → canonical → `data/generations.latest.json`.
+9. Continue until `generations` is reached. Optionally `render_concept` (Seedance); once posted, `actual_engagement`/`post_url` fill in.
 
 ## Post-rating action (from ACOE)
 
