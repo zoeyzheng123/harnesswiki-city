@@ -21,15 +21,20 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 | Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2; v2 rubric) — applies ACOE-YT-SHORTS-v2.0 → total_score/tier/category_breakdown + learning signal; emits `score_type`/`evidence_coverage` (D17); offline preflight + optional LLM judge |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
 | Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
-| Dashboard | `src/ui/` | 🟦 In progress — control-room UI built (founder-themed synthetic data). **Needs ACOE migration** (0–100 + tiers + 6 categories) per `docs/DASHBOARD_MIGRATION.md`. |
+| Dashboard | `src/ui/` | ✅ Done — ACOE v2 control room (0–100, tiers, 6 categories, auto-fail badges, critic-learning panel); data seam reads `VITE_GENERATIONS_URL` with synthetic fallback (DECISIONS D15). Stage-1 UI panels (outcome / candidates batch / provenance badges) pending Eng-1 producers. |
 
-## Next up (to make the demo loop run)
+## Next up — the critical path to a "show the climb" demo
 
-1. `src/ui` ACOE migration (Eng 4) — `docs/DASHBOARD_MIGRATION.md`.
-2. `harness/weave_trace.py` — `weave.init` + `@weave.op` wrappers.
-3. `harness/scout.py` — TrendContext + a rising approved track (Tavily).
-4. `harness/generator.py` — dance-Short ContentConcept (needed to get the ACOE critic out of seed_jail with the stub generator).
-5. Point `src/ui/lib/data.ts` at the bridge output (`data/generations.latest.json`).
+The loop runs end-to-end (real ACOE critic → `data/generations.latest.json`) but
+**plateaus in seed_jail** because the stub generator emits 8s / no-on-screen-text
+concepts (AF-02/AF-03). Per-engineer TO-DOs are in **`docs/TODO.md`**; the critical path:
+
+1. **`harness/generator.py`** (Eng 3) — a real dance-Short `ContentConcept` that escapes the auto-fails and scores ≥ growing. **This is the bottleneck** — without it the loop can't climb.
+2. **`harness/scout.py`** (Eng 3) — live `TrendContext` + a rising approved-pool track (Tavily).
+3. **Candidate-batch capture** (Eng 1) — ~5-line `on_generation` extension → `GenerationRecord.candidates` (the contrastive signal).
+4. **Wire `VITE_GENERATIONS_URL`** (Eng 4) — point the dashboard at the real bridge output (1-line; today it falls back to synthetic).
+5. **Stage 2 (ground truth):** outcome ingestion (render→post→metrics → `Outcome`, Eng 1/3) + real-data calibration & the LLM judge (Eng 2).
+6. `harness/weave_trace.py` — `weave.init` + `@weave.op` wrappers (observability; optional for the demo).
 
 ## Known placeholders
 

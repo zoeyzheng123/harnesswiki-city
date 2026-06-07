@@ -14,3 +14,9 @@ __pycache__/
 
 # Synthetic learning data (generated on demand by scripts/synth_outcomes.py)
 data/synthetic/
+
+# Loop run artifacts (regenerated each run by loop_core/loop.py) — keep the demo's
+# data/generations.latest.json tracked, but not the per-run scratch.
+raw/
+wiki/
+harness/gen_*.json
