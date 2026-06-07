@@ -72,6 +72,16 @@ class TrendContext(BaseModel):
     raw_signals: dict = {}
 
 
+# the chosen sound for a short-form concept (Eng 1's "audio (BPM, sound recency,
+# is-it-a-rising-sound)"). Distinct from TrendContext.audio, which just names a
+# sound the trend is using.
+class Audio(BaseModel):
+    name: Optional[str] = None
+    bpm: Optional[float] = None
+    sound_recency: Optional[str] = None  # e.g. "new" | "rising" | "established"
+    is_rising_sound: Optional[bool] = None
+
+
 # 2. ContentConcept — produced by C (Generator + inner-loop policy), consumed by B & C
 class ContentConcept(BaseModel):
     # ── core (render-ready) ──
@@ -93,8 +103,14 @@ class ContentConcept(BaseModel):
     element_weights: dict = {}  # inner-loop policy weight snapshot for this concept
     storyboard: list[str] = []
     seedance_prompt: Optional[str] = None  # ≡ visual_prompt
-    duration_sec: Optional[int] = None
+    duration_sec: Optional[int] = None  # ≡ length
     created_at: Optional[datetime] = None
+    # ── short-form-video attributes (Eng 1's TikTok feature set; optional) ──
+    dance_style: Optional[str] = None
+    audio: Optional[Audio] = None
+    cut_frequency: Optional[float] = None  # cuts per second
+    hashtag_set: Optional[list[str]] = None
+    posting_time: Optional[datetime] = None  # recommended/planned post time
 
 
 # the judge rubric, as numbers. Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md.

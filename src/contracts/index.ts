@@ -38,6 +38,15 @@ export type TrendContext = {
   raw_signals?: Record<string, unknown>;
 };
 
+// The chosen sound for a short-form concept. Distinct from TrendContext.audio
+// (which just names a sound the trend is using).
+export type Audio = {
+  name?: string;
+  bpm?: number;
+  sound_recency?: string; // "new" | "rising" | "established"
+  is_rising_sound?: boolean;
+};
+
 export type ContentConcept = {
   // core (render-ready)
   id: string;
@@ -58,8 +67,14 @@ export type ContentConcept = {
   element_weights?: Record<string, number>; // inner-loop policy snapshot
   storyboard?: string[];
   seedance_prompt?: string; // ≡ visual_prompt
-  duration_sec?: number;
+  duration_sec?: number; // ≡ length
   created_at?: string;
+  // short-form-video attributes (Eng 1's TikTok feature set; optional)
+  dance_style?: string;
+  audio?: Audio;
+  cut_frequency?: number; // cuts per second
+  hashtag_set?: string[];
+  posting_time?: string; // ISO-8601, recommended/planned post time
 };
 
 // Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md. Risk dims: higher = worse.

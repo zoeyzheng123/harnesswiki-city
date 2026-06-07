@@ -16,8 +16,8 @@ Score each ContentConcept 0..1 on:
 
 **Higher is better**
 
-- **hook_strength** — does the opening stop the scroll for the target audience?
-- **trend_fit** — does it ride the supplied TrendContext, not a generic theme?
+- **hook_strength** — does the opening stop the scroll in the first 1–3 seconds? (Short-form video: motion or a face in frame 1.)
+- **trend_fit** — does it ride the supplied TrendContext — aligned with an existing wave (e.g. a rising sound), not a generic theme?
 - **brand_fit** — on-voice for the audience and brand?
 - **novelty** — fresh angle vs. recycled consensus?
 - **clarity** — is the single idea unmistakable in one pass?
@@ -44,6 +44,18 @@ The Critic emits, in `RewardScore`:
 For `predicted_win_prob`: estimate the probability that concept A would
 outperform concept B for the target audience **while staying on-brand and
 policy-safe**. Generation 1 is the baseline, anchored at 0.5.
+
+## Short-form-video rubric (rubric_version `v2`, planned)
+
+When the build switches to short-form video, the Critic weighs additional signals
+— **cut frequency**, **audio recency / BPM / is-it-a-rising-sound**, **length**,
+**posting time**, **hashtag set** — as *inputs* that feed the existing dimensions
+(e.g. cut frequency and frame-1 motion → `hook_strength`; a rising sound →
+`trend_fit`; length/cuts → `visual_feasibility`). These ride under a new
+`rubric_version` and do **not** add keys to `RewardDimensions` (the dashboard's
+`DIMENSION_LABELS` is exhaustive — a new key breaks `pnpm typecheck:ui`; see
+DECISIONS.md D10). The video attributes themselves live on `ContentConcept`
+(`docs/DATA_CONTRACTS.md` → "Short-form-video attributes").
 
 ## Not the same as element weights or taxonomy
 

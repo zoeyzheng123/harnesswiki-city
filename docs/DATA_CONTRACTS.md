@@ -60,6 +60,7 @@ class ContentConcept(BaseModel):
     hook: str; format: str; angle: str; script: str; visual_prompt: str
     elements: list[str] = []; created_by: str = "content-generator"
     # + Eng 1: element_weights (inner-loop snapshot), storyboard, seedance_prompt, duration_sec, ...
+    # + short-form video: dance_style, audio (Audio: bpm/sound_recency/is_rising_sound), cut_frequency, hashtag_set, posting_time
 
 class RewardDimensions(BaseModel):   # keys == docs/JUDGE_RUBRIC.md; risk dims higher = worse
     hook_strength: float; trend_fit: float; brand_fit: float; novelty: float
@@ -94,6 +95,24 @@ class GenerationRecord(BaseModel):   # render-ready: embeds concept + score
     harness_diff: HarnessDiff | None = None; lesson: Lesson | None = None
     # + Eng 1: harness_id, predicted_score, actual_engagement, post_url, selected, rubric_version, diff_summary, ...
 ```
+
+## Short-form-video attributes (Eng 1's feature set)
+
+Eng 1's TikTok feature list maps across the three vocabularies — it is not one
+field on one model:
+
+| Attribute | Lives in |
+|---|---|
+| dance style, cut frequency, hashtag set, posting time | `ContentConcept` (new optional fields) |
+| length | `ContentConcept.duration_sec` |
+| audio (BPM, recency, is-rising-sound) | `ContentConcept.audio` (`Audio`); a trend's sound is `TrendContext.audio` + `signals` |
+| hook strength in first 1–3s; trend-alignment | the rubric — `RewardDimensions.hook_strength` / `trend_fit` (see `docs/JUDGE_RUBRIC.md`) |
+| posting result (engagement, url) | `GenerationRecord.actual_engagement` / `post_url` |
+
+The two scoring criteria refine existing rubric dimensions and are referenced by
+`rubric_version`; they are **not** added as new `RewardDimensions` keys, because
+the dashboard's `DIMENSION_LABELS` is an exhaustive map and a new key would
+break `pnpm typecheck:ui` (DECISIONS.md D10).
 
 ## Conventions
 

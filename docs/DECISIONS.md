@@ -3,6 +3,28 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Short-form-video contract fields
+
+### D10. Eng 1's short-form-video features land on ContentConcept + the rubric
+
+Eng 1's TikTok feature set (dance style; audio BPM/recency/is-rising; length;
+hook strength in first 1–3s; cut frequency; trend-alignment; posting time;
+hashtags) is placed by *kind*, not dumped on one model:
+
+- Creative/distribution knobs → **`ContentConcept`** optional fields
+  (`dance_style`, `audio: Audio`, `cut_frequency`, `hashtag_set`,
+  `posting_time`; `length` = the existing `duration_sec`).
+- Scoring criteria (hook strength in first 1–3s, trend-alignment) → the
+  **Critic's rubric** (`docs/JUDGE_RUBRIC.md`, referenced by `rubric_version`),
+  refining the existing `hook_strength` / `trend_fit`. They are **not** added as
+  new `RewardDimensions` keys: the dashboard's `format.ts` declares
+  `DIMENSION_LABELS: Record<DimensionKey, string>` (exhaustive), so a new key
+  would break `pnpm typecheck:ui`.
+- Audio momentum (sound recency / is-rising) → also a **`TrendContext`** signal.
+- Posting result → **`GenerationRecord.actual_engagement` / `post_url`**.
+
+All additions are optional (additive; the dashboard stays green). Extends D9.
+
 ## 2026-06-06 — Python contracts + superset merge
 
 ### D7. Contracts pivot to Python/Pydantic (canonical); repo is polyglot

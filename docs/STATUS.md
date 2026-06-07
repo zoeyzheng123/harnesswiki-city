@@ -34,3 +34,4 @@ _Last updated: 2026-06-06._
 - The dashboard renders a synthetic 5-generation arc (`src/ui/lib/synthetic.ts`) until the real loop writes records.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
 - The contract carries optional Eng 1 + short-form-video fields pending an Eng 1/Eng 4 prune (DECISIONS.md D8).
+- `ContentConcept` now has explicit short-form fields (`audio`, `dance_style`, `cut_frequency`, `hashtag_set`, `posting_time`); unused by the AI-founder demo, ready for the TikTok direction (DECISIONS.md D10).
