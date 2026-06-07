@@ -1,4 +1,5 @@
 import type { DemoLoop } from "../lib/useDemoLoop";
+import { emitSensoryCue, type SensoryCue } from "../lib/sensory";
 
 const PRIMARY =
   "rounded-md px-3.5 py-1.5 font-mono text-xs font-semibold tracking-wide uppercase text-ink transition-colors";
@@ -9,6 +10,12 @@ const KBD = "rounded border border-line px-1 py-px text-muted";
 export function DemoLoopControls({ loop, version }: { loop: DemoLoop; version: string }) {
   const { step, total, isPlaying, atStart, atEnd, toggle, stepForward, skipToEnd, reset } = loop;
   const playLabel = isPlaying ? "Pause" : atEnd ? "Replay loop" : atStart ? "Run loop" : "Resume";
+  const withCue =
+    (cue: SensoryCue, action: () => void) =>
+    () => {
+      emitSensoryCue(cue);
+      action();
+    };
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
@@ -33,20 +40,20 @@ export function DemoLoopControls({ loop, version }: { loop: DemoLoop; version: s
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={toggle}
+          onClick={withCue(isPlaying ? "pause" : "run", toggle)}
           title={`${isPlaying ? "Pause" : "Play"} (space)`}
           className={PRIMARY}
           style={{ backgroundColor: "var(--color-primary)", boxShadow: "0 6px 22px -8px var(--color-primary)" }}
         >
           {playLabel}
         </button>
-        <button type="button" onClick={stepForward} disabled={atEnd} title="Step forward (right arrow)" className={GHOST}>
+        <button type="button" onClick={withCue("step", stepForward)} disabled={atEnd} title="Step forward (right arrow)" className={GHOST}>
           Step
         </button>
-        <button type="button" onClick={skipToEnd} disabled={atEnd} title="Skip to final generation (End)" className={GHOST}>
+        <button type="button" onClick={withCue("skip", skipToEnd)} disabled={atEnd} title="Skip to final generation (End)" className={GHOST}>
           Skip
         </button>
-        <button type="button" onClick={reset} disabled={atStart} title="Reset (R)" className={GHOST}>
+        <button type="button" onClick={withCue("reset", reset)} disabled={atStart} title="Reset (R)" className={GHOST}>
           Reset
         </button>
       </div>

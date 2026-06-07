@@ -59,6 +59,9 @@
 
   --glow-primary: 0 0 0 1px oklch(0.64 0.15 242 / 0.35), 0 0 28px -6px oklch(0.64 0.15 242 / 0.55);
   --glow-soft: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 14px 40px -24px oklch(0 0 0 / 0.8);
+  --material-grain: linear-gradient(135deg, oklch(1 0 0 / 0.035) 0 1px, transparent 1px 6px);
+  --rail-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.035), inset 0 12px 24px -18px oklch(0 0 0 / 0.95);
+  --stamp-shadow: 0 1px 0 oklch(1 0 0 / 0.045) inset, 0 8px 24px -18px oklch(0 0 0 / 0.9);
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
@@ -97,6 +100,28 @@ body::before {
     linear-gradient(oklch(0.3 0.02 250 / 0.06) 1px, transparent 1px),
     linear-gradient(90deg, oklch(0.3 0.02 250 / 0.06) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+}
+
+.material-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    var(--material-grain),
+    linear-gradient(180deg, oklch(1 0 0 / 0.045), transparent 34%);
+  opacity: 0.6;
+}
+
+.fader-rail {
+  background:
+    linear-gradient(180deg, var(--color-surface-2), var(--color-surface-1)),
+    var(--material-grain);
+  box-shadow: var(--rail-shadow);
+}
+
+.evidence-stamp {
+  box-shadow: var(--stamp-shadow);
 }
 
 h1, h2, h3 {

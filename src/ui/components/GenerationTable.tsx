@@ -4,6 +4,7 @@ import {
   CATEGORY_LABELS,
   TIER_COLOR,
   TIER_LABELS,
+  elementLabel,
   humanize,
   pts,
   signedPts,
@@ -30,6 +31,13 @@ function signalFor(record: GenerationRecord): { label: string; flagged: boolean 
   return { label: categoryLabel(record.score.lowest_scoring_category), flagged: false };
 }
 
+function diffFor(record: GenerationRecord): { label: string; tone: "neutral" | "positive" | "flag" } {
+  const diff = record.harness_diff;
+  if (!diff) return { label: "no diff", tone: "neutral" };
+  if (!diff.accepted) return { label: "refused", tone: "flag" };
+  return { label: `${diff.from_version} → ${diff.to_version}`, tone: "positive" };
+}
+
 function Row({
   record,
   trend,
@@ -49,6 +57,7 @@ function Row({
   const tier = tierFor(score);
   const delta = previousTotal === null ? null : score - previousTotal;
   const signal = signalFor(record);
+  const diff = diffFor(record);
   return (
     <motion.li layout variants={fadeRise} exit={{ opacity: 0 }}>
       <button
@@ -56,18 +65,21 @@ function Row({
         onClick={() => onSelect(record)}
         aria-pressed={selected}
         aria-label={`Generation ${record.generation_number}, "${truncate(record.concept.hook, 48)}". ${signal.label}, score ${pts(score)} of 100, ${TIER_LABELS[tier]} tier${delta === null ? "" : `, ${signedPts(delta)} from prior generation`}. Open details.`}
-        className="grid w-full grid-cols-[2.25rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors sm:grid-cols-[2.25rem_1fr_7.5rem_4rem_4rem]"
+        className="grid w-full grid-cols-[3.25rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors sm:grid-cols-[3.25rem_1fr_8rem_6.5rem_4rem]"
         style={{
           borderColor: selected ? "var(--color-primary)" : "var(--color-line)",
           backgroundColor: selected ? "var(--color-surface-1)" : isNewest ? "var(--color-surface-1)" : "transparent",
+          boxShadow: selected ? "var(--glow-primary)" : isNewest ? "0 0 0 1px color-mix(in oklch, var(--color-primary) 18%, transparent)" : "none",
         }}
       >
-        <span className="flex items-center gap-1.5 font-mono text-sm tabular-nums">
+        <span className="evidence-stamp grid h-12 place-items-center rounded-md border border-line bg-bg/45 font-mono tabular-nums">
+          <span className="text-[0.625rem] text-faint">g{record.generation_number}</span>
           <span
-            className="size-1.5 rounded-full"
-            style={{ backgroundColor: signal.flagged ? "var(--color-flag)" : TIER_COLOR[tier] }}
-          />
-          <span className="text-muted">g{record.generation_number}</span>
+            className="text-sm font-semibold"
+            style={{ color: signal.flagged ? "var(--color-flag)" : TIER_COLOR[tier] }}
+          >
+            {pts(score)}
+          </span>
         </span>
 
         <span className="min-w-0">
@@ -78,13 +90,27 @@ function Row({
           <span className="mt-0.5 block truncate font-mono text-xs text-faint sm:hidden">
             {trend?.platform} · {signal.label}
           </span>
+          <span className="mt-1 hidden flex-wrap items-center gap-1.5 sm:flex">
+            <span className="rounded-md border border-line/80 px-2 py-0.5 font-mono text-[0.6875rem] text-muted">
+              {elementLabel(record.concept.format)}
+            </span>
+            {trend && (
+              <span className="truncate font-mono text-[0.6875rem] text-faint">
+                {trend.platform} · {trend.audience}
+              </span>
+            )}
+          </span>
         </span>
 
-        <span className={`hidden truncate font-mono text-xs sm:block ${signal.flagged ? "text-flag" : "text-muted"}`}>
-          {signal.label}
+        <span className="hidden min-w-0 sm:block">
+          <span className="block font-mono text-[0.625rem] tracking-wide text-faint uppercase">critic</span>
+          <span className={`block truncate font-mono text-xs ${signal.flagged ? "text-flag" : "text-muted"}`}>
+            {signal.label}
+          </span>
         </span>
-        <span className="hidden text-right font-mono text-sm tabular-nums sm:block" style={{ color: TIER_COLOR[tier] }}>
-          {pts(score)}
+        <span className="hidden justify-self-end sm:block">
+          <span className="block text-right font-mono text-[0.625rem] tracking-wide text-faint uppercase">rewrite</span>
+          <Badge tone={diff.tone}>{diff.label}</Badge>
         </span>
         <span className={`text-right font-mono text-sm tabular-nums ${delta === null ? "text-faint" : delta >= 0 ? "text-positive" : "text-negative"}`}>
           {delta === null ? "base" : signedPts(delta)}
@@ -108,11 +134,11 @@ export function GenerationTable({
   return (
     <Panel
       title="Generation history"
-      subtitle="Every concept, score, and harness change — click any row for receipts"
+      subtitle="Evidence artifacts for every concept, score, and harness rewrite"
       action={
         <div className="hidden gap-4 font-mono text-[0.6875rem] tracking-wide text-faint uppercase sm:flex">
-          <span className="w-24 text-right">signal</span>
-          <span className="w-10 text-right">score</span>
+          <span className="w-24 text-right">critic</span>
+          <span className="w-20 text-right">rewrite</span>
           <span className="w-8 text-right">Δ</span>
         </div>
       }

@@ -149,7 +149,7 @@ export function App() {
         </header>
 
         <main>
-        {/* Districts */}
+        {/* Spatial signal path */}
         <div className="mt-5">
           <DistrictsHeader record={currentRecord} trend={currentTrend} />
         </div>
@@ -159,12 +159,7 @@ export function App() {
           <HeroCurve points={curve} revealed={step} total={total} />
         </div>
 
-        {/* Cause-and-effect bridge */}
-        <div className="mt-4">
-          <LearningBridgePanel record={currentRecord} previous={previousRecord} />
-        </div>
-
-        {/* Output: generated video evidence */}
+        {/* Output evidence: the generated cuts prove the score movement */}
         {baseline && best && currentRecord && (
           <div className="mt-4">
             <OutputCompare
@@ -175,6 +170,11 @@ export function App() {
             />
           </div>
         )}
+
+        {/* Cause-and-effect bridge */}
+        <div className="mt-4">
+          <LearningBridgePanel record={currentRecord} previous={previousRecord} />
+        </div>
 
         {/* State row */}
         <motion.div

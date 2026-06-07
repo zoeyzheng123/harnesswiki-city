@@ -3,12 +3,12 @@ import type { Ref } from "react";
 import type { GenerationRecord } from "../lib/contracts";
 import { videoForRecord } from "../lib/videos";
 import { elementLabel, pts, signedPts, tierFor } from "../lib/format";
-import { MetricLabel, Panel, TierBadge } from "./primitives";
+import { Badge, MetricLabel, Panel, TierBadge } from "./primitives";
 import { VideoPlayer, type VideoPlayerHandle } from "./VideoPlayer";
 
 function ScoreChip({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <span className="rounded-md border border-line bg-surface-1/50 px-2 py-0.5 font-mono text-xs">
+    <span className="evidence-stamp rounded-md border border-line bg-surface-1/50 px-2 py-0.5 font-mono text-xs">
       <span className="text-faint">{label} </span>
       <span className={`tabular-nums ${tone}`}>{value}</span>
     </span>
@@ -30,11 +30,11 @@ function Side({
   const total = record.score.total_score ?? Math.round((record.score.weighted_total ?? 0) * 100);
   const tier = tierFor(total);
   return (
-    <div className="flex flex-col gap-4 sm:flex-row">
-      <div className="mx-auto w-40 shrink-0 sm:mx-0">
+    <div className="grid gap-4 sm:grid-cols-[12rem_1fr] xl:grid-cols-[13rem_1fr]">
+      <div className="mx-auto w-48 shrink-0 sm:mx-0 xl:w-52">
         {video && <VideoPlayer ref={playerRef} src={video.src} hook={record.concept.hook} accent={accent} />}
       </div>
-      <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 flex-col justify-center gap-2">
         <MetricLabel>
           Generation {record.generation_number} · {label}
         </MetricLabel>
@@ -53,8 +53,8 @@ function Side({
 
 function WaitingComparison({ nextGeneration }: { nextGeneration: number }) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row">
-      <div className="mx-auto grid aspect-[9/16] w-40 shrink-0 place-items-center rounded-xl border border-dashed border-line bg-surface-1/40 p-3 text-center sm:mx-0">
+    <div className="grid gap-4 sm:grid-cols-[12rem_1fr] xl:grid-cols-[13rem_1fr]">
+      <div className="mx-auto grid aspect-[9/16] w-48 shrink-0 place-items-center rounded-xl border border-dashed border-line bg-surface-1/40 p-3 text-center sm:mx-0 xl:w-52">
         <div>
           <svg width="22" height="22" viewBox="0 0 24 24" className="mx-auto text-faint" fill="none" aria-hidden="true">
             <path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -114,21 +114,31 @@ export function OutputCompare({
     <Panel
       title={
         bestUnlocked
-          ? "Output: baseline vs best"
+          ? "Video evidence: baseline vs best"
           : sameAsBaseline
-            ? "Output: first generated cut"
-            : "Output: baseline vs current"
+            ? "Video evidence: first generated cut"
+            : "Video evidence: baseline vs current"
       }
       subtitle={
         bestUnlocked
-          ? "The short-form video the harness produced, first generation versus last"
-          : "The active generation compared with the original baseline"
+          ? "Generated cuts five loop steps apart, with the score movement beside them"
+          : "The active generated cut compared with the original baseline"
+      }
+      action={
+        sameAsBaseline ? (
+          <Badge tone="neutral">baseline</Badge>
+        ) : (
+          <Badge tone={scoreDelta > 0 ? "positive" : scoreDelta < 0 ? "negative" : "neutral"}>
+            {scoreDelta === 0 ? "even" : signedPts(scoreDelta)} score
+          </Badge>
+        )
       }
     >
       <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-5">
         <Side record={baseline} label="baseline" accent="var(--color-muted)" playerRef={baseRef} />
 
-        <div className="flex flex-col items-center justify-center gap-3 border-line/70 lg:border-x lg:px-5">
+        <div className="relative flex flex-col items-center justify-center gap-3 rounded-lg border border-line/70 bg-surface-1/35 p-4">
+          <MetricLabel>proof delta</MetricLabel>
           <button
             type="button"
             onClick={playBoth}
@@ -139,9 +149,9 @@ export function OutputCompare({
             {playingBoth ? "Pause both" : "Play both"}
           </button>
           <div className="flex flex-col items-center gap-2 font-mono text-sm tabular-nums">
-            <div className={scoreDelta > 0 ? "text-positive" : scoreDelta < 0 ? "text-negative" : "text-faint"}>
+            <div className={`text-2xl ${scoreDelta > 0 ? "text-positive" : scoreDelta < 0 ? "text-negative" : "text-faint"}`}>
               {scoreDelta === 0 ? "baseline" : `${scoreDelta > 0 ? "▲" : "▼"} ${signedPts(scoreDelta)}`}{" "}
-              <span className="text-faint">score</span>
+              <span className="text-sm text-faint">score</span>
             </div>
             <div className="flex items-center gap-1.5">
               <TierBadge tier={baseTier} />
@@ -151,7 +161,7 @@ export function OutputCompare({
           </div>
           <p className="max-w-[15rem] text-center text-xs leading-relaxed text-muted">
             {bestUnlocked
-              ? "Same sound, five generations apart: a peak-motion open, a seamless loop, and a question worth arguing about."
+              ? "Same harness loop, five generations apart: the final cut carries the proof instead of another paragraph."
               : sameAsBaseline
                 ? "The baseline is the reference cut. The next generation shows whether the first rewrite paid off."
                 : "Current output is the receipt for the latest rewrite, before the final best cut is unlocked."}
