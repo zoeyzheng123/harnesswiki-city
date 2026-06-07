@@ -31,6 +31,7 @@
   --color-generator: oklch(0.7 0.15 285);
   --color-critic: oklch(0.8 0.14 85);
   --color-meta: oklch(0.72 0.17 330);
+  --color-memory: oklch(0.78 0.12 170);
 
   /* Semantics — never hue-only; always paired with a sign or direction */
   --color-positive: oklch(0.8 0.17 150);
@@ -122,6 +123,18 @@ body::before {
 
 .evidence-stamp {
   box-shadow: var(--stamp-shadow);
+}
+
+.city-building::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 52%;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 7%, oklch(1 0 0 / 0.035) 7% 8%, transparent 8% 22%) 0 0 / 42px 100%,
+    linear-gradient(180deg, transparent, oklch(0 0 0 / 0.16));
+  opacity: 0.58;
 }
 
 h1, h2, h3 {

@@ -13,12 +13,11 @@ import {
 import { useDemoLoop } from "./lib/useDemoLoop";
 import { tierFor, TIER_LABELS } from "./lib/format";
 import { staggerContainer } from "./styles/motion";
-import { DistrictsHeader } from "./components/DistrictsHeader";
+import { CityWikiControlDeck } from "./components/CityWikiControlDeck";
 import { HeroCurve } from "./components/HeroCurve";
 import { WeightShiftPanel } from "./components/WeightShiftPanel";
 import { HarnessStatePanel } from "./components/HarnessStatePanel";
 import { GenerationTable } from "./components/GenerationTable";
-import { LessonsPanel } from "./components/LessonsPanel";
 import { GenerationDetail } from "./components/GenerationDetail";
 import { DemoLoopControls } from "./components/DemoLoopControls";
 import { OutputCompare } from "./components/OutputCompare";
@@ -149,9 +148,17 @@ export function App() {
         </header>
 
         <main>
-        {/* Spatial signal path */}
+        {/* City/wiki control deck */}
         <div className="mt-5">
-          <DistrictsHeader record={currentRecord} trend={currentTrend} />
+          <CityWikiControlDeck
+            records={records}
+            step={step}
+            current={currentRecord}
+            previous={previousRecord}
+            trend={currentTrend}
+            lessons={lessons}
+            onSelect={setSelected}
+          />
         </div>
 
         {/* Hero curve */}
@@ -192,12 +199,12 @@ export function App() {
           <HarnessStatePanel lineage={lineage} current={state} refusedCount={refusedCount} />
         </motion.div>
 
-        {/* History + memory */}
+        {/* History receipts */}
         <motion.div
           initial="hidden"
           animate="show"
           variants={staggerContainer(0.08)}
-          className="mt-4 grid gap-4 lg:grid-cols-[1.5fr_1fr]"
+          className="mt-4"
         >
           <GenerationTable
             records={records.slice(0, step)}
@@ -205,7 +212,6 @@ export function App() {
             selectedId={selected?.id ?? null}
             onSelect={setSelected}
           />
-          <LessonsPanel lessons={lessons} />
         </motion.div>
         </main>
 

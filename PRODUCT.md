@@ -62,6 +62,8 @@ the numbers and the motion do the persuading.
 5. **The harness can say no.** When the meta-agent rejects a risky diff because
    `policy_flag` tripped, that is a feature to surface proudly, not an error to
    hide. A system with judgment is more trustworthy than one that only climbs.
+6. **City outside, wiki inside.** The city is a spatial model of the loop; the
+   wiki is the readable memory inside it.
 
 ## Accessibility & Inclusion
 

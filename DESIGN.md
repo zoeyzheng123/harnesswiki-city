@@ -9,14 +9,18 @@ canonical and that file mirrors them.
 
 A dark control room with sensory instrumentation. The physical scene is a dim
 demo room with a glowing instrument panel: the surface recedes to near-black so
-the signal lights (the cobalt score curve, the cyan accents, the four district
-hues, the video evidence) carry every emotion. Strategy is **full-palette on a
+the signal lights (the cobalt score curve, the cyan accents, the city role hues,
+the video evidence) carry every emotion. Strategy is **full-palette on a
 dark environmental base** — the dark IS the brand, the saturated roles are
 deliberate and few.
 
 The interface should feel like a living instrument, not a wall of analytics:
 the loop is spatial, the harness weights behave like faders, and each generation
 reads as an evidence artifact with receipts on demand.
+
+The Town-inspired rule: borrow ambient state grammar, not the skin. Buildings
+hold process state, windows encode recent generations, bubbles mark attention,
+and rooms expose receipts. Do not copy pixel art, western motifs, or game UI.
 
 Mood anchor (impeccable brand seed `seed-077`): *"pre-dawn signal tower — cold
 blue solitude, instruments glowing against the dark."*
@@ -45,16 +49,17 @@ All values OKLCH. Body text clears 7:1 against `--bg`; muted clears 3.5:1.
 (0.64 vs 0.82), so the two curve series never read as one. Text on either fill is
 near-white (`--ink`), per the saturated-fill rule.
 
-### District hues (the city's four agents)
-| Token | OKLCH | District |
+### City role hues
+| Token | OKLCH | Role |
 |---|---|---|
 | `--scout` | `oklch(0.80 0.13 195)` | Trend Scout (scan / signal) |
 | `--generator` | `oklch(0.70 0.15 285)` | Content Generator (creative) |
 | `--critic` | `oklch(0.80 0.14 85)` | Reward Critic (judging) |
 | `--meta` | `oklch(0.72 0.17 330)` | Meta-Agent (mutation / rewrite) |
+| `--memory` | `oklch(0.78 0.12 170)` | Memory Archive (wiki / lessons) |
 
-Four distinct hues at matched lightness so they read as siblings in one city.
-Each holds near-white text on a filled chip.
+Distinct hues at matched lightness so they read as siblings in one city. Each
+holds near-white text on a filled chip.
 
 ### Semantics (never hue-only — always paired with sign or direction)
 | Token | OKLCH | Role |
@@ -84,9 +89,19 @@ mono labels (≤ 4 words) may use tracked small caps for the telemetry register.
 
 ## Components
 
-- **District chip** — a labeled tile per agent, accent-keyed, with idle / active
-  / done / rejected states. In the dashboard, the four districts render as a
-  connected signal path so judges can see the loop move through the system.
+- **City Wiki control deck** — first major dashboard section: a spatial city map
+  plus a readable Memory Archive. It is the high-level index for the loop.
+- **City building node** — abstract instrument architecture for Trend Tower,
+  Concept Studio, Critic Court, Meta Workshop, and Memory Archive. Each building
+  has state windows and optional attention bubbles.
+- **State window** — a small illuminated slot representing recent generations or
+  lineage positions. States: standby, active, OK, review, flag, refused.
+- **Attention bubble** — a compact, clickable state callout (`!`, `↯`, `?`, `OK`,
+  `+`) for flags, refused diffs, review-worthy lessons, stored lessons, and new
+  concepts. Bubbles open receipts; they are not chat.
+- **Wiki lesson artifact** — a readable archive card with score stamp, tier,
+  lint/refusal/review badge, wikilink element chips, evidence, harness change,
+  expected effect, and a deterministic inspect action.
 - **Hero curve** — a single dark card holding the two-series SVG line chart, the
   dashed 0.50 baseline, and the headline win-prob count-up. The signature object.
 - **Weight fader** — a read-only vertical rail with tick marks, a tactile knob,
@@ -110,13 +125,13 @@ glow, not heavy drop shadows. No card-in-card nesting.
 Single dark shell, max content ~1280px, generous gutters.
 
 ```
-┌ Signal path (4 connected districts + Run-loop controls) ───┐
+┌ City Wiki control deck (buildings + Memory Archive) ───────┐
 ├ Hero curve (full width)  ──────────────────────────────────┤
 ├ Video evidence comparison ─────────────────────────────────┤
 ├ Why the line moved ────────────────────────────────────────┤
 ├ Fader board ───────────────────┬ Current harness state ────┤
-├ Generation history table ──────┴───────────────────────────┤
-└ (Detail drawer slides over from the right; Lessons panel)  ┘
+├ Generation history table ──────────────────────────────────┤
+└ (Detail drawer slides over from the right) ────────────────┘
 ```
 
 Flexbox for 1D rows (districts, controls), Grid for the 2D panel zone. Responsive
@@ -131,10 +146,13 @@ bounce, no elastic. Motion is part of the build, not a finish.
 
 - **Curve draw-on** — `motion.path` animating `pathLength` 0→1, advanced one
   generation per demo step. The newest point pops and its win-prob counts up.
-- **Weight bars** — animate `width` on a spring as versions fold v0→v5.
-- **District pulse** — within a generation, the four districts pulse in pipeline
-  order (Scout → Generator → Critic → Meta), mirroring the loop steps. The
-  connected signal track fills as the generation advances.
+- **Weight faders** — animate handle position on a spring as versions fold v0→v5.
+- **City signal** — within a generation, the five buildings pulse in pipeline
+  order (Trend → Concept → Score → Rewrite → Memory). The connected signal track
+  fills as the generation advances.
+- **Attention bubbles** — appear only when their triggering state exists:
+  auto-fail/policy flag, refused diff, review-worthy lesson, stored lesson, or
+  new concept.
 - **Reveals** — `AnimatePresence` staggers new table rows and lesson cards in;
   the drawer slides + fades.
 - **Count-ups** — a shared `useCountUp` (Motion `useMotionValue`) for every Stat.
