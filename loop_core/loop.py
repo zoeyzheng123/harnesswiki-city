@@ -47,10 +47,44 @@ def normalize(policy: dict[str, float], taxonomy: list[str]) -> dict[str, float]
 def top_k(weights: dict[str, float], k: int = 3) -> list[str]:
     return sorted(weights, key=lambda e: -weights[e])[:k]
 
-def update_policy(policy, concept, reward, eta=2.0):
-    advantage = reward.predicted_score - 0.5            # Hedge / multiplicative weights
+def update_policy(policy, concept, reward, baseline_state, eta=0.4, explore_floor=0.03):
+    """Inner-loop policy update with critic signal, auto-fail shield, and moving baseline.
+
+    Prefers the critic's evidence-based suggested_policy_updates (bounded ±0.10 each)
+    over crude Hedge multiplication. Auto-fails trigger a reject-and-regenerate
+    (no weight update). Falls back to Hedge with a moving-mean baseline and low eta
+    when the critic supplies no structured learning signal.
+    """
+    # 1. Exploration floor — every element has a minimum weight so new candidates get tried.
+    for e in list(policy):
+        if policy[e] < explore_floor:
+            policy[e] = explore_floor
+
+    # 2. Auto-fail shield: don't learn from auto-failed generations.
+    auto_fails = getattr(reward, 'auto_fails_triggered', None)
+    if auto_fails:
+        return policy
+
+    # 3. Evidence-based suggested_policy_updates from the critic (bounded ±0.10).
+    suggested = getattr(reward, 'suggested_policy_updates', None) or {}
+    if suggested:
+        for e, delta in suggested.items():
+            if e in policy:
+                policy[e] = max(explore_floor, policy[e] + delta)
+        return policy
+
+    # 4. Fallback: Hedge with moving-mean baseline and low eta.
+    running = baseline_state.get("running_mean")
+    baseline = running if running is not None else 0.5
+    advantage = reward.predicted_score - baseline
     for e in top_k(concept.elements):
         policy[e] *= math.exp(eta * advantage)
+
+    # 5. Update the moving baseline (EMA across generations).
+    baseline_state["running_mean"] = (
+        0.9 * baseline + 0.1 * reward.predicted_score
+    )
+
     return policy
 
 
@@ -125,9 +159,11 @@ def load_records() -> list[GenerationRecord]:
 @weave_op()
 def run_generation_loop(n_generations=5, concepts_per_gen=4,
                         generator=stub_generator, critic=stub_critic,
-                        meta=stub_meta, trend_source=stub_trend_source, eta=2.0):
+                        meta=stub_meta, trend_source=stub_trend_source, eta=0.4,
+                        on_generation=None):
     harness = stub_harness(0)
     policy = init_policy(harness.element_taxonomy)
+    baseline_state: dict[str, float | None] = {"running_mean": None}
     records: list[GenerationRecord] = []
     for _ in range(n_generations):
         sync_policy(policy, harness.element_taxonomy)
@@ -136,7 +172,7 @@ def run_generation_loop(n_generations=5, concepts_per_gen=4,
         for _ in range(concepts_per_gen):
             concept = traced_generate(generator, trend, harness, dict(policy))
             reward = traced_score(critic, concept, harness)
-            update_policy(policy, concept, reward, eta)          # INNER loop
+            update_policy(policy, concept, reward, baseline_state, eta)          # INNER loop
             if best is None or reward.predicted_score > best[1].predicted_score:
                 best = (concept, reward)
         concept, reward = best
@@ -144,20 +180,47 @@ def run_generation_loop(n_generations=5, concepts_per_gen=4,
             concept_id=concept.concept_id, harness_id=harness.harness_id,
             predicted_score=reward.predicted_score, harness_diff=harness.diff_summary,
             rubric_version=harness.rubric_version, selected=True)
+        # Bridge hook: notify external observers of the winning concept + score
+        if on_generation is not None:
+            on_generation(concept, reward, harness, rec)
         save_harness(harness); save_record(rec); records.append(rec)
         harness = traced_meta(meta, harness, records)            # OUTER loop
     return records
 
 
 if __name__ == "__main__":
+    # Ensure the project root is on sys.path so harness.bridge is importable.
+    import sys, os
+    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _ROOT not in sys.path:
+        sys.path.insert(0, _ROOT)
+
     try:
         import weave; weave.init("sia-social-loop")
     except Exception:
         print("(weave not installed — running without tracing)\n")
-    records = run_generation_loop()
+
+    # Wire the real ACOE critic (falls back to stub if unavailable).
+    critic_fn = stub_critic
+    bridge_hook = None
+    collector = None
+    try:
+        from harness.bridge import make_acoe_critic, make_bridge_hook
+        critic_fn = make_acoe_critic()
+        bridge_hook, collector = make_bridge_hook()
+        print("[loop] using ACOE dance critic + bridge hook\n")
+    except Exception as e:
+        print(f"[loop] ACOE critic unavailable ({e}); using stub critic\n")
+
+    records = run_generation_loop(critic=critic_fn, on_generation=bridge_hook)
     print(" gen | winner score | #elements | harness change")
     print("-----+--------------+-----------+----------------------------")
     for r in records:
         h = HarnessState.model_validate_json(Path(f"harness/gen_{r.generation}.json").read_text())
         print(f"  {r.generation}  |     {r.predicted_score:0.2f}     |     {len(h.element_taxonomy)}     | {r.harness_diff}")
     print(f"\nwrote {len(records)} GenerationRecords to ./raw/  [ok]")
+
+    # Write bridge output for the dashboard.
+    if collector and collector.records:
+        collector.write()
+        print(f"wrote {len(collector.records)} canonical GenerationRecords to data/generations.latest.json  [ok]")

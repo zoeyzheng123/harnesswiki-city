@@ -21,8 +21,25 @@ from contracts import HarnessState, GenerationRecord
 WIKI = Path("wiki")
 
 # The stub's action space — elements it can introduce when no LLM is available.
-_CANDIDATES = ["pattern_interrupt_3s", "captions_burned_in", "duet_bait_ending",
-               "first_comment_cta", "trend_audio_remix"]
+# V2 mechanics: you-hook, curiosity gap, conflict phrasing, visual rhythm, rising audio, polarizing bait.
+_CANDIDATES = [
+    "you_hook_opening",        # HQ-05 second-person text in first 2s
+    "curiosity_gap_payoff",    # RL-04 premise at 0:00, payoff held to ~0:13
+    "conflict_phrasing",       # RL-05 But/However/Suddenly transitions (not And/Also)
+    "visual_cut_rhythm",       # VP-04 a cut/zoom/pan every ≤2.5s
+    "rising_audio_early",      # AA-03 early-adopter sound, not saturated
+    "polarizing_comment_bait", # EB-03 ranking/comparison question
+]
+
+# V2 prompt snippets injected when each element is added.
+_V2_PROMPT_SNIPPETS: dict[str, str] = {
+    "you_hook_opening": "Open with 'you'/'your' framing text by frame 2.",
+    "curiosity_gap_payoff": "Withhold the payoff until the final ~15% of the video.",
+    "conflict_phrasing": "Use But/However/Suddenly transitions, not And/Also.",
+    "visual_cut_rhythm": "Change cut/zoom/pan at least every 2.5 seconds.",
+    "rising_audio_early": "Choose a rising or early-adopter audio track, not saturated.",
+    "polarizing_comment_bait": "Invite ranking or comparison: 'Rate 1-10' or 'Which is better?'",
+}
 
 
 # ---------------- compile (deterministic stub) ----------------
@@ -65,7 +82,8 @@ def _emit_stub(harness: HarnessState, records: list[GenerationRecord]) -> Harnes
     if new_el:
         tax.append(new_el)
         diff = f"wiki suggests trying [[{new_el}]] next"
-        prompt = harness.system_prompt + f" Use {new_el} when it fits."
+        snippet = _V2_PROMPT_SNIPPETS.get(new_el, f"Use {new_el} when it fits.")
+        prompt = harness.system_prompt + f" {snippet}"
     (WIKI / "lessons.md").write_text(_compile_lessons(records))
     (WIKI / "elements.md").write_text(_compile_elements(harness, new_el))
     return HarnessState(generation=harness.generation + 1, system_prompt=prompt,
@@ -81,11 +99,21 @@ def _parse_json(text: str) -> dict:
     m = re.search(r"\{.*\}", t, re.S)
     return json.loads(m.group(0) if m else t)
 
-_SYS = ("You are the meta-agent maintaining an LLM-Wiki for a self-improving short-form "
-        "video generator. Ingest the new run records, RECOMPILE the wiki (accumulate and "
-        "consolidate, do not just append), LINT it (resolve contradictions, mark stale "
-        "lessons, no orphan elements), and propose ONE concrete next harness change. "
-        "Separate observation from speculation. Return ONLY a JSON object.")
+_SYS = (
+    "You are the meta-agent maintaining an LLM-Wiki for a self-improving YouTube Shorts "
+    "dance-video generator scored against the ACOE-YT-SHORTS-v2.0 rubric. Ingest the new "
+    "run records, RECOMPILE the wiki (accumulate and consolidate, do not just append), "
+    "LINT it (resolve contradictions, mark stale lessons, no orphan elements), and "
+    "propose ONE concrete next harness change.\n\n"
+    "V2 LEVERS to bias harness rewrites toward:\n"
+    "- Micro-curiosity gap: premise at 0:00, payoff withheld until ~0:13 (RL-04)\n"
+    "- Second-person hook: 'you'/'your' framing in the opening (HQ-05)\n"
+    "- Conflict phrasing: But/However/Suddenly transitions, NOT And/Also (RL-05)\n"
+    "- Visual change rhythm: a cut/zoom/pan every ≤2.5s (VP-04)\n"
+    "- Rising approved audio: early-adopter sound, not saturated (AA-03)\n"
+    "- Polarizing comment bait: ranking/comparison questions (EB-03)\n\n"
+    "Separate observation from speculation. Return ONLY a JSON object."
+)
 
 def _emit_llm(client, model: str, harness: HarnessState,
               records: list[GenerationRecord]) -> HarnessState:
@@ -95,6 +123,7 @@ def _emit_llm(client, model: str, harness: HarnessState,
         "current_harness": harness.model_dump(mode="json"),
         "existing_wiki_lessons": existing,
         "raw_records": [r.model_dump(mode="json") for r in records],
+        "v2_candidates": [c for c in _CANDIDATES if c not in harness.element_taxonomy],
         "return_schema": {
             "lessons_md": "full recompiled wiki/lessons.md",
             "elements_md": "full wiki/elements.md with [[wikilinks]] + status",
@@ -102,6 +131,8 @@ def _emit_llm(client, model: str, harness: HarnessState,
             "prompt_addition": "<=12 words appended to system_prompt, or empty string",
             "diff_summary": "one line",
             "lint_notes": "contradictions / stale items you resolved",
+            "v2_mechanic": "which ACOE v2 criterion (HQ-05/RL-04/RL-05/VP-04/AA-03/EB-03) this change targets, or empty",
+            "expected_acoe_impact": "which criterion(s) should improve, or empty",
         },
     })
     resp = client.chat.completions.create(model=model, temperature=0.4, max_tokens=1500,

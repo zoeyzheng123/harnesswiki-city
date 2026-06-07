@@ -1,0 +1,2061 @@
+[
+  {
+    "id": "rec_3e0d66cc",
+    "generation_number": 0,
+    "created_at": "2026-06-07T12:24:09.970032Z",
+    "trend_context_id": "trend_166c9db4",
+    "concept": {
+      "id": "concept_1d33876f",
+      "generation_number": 0,
+      "trend_context_id": "trend_166c9db4",
+      "harness_state_version": "v0",
+      "hook": "POV: your cubicle in 1997 vs now",
+      "format": "comedy",
+      "angle": "emphasize comedy; emphasize 90s_aesthetic; emphasize text_hook_frame1",
+      "script": "POV: your cubicle in 1997 vs now",
+      "visual_prompt": "8s POV skit; 90s office desk glow-up; lead with comedy",
+      "elements": [
+        "comedy",
+        "90s_aesthetic",
+        "text_hook_frame1",
+        "trending_audio_sync",
+        "slow_pan_intro"
+      ],
+      "created_by": "content-generator",
+      "concept_id": "concept_1d33876f",
+      "generation": 0,
+      "trend_id": "trend_166c9db4",
+      "element_weights": {
+        "comedy": 0.2,
+        "90s_aesthetic": 0.2,
+        "text_hook_frame1": 0.2,
+        "trending_audio_sync": 0.2,
+        "slow_pan_intro": 0.2
+      },
+      "storyboard": [
+        "emphasize comedy",
+        "emphasize 90s_aesthetic",
+        "emphasize text_hook_frame1"
+      ],
+      "seedance_prompt": "8s POV skit; 90s office desk glow-up; lead with comedy",
+      "duration_sec": 8,
+      "created_at": "2026-06-07T12:24:09.969152Z"
+    },
+    "score": {
+      "id": "rs_e6474879",
+      "concept_id": "concept_1d33876f",
+      "generation_number": 0,
+      "harness_state_version": "v0",
+      "weighted_total": 0.0,
+      "predicted_win_prob": 0.5,
+      "policy_flag": true,
+      "judge_rationale": "ACOE projected score 0/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "predicted_score": 0.0,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.58,
+      "scored_by": "acoe-dance-judge:ACOE-YT-SHORTS-v2.0",
+      "rationale": "ACOE projected score 0/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "scored_at": "2026-06-07T12:24:09.969494Z",
+      "total_score": 0.0,
+      "distribution_tier": "seed_jail",
+      "auto_fails_triggered": [
+        "AF-02",
+        "AF-03"
+      ],
+      "category_breakdown": {
+        "hook_quality": 0,
+        "retention_and_loop": 0,
+        "engagement_bait": 0,
+        "visual_production": 0,
+        "audio_alignment": 0,
+        "metadata": 0
+      },
+      "lowest_scoring_category": "hook_quality",
+      "recommended_fix_priority": "Peak motion is visible in frame 1.; The background strongly separates the dancer.; A bold visual or text pattern interrupt appears by 1.5 seconds.",
+      "winning_elements": [],
+      "weak_elements": [],
+      "suggested_policy_updates": {},
+      "rubric_breakdown": {
+        "policy_id": "ACOE-YT-SHORTS-v2.0",
+        "evaluation_mode": "prompt_preflight",
+        "score_type": "projected",
+        "projected_score": 0,
+        "verified_score": null,
+        "supported_subtotal": 0,
+        "evidence_coverage": 0.5652173913043478,
+        "distribution_tier": "seed_jail",
+        "auto_fails_triggered": [
+          "AF-02",
+          "AF-03"
+        ],
+        "category_breakdown": {
+          "hook_quality": {
+            "score": 0,
+            "max_points": 30,
+            "criteria": [
+              {
+                "id": "HQ-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit peak-motion frame-1 instruction.",
+                "reason": "Peak motion is visible in frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "HQ-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Background direction: not specified as isolated or high contrast.",
+                "reason": "The background strongly separates the dancer.",
+                "points_awarded": 0,
+                "max_points": 6
+              },
+              {
+                "id": "HQ-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Prompt does not request an opening pattern interrupt.",
+                "reason": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-04",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Start timing is not explicit.",
+                "reason": "Dance motion starts immediately with no title card or fade.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-05",
+                "status": "pass",
+                "evidence_type": "requested",
+                "evidence": "Opening text uses second-person framing.",
+                "reason": "Opening on-screen text uses second-person framing ('you'/'your').",
+                "points_awarded": 5,
+                "max_points": 5
+              }
+            ]
+          },
+          "retention_and_loop": {
+            "score": 0,
+            "max_points": 25,
+            "criteria": [
+              {
+                "id": "RL-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Requested duration: 8s.",
+                "reason": "Duration is 13-15 seconds (16-18 is partial).",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "RL-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Loop direction: not specified.",
+                "reason": "The final pose and camera framing reconnect to frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "RL-03",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Pacing continuity is not explicit.",
+                "reason": "Motion remains active with no dead zones.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-04",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "No explicit delayed-payoff structure in the prompt.",
+                "reason": "The promised payoff is withheld until the final ~15% of the video.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-05",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No narrative transition words in the script.",
+                "reason": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "engagement_bait": {
+            "score": 0,
+            "max_points": 10,
+            "criteria": [
+              {
+                "id": "EB-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No typed-response question is requested.",
+                "reason": "An on-screen question invites a meaningful typed response.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "EB-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Question/text visibility: no overlay requested.",
+                "reason": "The question remains legible for most of the video.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "EB-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No specific comparative opinion prompt.",
+                "reason": "The question invites ranking, comparison, or a specific opinion.",
+                "points_awarded": 0,
+                "max_points": 2
+              }
+            ]
+          },
+          "visual_production": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "VP-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Composition does not establish the dancer as the focal point.",
+                "reason": "The dancer is the clear visual focal point.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Wardrobe is not specified as dynamic or contrasting.",
+                "reason": "Wardrobe has dynamic light interaction or strong contrast.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "VP-03",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "Prompt does not specify render-quality safeguards.",
+                "reason": "The render is crisp without body, face, or motion artifacts.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-04",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Cut/motion frequency is not specified.",
+                "reason": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+                "points_awarded": 0,
+                "max_points": 4
+              }
+            ]
+          },
+          "audio_alignment": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "AA-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Approved-pool provenance is not supplied.",
+                "reason": "The supplied audio belongs to the approved current pool.",
+                "points_awarded": 0,
+                "max_points": 7
+              },
+              {
+                "id": "AA-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit movement-to-beat mapping.",
+                "reason": "Movement peaks align to distinct beat hits.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "AA-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "No audio supplied; sound momentum unknown.",
+                "reason": "The chosen sound is rising / early-adopter, not saturated.",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "metadata": {
+            "score": 0,
+            "max_points": 5,
+            "criteria": [
+              {
+                "id": "MD-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing title is not supplied.",
+                "reason": "The publishing title mirrors the on-screen question.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-02",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Hashtags are not supplied.",
+                "reason": "Hashtags mix niche, broad, and audio-anchor tags.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing description is not supplied.",
+                "reason": "The description contains a relevant comment invitation.",
+                "points_awarded": 0,
+                "max_points": 1
+              }
+            ]
+          }
+        },
+        "general_quality": {
+          "prompt_detail": 0.51,
+          "prompt_clarity": 0.75,
+          "sequence_flow": 0.55,
+          "choreography_coherence": 0.45,
+          "music_motion_alignment": 0.4,
+          "vibe_coherence": 0.55,
+          "visual_direction": 0.5,
+          "video_model_feasibility": 0.78,
+          "originality": 0.5,
+          "viewer_satisfaction_potential": 0.546
+        },
+        "cringe_risk": 0.12,
+        "policy_risk": 0.05,
+        "confidence": 0.58,
+        "strengths": [
+          "Opening on-screen text uses second-person framing ('you'/'your')."
+        ],
+        "weaknesses": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+          "Duration is 13-15 seconds (16-18 is partial).",
+          "The final pose and camera framing reconnect to frame 1."
+        ],
+        "missing_evidence": [
+          "Dance motion starts immediately with no title card or fade.",
+          "Motion remains active with no dead zones.",
+          "The render is crisp without body, face, or motion artifacts.",
+          "The supplied audio belongs to the approved current pool.",
+          "The publishing title mirrors the on-screen question.",
+          "Hashtags mix niche, broad, and audio-anchor tags.",
+          "The description contains a relevant comment invitation.",
+          "The promised payoff is withheld until the final ~15% of the video.",
+          "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+          "The chosen sound is rising / early-adopter, not saturated."
+        ],
+        "contradictions": [],
+        "predicted_generation_failures": [],
+        "lowest_scoring_category": "hook_quality",
+        "recommended_fix_priority": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "A bold visual or text pattern interrupt appears by 1.5 seconds."
+        ],
+        "revised_generation_prompt": "8s POV skit; 90s office desk glow-up; lead with comedy",
+        "policy_update_allowed": false,
+        "policy_learning": {
+          "confidence": 0.58,
+          "winning_elements": [],
+          "weak_elements": [],
+          "policy_deltas": {},
+          "new_candidate_elements": [],
+          "evidence": []
+        },
+        "needs_human_review": true
+      }
+    },
+    "harness_state_version_before": "v0",
+    "harness_state_version_after": "v1",
+    "record_id": "rec_3e0d66cc",
+    "generation": 0,
+    "trend_id": "trend_166c9db4",
+    "concept_id": "concept_1d33876f",
+    "harness_id": "harness_a851207d",
+    "predicted_score": 0.0,
+    "rubric_version": "v1",
+    "selected": true
+  },
+  {
+    "id": "rec_3273ae1c",
+    "generation_number": 1,
+    "created_at": "2026-06-07T12:24:09.970955Z",
+    "trend_context_id": "trend_511acfed",
+    "concept": {
+      "id": "concept_104a9a29",
+      "generation_number": 1,
+      "trend_context_id": "trend_511acfed",
+      "harness_state_version": "v1",
+      "hook": "POV: your cubicle in 1997 vs now",
+      "format": "comedy",
+      "angle": "emphasize pattern_interrupt_3s; emphasize comedy; emphasize 90s_aesthetic",
+      "script": "POV: your cubicle in 1997 vs now",
+      "visual_prompt": "8s POV skit; 90s office desk glow-up; lead with pattern_interrupt_3s",
+      "elements": [
+        "comedy",
+        "90s_aesthetic",
+        "text_hook_frame1",
+        "trending_audio_sync",
+        "slow_pan_intro",
+        "pattern_interrupt_3s"
+      ],
+      "created_by": "content-generator",
+      "concept_id": "concept_104a9a29",
+      "generation": 1,
+      "trend_id": "trend_511acfed",
+      "element_weights": {
+        "comedy": 0.154,
+        "90s_aesthetic": 0.154,
+        "text_hook_frame1": 0.154,
+        "trending_audio_sync": 0.154,
+        "slow_pan_intro": 0.154,
+        "pattern_interrupt_3s": 0.231
+      },
+      "storyboard": [
+        "emphasize pattern_interrupt_3s",
+        "emphasize comedy",
+        "emphasize 90s_aesthetic"
+      ],
+      "seedance_prompt": "8s POV skit; 90s office desk glow-up; lead with pattern_interrupt_3s",
+      "duration_sec": 8,
+      "created_at": "2026-06-07T12:24:09.970364Z"
+    },
+    "score": {
+      "id": "rs_9ef23ae7",
+      "concept_id": "concept_104a9a29",
+      "generation_number": 1,
+      "harness_state_version": "v1",
+      "weighted_total": 0.0,
+      "predicted_win_prob": 0.5,
+      "policy_flag": true,
+      "judge_rationale": "ACOE projected score 0/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "predicted_score": 0.0,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.58,
+      "scored_by": "acoe-dance-judge:ACOE-YT-SHORTS-v2.0",
+      "rationale": "ACOE projected score 0/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "scored_at": "2026-06-07T12:24:09.970498Z",
+      "total_score": 0.0,
+      "distribution_tier": "seed_jail",
+      "auto_fails_triggered": [
+        "AF-02",
+        "AF-03"
+      ],
+      "category_breakdown": {
+        "hook_quality": 0,
+        "retention_and_loop": 0,
+        "engagement_bait": 0,
+        "visual_production": 0,
+        "audio_alignment": 0,
+        "metadata": 0
+      },
+      "lowest_scoring_category": "hook_quality",
+      "recommended_fix_priority": "Peak motion is visible in frame 1.; The background strongly separates the dancer.; A bold visual or text pattern interrupt appears by 1.5 seconds.",
+      "winning_elements": [],
+      "weak_elements": [],
+      "suggested_policy_updates": {},
+      "rubric_breakdown": {
+        "policy_id": "ACOE-YT-SHORTS-v2.0",
+        "evaluation_mode": "prompt_preflight",
+        "score_type": "projected",
+        "projected_score": 0,
+        "verified_score": null,
+        "supported_subtotal": 0,
+        "evidence_coverage": 0.5652173913043478,
+        "distribution_tier": "seed_jail",
+        "auto_fails_triggered": [
+          "AF-02",
+          "AF-03"
+        ],
+        "category_breakdown": {
+          "hook_quality": {
+            "score": 0,
+            "max_points": 30,
+            "criteria": [
+              {
+                "id": "HQ-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit peak-motion frame-1 instruction.",
+                "reason": "Peak motion is visible in frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "HQ-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Background direction: not specified as isolated or high contrast.",
+                "reason": "The background strongly separates the dancer.",
+                "points_awarded": 0,
+                "max_points": 6
+              },
+              {
+                "id": "HQ-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Prompt does not request an opening pattern interrupt.",
+                "reason": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-04",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Start timing is not explicit.",
+                "reason": "Dance motion starts immediately with no title card or fade.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-05",
+                "status": "pass",
+                "evidence_type": "requested",
+                "evidence": "Opening text uses second-person framing.",
+                "reason": "Opening on-screen text uses second-person framing ('you'/'your').",
+                "points_awarded": 5,
+                "max_points": 5
+              }
+            ]
+          },
+          "retention_and_loop": {
+            "score": 0,
+            "max_points": 25,
+            "criteria": [
+              {
+                "id": "RL-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Requested duration: 8s.",
+                "reason": "Duration is 13-15 seconds (16-18 is partial).",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "RL-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Loop direction: not specified.",
+                "reason": "The final pose and camera framing reconnect to frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "RL-03",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Pacing continuity is not explicit.",
+                "reason": "Motion remains active with no dead zones.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-04",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "No explicit delayed-payoff structure in the prompt.",
+                "reason": "The promised payoff is withheld until the final ~15% of the video.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-05",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No narrative transition words in the script.",
+                "reason": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "engagement_bait": {
+            "score": 0,
+            "max_points": 10,
+            "criteria": [
+              {
+                "id": "EB-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No typed-response question is requested.",
+                "reason": "An on-screen question invites a meaningful typed response.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "EB-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Question/text visibility: no overlay requested.",
+                "reason": "The question remains legible for most of the video.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "EB-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No specific comparative opinion prompt.",
+                "reason": "The question invites ranking, comparison, or a specific opinion.",
+                "points_awarded": 0,
+                "max_points": 2
+              }
+            ]
+          },
+          "visual_production": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "VP-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Composition does not establish the dancer as the focal point.",
+                "reason": "The dancer is the clear visual focal point.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Wardrobe is not specified as dynamic or contrasting.",
+                "reason": "Wardrobe has dynamic light interaction or strong contrast.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "VP-03",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "Prompt does not specify render-quality safeguards.",
+                "reason": "The render is crisp without body, face, or motion artifacts.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-04",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Cut/motion frequency is not specified.",
+                "reason": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+                "points_awarded": 0,
+                "max_points": 4
+              }
+            ]
+          },
+          "audio_alignment": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "AA-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Approved-pool provenance is not supplied.",
+                "reason": "The supplied audio belongs to the approved current pool.",
+                "points_awarded": 0,
+                "max_points": 7
+              },
+              {
+                "id": "AA-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit movement-to-beat mapping.",
+                "reason": "Movement peaks align to distinct beat hits.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "AA-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "No audio supplied; sound momentum unknown.",
+                "reason": "The chosen sound is rising / early-adopter, not saturated.",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "metadata": {
+            "score": 0,
+            "max_points": 5,
+            "criteria": [
+              {
+                "id": "MD-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing title is not supplied.",
+                "reason": "The publishing title mirrors the on-screen question.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-02",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Hashtags are not supplied.",
+                "reason": "Hashtags mix niche, broad, and audio-anchor tags.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing description is not supplied.",
+                "reason": "The description contains a relevant comment invitation.",
+                "points_awarded": 0,
+                "max_points": 1
+              }
+            ]
+          }
+        },
+        "general_quality": {
+          "prompt_detail": 0.45,
+          "prompt_clarity": 0.75,
+          "sequence_flow": 0.55,
+          "choreography_coherence": 0.45,
+          "music_motion_alignment": 0.4,
+          "vibe_coherence": 0.55,
+          "visual_direction": 0.5,
+          "video_model_feasibility": 0.78,
+          "originality": 0.5,
+          "viewer_satisfaction_potential": 0.546
+        },
+        "cringe_risk": 0.12,
+        "policy_risk": 0.05,
+        "confidence": 0.58,
+        "strengths": [
+          "Opening on-screen text uses second-person framing ('you'/'your')."
+        ],
+        "weaknesses": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+          "Duration is 13-15 seconds (16-18 is partial).",
+          "The final pose and camera framing reconnect to frame 1."
+        ],
+        "missing_evidence": [
+          "Dance motion starts immediately with no title card or fade.",
+          "Motion remains active with no dead zones.",
+          "The render is crisp without body, face, or motion artifacts.",
+          "The supplied audio belongs to the approved current pool.",
+          "The publishing title mirrors the on-screen question.",
+          "Hashtags mix niche, broad, and audio-anchor tags.",
+          "The description contains a relevant comment invitation.",
+          "The promised payoff is withheld until the final ~15% of the video.",
+          "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+          "The chosen sound is rising / early-adopter, not saturated."
+        ],
+        "contradictions": [],
+        "predicted_generation_failures": [],
+        "lowest_scoring_category": "hook_quality",
+        "recommended_fix_priority": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "A bold visual or text pattern interrupt appears by 1.5 seconds."
+        ],
+        "revised_generation_prompt": "8s POV skit; 90s office desk glow-up; lead with pattern_interrupt_3s",
+        "policy_update_allowed": false,
+        "policy_learning": {
+          "confidence": 0.58,
+          "winning_elements": [],
+          "weak_elements": [],
+          "policy_deltas": {},
+          "new_candidate_elements": [],
+          "evidence": []
+        },
+        "needs_human_review": true
+      }
+    },
+    "harness_state_version_before": "v1",
+    "harness_state_version_after": "v2",
+    "harness_diff": {
+      "id": "hd_fca0c614",
+      "from_version": "v1",
+      "to_version": "v2",
+      "element_weight_changes": {},
+      "rationale": "added element 'pattern_interrupt_3s'",
+      "accepted": true
+    },
+    "record_id": "rec_3273ae1c",
+    "generation": 1,
+    "trend_id": "trend_511acfed",
+    "concept_id": "concept_104a9a29",
+    "harness_id": "harness_f94ffa90",
+    "predicted_score": 0.0,
+    "rubric_version": "v1",
+    "selected": true
+  },
+  {
+    "id": "rec_a68f4def",
+    "generation_number": 2,
+    "created_at": "2026-06-07T12:24:09.971738Z",
+    "trend_context_id": "trend_2765b428",
+    "concept": {
+      "id": "concept_6abf8034",
+      "generation_number": 2,
+      "trend_context_id": "trend_2765b428",
+      "harness_state_version": "v2",
+      "hook": "POV: your cubicle in 1997 vs now",
+      "format": "comedy",
+      "angle": "emphasize captions_burned_in; emphasize pattern_interrupt_3s; emphasize comedy",
+      "script": "POV: your cubicle in 1997 vs now",
+      "visual_prompt": "8s POV skit; 90s office desk glow-up; lead with captions_burned_in",
+      "elements": [
+        "comedy",
+        "90s_aesthetic",
+        "text_hook_frame1",
+        "trending_audio_sync",
+        "slow_pan_intro",
+        "pattern_interrupt_3s",
+        "captions_burned_in"
+      ],
+      "created_by": "content-generator",
+      "concept_id": "concept_6abf8034",
+      "generation": 2,
+      "trend_id": "trend_2765b428",
+      "element_weights": {
+        "comedy": 0.114,
+        "90s_aesthetic": 0.114,
+        "text_hook_frame1": 0.114,
+        "trending_audio_sync": 0.114,
+        "slow_pan_intro": 0.114,
+        "pattern_interrupt_3s": 0.171,
+        "captions_burned_in": 0.257
+      },
+      "storyboard": [
+        "emphasize captions_burned_in",
+        "emphasize pattern_interrupt_3s",
+        "emphasize comedy"
+      ],
+      "seedance_prompt": "8s POV skit; 90s office desk glow-up; lead with captions_burned_in",
+      "duration_sec": 8,
+      "created_at": "2026-06-07T12:24:09.971167Z"
+    },
+    "score": {
+      "id": "rs_9d0934c1",
+      "concept_id": "concept_6abf8034",
+      "generation_number": 2,
+      "harness_state_version": "v2",
+      "weighted_total": 0.058,
+      "predicted_win_prob": 0.5,
+      "policy_flag": true,
+      "judge_rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "predicted_score": 0.058,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.58,
+      "scored_by": "acoe-dance-judge:ACOE-YT-SHORTS-v2.0",
+      "rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "scored_at": "2026-06-07T12:24:09.971292Z",
+      "total_score": 8.0,
+      "distribution_tier": "seed_jail",
+      "auto_fails_triggered": [
+        "AF-03"
+      ],
+      "category_breakdown": {
+        "hook_quality": 7,
+        "retention_and_loop": 0,
+        "engagement_bait": 1,
+        "visual_production": 0,
+        "audio_alignment": 0,
+        "metadata": 0
+      },
+      "lowest_scoring_category": "retention_and_loop",
+      "recommended_fix_priority": "Peak motion is visible in frame 1.; The background strongly separates the dancer.; Duration is 13-15 seconds (16-18 is partial).",
+      "winning_elements": [],
+      "weak_elements": [],
+      "suggested_policy_updates": {},
+      "rubric_breakdown": {
+        "policy_id": "ACOE-YT-SHORTS-v2.0",
+        "evaluation_mode": "prompt_preflight",
+        "score_type": "projected",
+        "projected_score": 8,
+        "verified_score": null,
+        "supported_subtotal": 8,
+        "evidence_coverage": 0.5652173913043478,
+        "distribution_tier": "seed_jail",
+        "auto_fails_triggered": [
+          "AF-03"
+        ],
+        "category_breakdown": {
+          "hook_quality": {
+            "score": 7,
+            "max_points": 30,
+            "criteria": [
+              {
+                "id": "HQ-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit peak-motion frame-1 instruction.",
+                "reason": "Peak motion is visible in frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "HQ-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Background direction: not specified as isolated or high contrast.",
+                "reason": "The background strongly separates the dancer.",
+                "points_awarded": 0,
+                "max_points": 6
+              },
+              {
+                "id": "HQ-03",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Prompt requests text but does not anchor it to the opening.",
+                "reason": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+                "points_awarded": 2,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-04",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Start timing is not explicit.",
+                "reason": "Dance motion starts immediately with no title card or fade.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-05",
+                "status": "pass",
+                "evidence_type": "requested",
+                "evidence": "Opening text uses second-person framing.",
+                "reason": "Opening on-screen text uses second-person framing ('you'/'your').",
+                "points_awarded": 5,
+                "max_points": 5
+              }
+            ]
+          },
+          "retention_and_loop": {
+            "score": 0,
+            "max_points": 25,
+            "criteria": [
+              {
+                "id": "RL-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Requested duration: 8s.",
+                "reason": "Duration is 13-15 seconds (16-18 is partial).",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "RL-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Loop direction: not specified.",
+                "reason": "The final pose and camera framing reconnect to frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "RL-03",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Pacing continuity is not explicit.",
+                "reason": "Motion remains active with no dead zones.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-04",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "No explicit delayed-payoff structure in the prompt.",
+                "reason": "The promised payoff is withheld until the final ~15% of the video.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-05",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No narrative transition words in the script.",
+                "reason": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "engagement_bait": {
+            "score": 1,
+            "max_points": 10,
+            "criteria": [
+              {
+                "id": "EB-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No typed-response question is requested.",
+                "reason": "An on-screen question invites a meaningful typed response.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "EB-02",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Question/text visibility: text requested without duration.",
+                "reason": "The question remains legible for most of the video.",
+                "points_awarded": 1,
+                "max_points": 3
+              },
+              {
+                "id": "EB-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No specific comparative opinion prompt.",
+                "reason": "The question invites ranking, comparison, or a specific opinion.",
+                "points_awarded": 0,
+                "max_points": 2
+              }
+            ]
+          },
+          "visual_production": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "VP-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Composition does not establish the dancer as the focal point.",
+                "reason": "The dancer is the clear visual focal point.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Wardrobe is not specified as dynamic or contrasting.",
+                "reason": "Wardrobe has dynamic light interaction or strong contrast.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "VP-03",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "Prompt does not specify render-quality safeguards.",
+                "reason": "The render is crisp without body, face, or motion artifacts.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-04",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Cut/motion frequency is not specified.",
+                "reason": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+                "points_awarded": 0,
+                "max_points": 4
+              }
+            ]
+          },
+          "audio_alignment": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "AA-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Approved-pool provenance is not supplied.",
+                "reason": "The supplied audio belongs to the approved current pool.",
+                "points_awarded": 0,
+                "max_points": 7
+              },
+              {
+                "id": "AA-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit movement-to-beat mapping.",
+                "reason": "Movement peaks align to distinct beat hits.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "AA-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "No audio supplied; sound momentum unknown.",
+                "reason": "The chosen sound is rising / early-adopter, not saturated.",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "metadata": {
+            "score": 0,
+            "max_points": 5,
+            "criteria": [
+              {
+                "id": "MD-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing title is not supplied.",
+                "reason": "The publishing title mirrors the on-screen question.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-02",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Hashtags are not supplied.",
+                "reason": "Hashtags mix niche, broad, and audio-anchor tags.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing description is not supplied.",
+                "reason": "The description contains a relevant comment invitation.",
+                "points_awarded": 0,
+                "max_points": 1
+              }
+            ]
+          }
+        },
+        "general_quality": {
+          "prompt_detail": 0.45,
+          "prompt_clarity": 0.75,
+          "sequence_flow": 0.55,
+          "choreography_coherence": 0.45,
+          "music_motion_alignment": 0.4,
+          "vibe_coherence": 0.55,
+          "visual_direction": 0.5,
+          "video_model_feasibility": 0.78,
+          "originality": 0.5,
+          "viewer_satisfaction_potential": 0.546
+        },
+        "cringe_risk": 0.12,
+        "policy_risk": 0.05,
+        "confidence": 0.58,
+        "strengths": [
+          "Opening on-screen text uses second-person framing ('you'/'your')."
+        ],
+        "weaknesses": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial).",
+          "The final pose and camera framing reconnect to frame 1.",
+          "An on-screen question invites a meaningful typed response."
+        ],
+        "missing_evidence": [
+          "Dance motion starts immediately with no title card or fade.",
+          "Motion remains active with no dead zones.",
+          "The render is crisp without body, face, or motion artifacts.",
+          "The supplied audio belongs to the approved current pool.",
+          "The publishing title mirrors the on-screen question.",
+          "Hashtags mix niche, broad, and audio-anchor tags.",
+          "The description contains a relevant comment invitation.",
+          "The promised payoff is withheld until the final ~15% of the video.",
+          "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+          "The chosen sound is rising / early-adopter, not saturated."
+        ],
+        "contradictions": [],
+        "predicted_generation_failures": [],
+        "lowest_scoring_category": "retention_and_loop",
+        "recommended_fix_priority": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial)."
+        ],
+        "revised_generation_prompt": "8s POV skit; 90s office desk glow-up; lead with captions_burned_in",
+        "policy_update_allowed": false,
+        "policy_learning": {
+          "confidence": 0.58,
+          "winning_elements": [],
+          "weak_elements": [],
+          "policy_deltas": {},
+          "new_candidate_elements": [],
+          "evidence": []
+        },
+        "needs_human_review": true
+      }
+    },
+    "harness_state_version_before": "v2",
+    "harness_state_version_after": "v3",
+    "harness_diff": {
+      "id": "hd_f300e543",
+      "from_version": "v2",
+      "to_version": "v3",
+      "element_weight_changes": {},
+      "rationale": "added element 'captions_burned_in'",
+      "accepted": true
+    },
+    "record_id": "rec_a68f4def",
+    "generation": 2,
+    "trend_id": "trend_2765b428",
+    "concept_id": "concept_6abf8034",
+    "harness_id": "harness_0e795d54",
+    "predicted_score": 0.058,
+    "rubric_version": "v1",
+    "selected": true
+  },
+  {
+    "id": "rec_b4c432f6",
+    "generation_number": 3,
+    "created_at": "2026-06-07T12:24:09.972466Z",
+    "trend_context_id": "trend_e907011d",
+    "concept": {
+      "id": "concept_eaad1bcc",
+      "generation_number": 3,
+      "trend_context_id": "trend_e907011d",
+      "harness_state_version": "v3",
+      "hook": "POV: your cubicle in 1997 vs now",
+      "format": "comedy",
+      "angle": "emphasize duet_bait_ending; emphasize captions_burned_in; emphasize pattern_interrupt_3s",
+      "script": "POV: your cubicle in 1997 vs now",
+      "visual_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+      "elements": [
+        "comedy",
+        "90s_aesthetic",
+        "text_hook_frame1",
+        "trending_audio_sync",
+        "slow_pan_intro",
+        "pattern_interrupt_3s",
+        "captions_burned_in",
+        "duet_bait_ending"
+      ],
+      "created_by": "content-generator",
+      "concept_id": "concept_eaad1bcc",
+      "generation": 3,
+      "trend_id": "trend_e907011d",
+      "element_weights": {
+        "comedy": 0.082,
+        "90s_aesthetic": 0.082,
+        "text_hook_frame1": 0.082,
+        "trending_audio_sync": 0.082,
+        "slow_pan_intro": 0.082,
+        "pattern_interrupt_3s": 0.124,
+        "captions_burned_in": 0.186,
+        "duet_bait_ending": 0.278
+      },
+      "storyboard": [
+        "emphasize duet_bait_ending",
+        "emphasize captions_burned_in",
+        "emphasize pattern_interrupt_3s"
+      ],
+      "seedance_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+      "duration_sec": 8,
+      "created_at": "2026-06-07T12:24:09.971912Z"
+    },
+    "score": {
+      "id": "rs_3fb2627f",
+      "concept_id": "concept_eaad1bcc",
+      "generation_number": 3,
+      "harness_state_version": "v3",
+      "weighted_total": 0.058,
+      "predicted_win_prob": 0.5,
+      "policy_flag": true,
+      "judge_rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "predicted_score": 0.058,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.58,
+      "scored_by": "acoe-dance-judge:ACOE-YT-SHORTS-v2.0",
+      "rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "scored_at": "2026-06-07T12:24:09.972031Z",
+      "total_score": 8.0,
+      "distribution_tier": "seed_jail",
+      "auto_fails_triggered": [
+        "AF-03"
+      ],
+      "category_breakdown": {
+        "hook_quality": 7,
+        "retention_and_loop": 0,
+        "engagement_bait": 1,
+        "visual_production": 0,
+        "audio_alignment": 0,
+        "metadata": 0
+      },
+      "lowest_scoring_category": "retention_and_loop",
+      "recommended_fix_priority": "Peak motion is visible in frame 1.; The background strongly separates the dancer.; Duration is 13-15 seconds (16-18 is partial).",
+      "winning_elements": [],
+      "weak_elements": [],
+      "suggested_policy_updates": {},
+      "rubric_breakdown": {
+        "policy_id": "ACOE-YT-SHORTS-v2.0",
+        "evaluation_mode": "prompt_preflight",
+        "score_type": "projected",
+        "projected_score": 8,
+        "verified_score": null,
+        "supported_subtotal": 8,
+        "evidence_coverage": 0.5652173913043478,
+        "distribution_tier": "seed_jail",
+        "auto_fails_triggered": [
+          "AF-03"
+        ],
+        "category_breakdown": {
+          "hook_quality": {
+            "score": 7,
+            "max_points": 30,
+            "criteria": [
+              {
+                "id": "HQ-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit peak-motion frame-1 instruction.",
+                "reason": "Peak motion is visible in frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "HQ-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Background direction: not specified as isolated or high contrast.",
+                "reason": "The background strongly separates the dancer.",
+                "points_awarded": 0,
+                "max_points": 6
+              },
+              {
+                "id": "HQ-03",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Prompt requests text but does not anchor it to the opening.",
+                "reason": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+                "points_awarded": 2,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-04",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Start timing is not explicit.",
+                "reason": "Dance motion starts immediately with no title card or fade.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-05",
+                "status": "pass",
+                "evidence_type": "requested",
+                "evidence": "Opening text uses second-person framing.",
+                "reason": "Opening on-screen text uses second-person framing ('you'/'your').",
+                "points_awarded": 5,
+                "max_points": 5
+              }
+            ]
+          },
+          "retention_and_loop": {
+            "score": 0,
+            "max_points": 25,
+            "criteria": [
+              {
+                "id": "RL-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Requested duration: 8s.",
+                "reason": "Duration is 13-15 seconds (16-18 is partial).",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "RL-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Loop direction: not specified.",
+                "reason": "The final pose and camera framing reconnect to frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "RL-03",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Pacing continuity is not explicit.",
+                "reason": "Motion remains active with no dead zones.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-04",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "No explicit delayed-payoff structure in the prompt.",
+                "reason": "The promised payoff is withheld until the final ~15% of the video.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-05",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No narrative transition words in the script.",
+                "reason": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "engagement_bait": {
+            "score": 1,
+            "max_points": 10,
+            "criteria": [
+              {
+                "id": "EB-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No typed-response question is requested.",
+                "reason": "An on-screen question invites a meaningful typed response.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "EB-02",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Question/text visibility: text requested without duration.",
+                "reason": "The question remains legible for most of the video.",
+                "points_awarded": 1,
+                "max_points": 3
+              },
+              {
+                "id": "EB-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No specific comparative opinion prompt.",
+                "reason": "The question invites ranking, comparison, or a specific opinion.",
+                "points_awarded": 0,
+                "max_points": 2
+              }
+            ]
+          },
+          "visual_production": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "VP-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Composition does not establish the dancer as the focal point.",
+                "reason": "The dancer is the clear visual focal point.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Wardrobe is not specified as dynamic or contrasting.",
+                "reason": "Wardrobe has dynamic light interaction or strong contrast.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "VP-03",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "Prompt does not specify render-quality safeguards.",
+                "reason": "The render is crisp without body, face, or motion artifacts.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-04",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Cut/motion frequency is not specified.",
+                "reason": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+                "points_awarded": 0,
+                "max_points": 4
+              }
+            ]
+          },
+          "audio_alignment": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "AA-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Approved-pool provenance is not supplied.",
+                "reason": "The supplied audio belongs to the approved current pool.",
+                "points_awarded": 0,
+                "max_points": 7
+              },
+              {
+                "id": "AA-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit movement-to-beat mapping.",
+                "reason": "Movement peaks align to distinct beat hits.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "AA-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "No audio supplied; sound momentum unknown.",
+                "reason": "The chosen sound is rising / early-adopter, not saturated.",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "metadata": {
+            "score": 0,
+            "max_points": 5,
+            "criteria": [
+              {
+                "id": "MD-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing title is not supplied.",
+                "reason": "The publishing title mirrors the on-screen question.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-02",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Hashtags are not supplied.",
+                "reason": "Hashtags mix niche, broad, and audio-anchor tags.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing description is not supplied.",
+                "reason": "The description contains a relevant comment invitation.",
+                "points_awarded": 0,
+                "max_points": 1
+              }
+            ]
+          }
+        },
+        "general_quality": {
+          "prompt_detail": 0.45,
+          "prompt_clarity": 0.75,
+          "sequence_flow": 0.55,
+          "choreography_coherence": 0.45,
+          "music_motion_alignment": 0.4,
+          "vibe_coherence": 0.55,
+          "visual_direction": 0.5,
+          "video_model_feasibility": 0.78,
+          "originality": 0.5,
+          "viewer_satisfaction_potential": 0.546
+        },
+        "cringe_risk": 0.12,
+        "policy_risk": 0.05,
+        "confidence": 0.58,
+        "strengths": [
+          "Opening on-screen text uses second-person framing ('you'/'your')."
+        ],
+        "weaknesses": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial).",
+          "The final pose and camera framing reconnect to frame 1.",
+          "An on-screen question invites a meaningful typed response."
+        ],
+        "missing_evidence": [
+          "Dance motion starts immediately with no title card or fade.",
+          "Motion remains active with no dead zones.",
+          "The render is crisp without body, face, or motion artifacts.",
+          "The supplied audio belongs to the approved current pool.",
+          "The publishing title mirrors the on-screen question.",
+          "Hashtags mix niche, broad, and audio-anchor tags.",
+          "The description contains a relevant comment invitation.",
+          "The promised payoff is withheld until the final ~15% of the video.",
+          "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+          "The chosen sound is rising / early-adopter, not saturated."
+        ],
+        "contradictions": [],
+        "predicted_generation_failures": [],
+        "lowest_scoring_category": "retention_and_loop",
+        "recommended_fix_priority": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial)."
+        ],
+        "revised_generation_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+        "policy_update_allowed": false,
+        "policy_learning": {
+          "confidence": 0.58,
+          "winning_elements": [],
+          "weak_elements": [],
+          "policy_deltas": {},
+          "new_candidate_elements": [],
+          "evidence": []
+        },
+        "needs_human_review": true
+      }
+    },
+    "harness_state_version_before": "v3",
+    "harness_state_version_after": "v4",
+    "harness_diff": {
+      "id": "hd_112a8d91",
+      "from_version": "v3",
+      "to_version": "v4",
+      "element_weight_changes": {},
+      "rationale": "added element 'duet_bait_ending'",
+      "accepted": true
+    },
+    "record_id": "rec_b4c432f6",
+    "generation": 3,
+    "trend_id": "trend_e907011d",
+    "concept_id": "concept_eaad1bcc",
+    "harness_id": "harness_2fe53acc",
+    "predicted_score": 0.058,
+    "rubric_version": "v1",
+    "selected": true
+  },
+  {
+    "id": "rec_6b501ef7",
+    "generation_number": 4,
+    "created_at": "2026-06-07T12:24:09.973272Z",
+    "trend_context_id": "trend_7646b9f2",
+    "concept": {
+      "id": "concept_f0b56f28",
+      "generation_number": 4,
+      "trend_context_id": "trend_7646b9f2",
+      "harness_state_version": "v4",
+      "hook": "POV: your cubicle in 1997 vs now",
+      "format": "comedy",
+      "angle": "emphasize duet_bait_ending; emphasize captions_burned_in; emphasize pattern_interrupt_3s",
+      "script": "POV: your cubicle in 1997 vs now",
+      "visual_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+      "elements": [
+        "comedy",
+        "90s_aesthetic",
+        "text_hook_frame1",
+        "trending_audio_sync",
+        "slow_pan_intro",
+        "pattern_interrupt_3s",
+        "captions_burned_in",
+        "duet_bait_ending"
+      ],
+      "created_by": "content-generator",
+      "concept_id": "concept_f0b56f28",
+      "generation": 4,
+      "trend_id": "trend_7646b9f2",
+      "element_weights": {
+        "comedy": 0.082,
+        "90s_aesthetic": 0.082,
+        "text_hook_frame1": 0.082,
+        "trending_audio_sync": 0.082,
+        "slow_pan_intro": 0.082,
+        "pattern_interrupt_3s": 0.124,
+        "captions_burned_in": 0.186,
+        "duet_bait_ending": 0.278
+      },
+      "storyboard": [
+        "emphasize duet_bait_ending",
+        "emphasize captions_burned_in",
+        "emphasize pattern_interrupt_3s"
+      ],
+      "seedance_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+      "duration_sec": 8,
+      "created_at": "2026-06-07T12:24:09.972669Z"
+    },
+    "score": {
+      "id": "rs_8d6a559a",
+      "concept_id": "concept_f0b56f28",
+      "generation_number": 4,
+      "harness_state_version": "v4",
+      "weighted_total": 0.058,
+      "predicted_win_prob": 0.5,
+      "policy_flag": true,
+      "judge_rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "predicted_score": 0.058,
+      "pairwise_winprob": 0.5,
+      "confidence": 0.58,
+      "scored_by": "acoe-dance-judge:ACOE-YT-SHORTS-v2.0",
+      "rationale": "ACOE projected score 8/100. Strongest evidence: Opening on-screen text uses second-person framing ('you'/'your'). Priority fix: Peak motion is visible in frame 1.",
+      "scored_at": "2026-06-07T12:24:09.972781Z",
+      "total_score": 8.0,
+      "distribution_tier": "seed_jail",
+      "auto_fails_triggered": [
+        "AF-03"
+      ],
+      "category_breakdown": {
+        "hook_quality": 7,
+        "retention_and_loop": 0,
+        "engagement_bait": 1,
+        "visual_production": 0,
+        "audio_alignment": 0,
+        "metadata": 0
+      },
+      "lowest_scoring_category": "retention_and_loop",
+      "recommended_fix_priority": "Peak motion is visible in frame 1.; The background strongly separates the dancer.; Duration is 13-15 seconds (16-18 is partial).",
+      "winning_elements": [],
+      "weak_elements": [],
+      "suggested_policy_updates": {},
+      "rubric_breakdown": {
+        "policy_id": "ACOE-YT-SHORTS-v2.0",
+        "evaluation_mode": "prompt_preflight",
+        "score_type": "projected",
+        "projected_score": 8,
+        "verified_score": null,
+        "supported_subtotal": 8,
+        "evidence_coverage": 0.5652173913043478,
+        "distribution_tier": "seed_jail",
+        "auto_fails_triggered": [
+          "AF-03"
+        ],
+        "category_breakdown": {
+          "hook_quality": {
+            "score": 7,
+            "max_points": 30,
+            "criteria": [
+              {
+                "id": "HQ-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit peak-motion frame-1 instruction.",
+                "reason": "Peak motion is visible in frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "HQ-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Background direction: not specified as isolated or high contrast.",
+                "reason": "The background strongly separates the dancer.",
+                "points_awarded": 0,
+                "max_points": 6
+              },
+              {
+                "id": "HQ-03",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Prompt requests text but does not anchor it to the opening.",
+                "reason": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
+                "points_awarded": 2,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-04",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Start timing is not explicit.",
+                "reason": "Dance motion starts immediately with no title card or fade.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "HQ-05",
+                "status": "pass",
+                "evidence_type": "requested",
+                "evidence": "Opening text uses second-person framing.",
+                "reason": "Opening on-screen text uses second-person framing ('you'/'your').",
+                "points_awarded": 5,
+                "max_points": 5
+              }
+            ]
+          },
+          "retention_and_loop": {
+            "score": 0,
+            "max_points": 25,
+            "criteria": [
+              {
+                "id": "RL-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Requested duration: 8s.",
+                "reason": "Duration is 13-15 seconds (16-18 is partial).",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "RL-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Loop direction: not specified.",
+                "reason": "The final pose and camera framing reconnect to frame 1.",
+                "points_awarded": 0,
+                "max_points": 9
+              },
+              {
+                "id": "RL-03",
+                "status": "unknown",
+                "evidence_type": "requested",
+                "evidence": "Pacing continuity is not explicit.",
+                "reason": "Motion remains active with no dead zones.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-04",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "No explicit delayed-payoff structure in the prompt.",
+                "reason": "The promised payoff is withheld until the final ~15% of the video.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "RL-05",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No narrative transition words in the script.",
+                "reason": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "engagement_bait": {
+            "score": 1,
+            "max_points": 10,
+            "criteria": [
+              {
+                "id": "EB-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No typed-response question is requested.",
+                "reason": "An on-screen question invites a meaningful typed response.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "EB-02",
+                "status": "partial",
+                "evidence_type": "requested",
+                "evidence": "Question/text visibility: text requested without duration.",
+                "reason": "The question remains legible for most of the video.",
+                "points_awarded": 1,
+                "max_points": 3
+              },
+              {
+                "id": "EB-03",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No specific comparative opinion prompt.",
+                "reason": "The question invites ranking, comparison, or a specific opinion.",
+                "points_awarded": 0,
+                "max_points": 2
+              }
+            ]
+          },
+          "visual_production": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "VP-01",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Composition does not establish the dancer as the focal point.",
+                "reason": "The dancer is the clear visual focal point.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "Wardrobe is not specified as dynamic or contrasting.",
+                "reason": "Wardrobe has dynamic light interaction or strong contrast.",
+                "points_awarded": 0,
+                "max_points": 3
+              },
+              {
+                "id": "VP-03",
+                "status": "unknown",
+                "evidence_type": "predicted",
+                "evidence": "Prompt does not specify render-quality safeguards.",
+                "reason": "The render is crisp without body, face, or motion artifacts.",
+                "points_awarded": 0,
+                "max_points": 4
+              },
+              {
+                "id": "VP-04",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Cut/motion frequency is not specified.",
+                "reason": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+                "points_awarded": 0,
+                "max_points": 4
+              }
+            ]
+          },
+          "audio_alignment": {
+            "score": 0,
+            "max_points": 15,
+            "criteria": [
+              {
+                "id": "AA-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Approved-pool provenance is not supplied.",
+                "reason": "The supplied audio belongs to the approved current pool.",
+                "points_awarded": 0,
+                "max_points": 7
+              },
+              {
+                "id": "AA-02",
+                "status": "fail",
+                "evidence_type": "requested",
+                "evidence": "No explicit movement-to-beat mapping.",
+                "reason": "Movement peaks align to distinct beat hits.",
+                "points_awarded": 0,
+                "max_points": 5
+              },
+              {
+                "id": "AA-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "No audio supplied; sound momentum unknown.",
+                "reason": "The chosen sound is rising / early-adopter, not saturated.",
+                "points_awarded": 0,
+                "max_points": 3
+              }
+            ]
+          },
+          "metadata": {
+            "score": 0,
+            "max_points": 5,
+            "criteria": [
+              {
+                "id": "MD-01",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing title is not supplied.",
+                "reason": "The publishing title mirrors the on-screen question.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-02",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Hashtags are not supplied.",
+                "reason": "Hashtags mix niche, broad, and audio-anchor tags.",
+                "points_awarded": 0,
+                "max_points": 2
+              },
+              {
+                "id": "MD-03",
+                "status": "unknown",
+                "evidence_type": "supplied_metadata",
+                "evidence": "Publishing description is not supplied.",
+                "reason": "The description contains a relevant comment invitation.",
+                "points_awarded": 0,
+                "max_points": 1
+              }
+            ]
+          }
+        },
+        "general_quality": {
+          "prompt_detail": 0.45,
+          "prompt_clarity": 0.75,
+          "sequence_flow": 0.55,
+          "choreography_coherence": 0.45,
+          "music_motion_alignment": 0.4,
+          "vibe_coherence": 0.55,
+          "visual_direction": 0.5,
+          "video_model_feasibility": 0.78,
+          "originality": 0.5,
+          "viewer_satisfaction_potential": 0.546
+        },
+        "cringe_risk": 0.12,
+        "policy_risk": 0.05,
+        "confidence": 0.58,
+        "strengths": [
+          "Opening on-screen text uses second-person framing ('you'/'your')."
+        ],
+        "weaknesses": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial).",
+          "The final pose and camera framing reconnect to frame 1.",
+          "An on-screen question invites a meaningful typed response."
+        ],
+        "missing_evidence": [
+          "Dance motion starts immediately with no title card or fade.",
+          "Motion remains active with no dead zones.",
+          "The render is crisp without body, face, or motion artifacts.",
+          "The supplied audio belongs to the approved current pool.",
+          "The publishing title mirrors the on-screen question.",
+          "Hashtags mix niche, broad, and audio-anchor tags.",
+          "The description contains a relevant comment invitation.",
+          "The promised payoff is withheld until the final ~15% of the video.",
+          "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
+          "The chosen sound is rising / early-adopter, not saturated."
+        ],
+        "contradictions": [],
+        "predicted_generation_failures": [],
+        "lowest_scoring_category": "retention_and_loop",
+        "recommended_fix_priority": [
+          "Peak motion is visible in frame 1.",
+          "The background strongly separates the dancer.",
+          "Duration is 13-15 seconds (16-18 is partial)."
+        ],
+        "revised_generation_prompt": "8s POV skit; 90s office desk glow-up; lead with duet_bait_ending",
+        "policy_update_allowed": false,
+        "policy_learning": {
+          "confidence": 0.58,
+          "winning_elements": [],
+          "weak_elements": [],
+          "policy_deltas": {},
+          "new_candidate_elements": [],
+          "evidence": []
+        },
+        "needs_human_review": true
+      }
+    },
+    "harness_state_version_before": "v4",
+    "harness_state_version_after": "v5",
+    "harness_diff": {
+      "id": "hd_35a5815c",
+      "from_version": "v4",
+      "to_version": "v5",
+      "element_weight_changes": {},
+      "rationale": "no change",
+      "accepted": true
+    },
+    "record_id": "rec_6b501ef7",
+    "generation": 4,
+    "trend_id": "trend_7646b9f2",
+    "concept_id": "concept_f0b56f28",
+    "harness_id": "harness_2e79927b",
+    "predicted_score": 0.058,
+    "rubric_version": "v1",
+    "selected": true
+  }
+]
