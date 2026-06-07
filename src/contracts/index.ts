@@ -119,6 +119,11 @@ export type RewardScore = {
   category_breakdown?: Record<string, number>;
   lowest_scoring_category?: string;
   recommended_fix_priority?: string;
+  // critic learning signal (optional; consumed by the inner loop) — PR #2
+  winning_elements?: string[];
+  weak_elements?: string[];
+  suggested_policy_updates?: Record<string, number>;
+  rubric_breakdown?: Record<string, unknown>;
 };
 
 export type HarnessState = {

@@ -58,6 +58,22 @@ and will be removed once the migration lands.
 The "approved trending audio pool" must be sourced from the platform's licensed
 / cleared music library — the policy lists chart references, not files to ship.
 
+## The critic (`harness/critic.py`)
+
+The judge runs in three **evaluation modes**: `prompt_preflight` (judge the
+generation prompt, offline-deterministic, no LLM needed), `rendered_video`, and
+`publishing_package` (also scores title/description/hashtags). It records a
+`score_type` — `projected` (preflight), `verified` (full rendered evidence), or
+`partial` — and maps the rubric onto the canonical 8 `RewardDimensions` (e.g.
+`hook_quality/30 → hook_strength`, `video_model_feasibility → visual_feasibility`)
+plus `weighted_total`, while preserving the full criterion detail in
+`RewardScore.rubric_breakdown`.
+
+**Confidence-gated learning:** the critic proposes bounded element-weight deltas
+(±0.10) as `suggested_policy_updates` (+ `winning_elements`/`weak_elements`), but
+only from non-preflight evidence with confidence ≥ 0.70 — a prompt projection
+never mutates policy. The Loop Core decides whether to apply them (DECISIONS.md D13).
+
 ## Not the same as element weights or taxonomy
 
 These categories describe *how we score*. They are distinct from

@@ -3,6 +3,33 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Dance reward critic (PR #2)
+
+### D13. The ACOE critic maps into the 8 dimensions + adds a confidence-gated learning signal
+
+`harness/critic.py` (Zoey, PR #2) implements the ACOE-YT-SHORTS-v1.0 judge. It
+applies the rubric criterion-by-criterion, then:
+- **maps the result into the canonical 8 `RewardDimensions` + `weighted_total`**
+  (so the dashboard contract doesn't expand), keeping the full criterion/category
+  detail in `RewardScore.rubric_breakdown`;
+- also fills D11's structured ACOE outputs (`total_score`, `distribution_tier`,
+  `category_breakdown`, `auto_fails_triggered`, `lowest_scoring_category`,
+  `recommended_fix_priority`) from the same judgement — D11 and this decision are
+  complementary, not rival;
+- emits an **additive, optional learning signal** (`winning_elements`,
+  `weak_elements`, `suggested_policy_updates`) that the Loop Core may apply; the
+  Critic only proposes bounded deltas (±0.10).
+
+**Confidence gating:** `score_type` is `projected` (prompt preflight), `verified`
+(full rendered evidence), or `partial`. Policy updates are allowed only from
+non-preflight evidence with confidence ≥ 0.70 — a prompt projection can never
+mutate policy.
+
+Integration note: the merged `RewardScore` field set is the **union** of D11's
+outputs and the learning signal (all optional → `typecheck:ui` stays green).
+`recommended_fix_priority` stays a `str` (joined from the critic's ranked list to
+match the dashboard's existing use; the full list is in `rubric_breakdown`).
+
 ## 2026-06-06 — Loop-core contract layering
 
 ### D12. Canonical contract vs the loop's internal model (two layers + bridge)

@@ -33,6 +33,7 @@ Produces RewardScore by applying **ACOE-YT-SHORTS-v1.0**. **Owns the rubric** (r
 - **Allowed tools:** Anthropic as judge.
 - **Failure modes:** misses an auto-fail; inconsistent category scoring.
 - **Owner:** Eng 2 (B — Reward Critic)
+- **Implemented:** `harness/critic.py` (PR #2) — three modes (prompt preflight / rendered video / publishing package), a projected-vs-verified `score_type`, an offline deterministic preflight plus an optional LLM `judge`, and a confidence-gated learning signal (`winning_elements`/`weak_elements`/`suggested_policy_updates`) the Loop Core applies.
 
 ## Loop Core (inner loop)
 

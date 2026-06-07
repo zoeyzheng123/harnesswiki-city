@@ -55,6 +55,13 @@ def check_policy() -> list[str]:
     af_ids = [af["id"] for af in policy["auto_fail_conditions"]]
     assert len(af_ids) == len(set(af_ids)), "auto-fail ids must be unique"
     assert set(policy["distribution_tiers"]) == {"viral", "growing", "seed_jail"}, "unexpected tiers"
+    # Guard: the critic's hardcoded ACOE_RUBRIC must match the policy's points
+    # (until the critic loads the table from this JSON — see docs/JUDGE_RUBRIC.md).
+    from harness.critic import ACOE_RUBRIC
+
+    policy_max = {name: c["max_points"] for name, c in cats.items()}
+    critic_max = {name: cat["max_points"] for name, cat in ACOE_RUBRIC.items()}
+    assert critic_max == policy_max, f"critic ACOE_RUBRIC != policy max_points: {critic_max} vs {policy_max}"
     return list(cats.keys())
 
 

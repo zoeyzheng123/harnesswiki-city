@@ -155,7 +155,12 @@ class RewardScore(BaseModel):
     auto_fails_triggered: Optional[list[str]] = None  # e.g. ["AF-02"]
     category_breakdown: Optional[dict] = None  # points per ACOE category
     lowest_scoring_category: Optional[str] = None
-    recommended_fix_priority: Optional[str] = None
+    recommended_fix_priority: Optional[str] = None  # joined from the critic's ranked list; full list in rubric_breakdown
+    # ── critic learning signal (optional; consumed by the inner loop) — PR #2 ──
+    winning_elements: Optional[list[str]] = None
+    weak_elements: Optional[list[str]] = None
+    suggested_policy_updates: Optional[dict[str, float]] = None
+    rubric_breakdown: Optional[dict] = None
 
 
 # 4. HarnessState — the mutable scaffold. Read by C (Generator). Rewritten by A (Meta-agent).

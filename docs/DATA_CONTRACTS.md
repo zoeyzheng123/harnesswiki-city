@@ -74,6 +74,8 @@ class RewardScore(BaseModel):
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
     # + ACOE (rubric ACOE-YT-SHORTS-v1.0): total_score (0–100), distribution_tier,
     #   auto_fails_triggered, category_breakdown, lowest_scoring_category, recommended_fix_priority
+    # + critic learning signal (PR #2): winning_elements, weak_elements,
+    #   suggested_policy_updates, rubric_breakdown (full criterion-level detail)
 
 class HarnessState(BaseModel):
     id: str; version: str; element_weights: dict; script_prompt: str

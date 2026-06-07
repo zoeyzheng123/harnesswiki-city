@@ -16,7 +16,7 @@ _Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.
 | Harness loop (Workstream A) | `loop_core/` (PR #1) | 🟦 Landed — lean internal model + meta-agent; needs the canonical bridge (`docs/LOOP_CORE_BRIDGE.md`) |
 | Loop → canonical bridge | `harness/bridge.py` (planned) | ⬜ Not started — spec in `docs/LOOP_CORE_BRIDGE.md` (Eng 1) |
 | HarnessState + meta-agent | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
-| Reward critic (ACOE) | `harness/critic.py` | ⬜ Not started — applies `data/policies/ACOE-YT-SHORTS-v1.0.json` |
+| Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2) — applies ACOE; maps to the 8 dims + fills the structured outputs + learning signal; offline preflight + optional LLM judge |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
 | Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
 | Dashboard | `src/ui/` | 🟦 In progress — control-room UI built (founder-themed synthetic data). **Needs ACOE migration** (0–100 + tiers + 6 categories) per `docs/DASHBOARD_MIGRATION.md`. |
