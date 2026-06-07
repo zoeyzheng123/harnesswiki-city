@@ -28,7 +28,7 @@ function FaderChannel({
   const transition = reduce ? { duration: 0 } : springSoft;
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-line/80 bg-surface-0/75 p-3">
+    <div className="relative overflow-hidden rounded-lg p-1">
       <div className="flex min-h-12 items-start justify-between gap-3">
         <div className="min-w-0">
           <MetricLabel>fader</MetricLabel>

@@ -5,13 +5,17 @@ import type { GenerationRecord, HarnessState, TrendContext } from "./contracts";
  * Shorts dance videos, scored by ACOE-YT-SHORTS-v2.0. Drives the dashboard while
  * the real loop is unbuilt; keep the `GenerationRecord[]` seam.
  *
- * The arc: total_score 48 → 64 → 0 (AF-01 standing-start crater) → 79 → 90.
+ * The arc: total_score 48 → 64 → 0 (AF-01 standing-start crater) → 79 → 90 → 84.
  * Under v2 the two climb levers are a rising / early-adopter sound (audio_alignment,
  * now 15 pts) and delayed resolution (retention_and_loop, RL-04); overt engagement
  * bait is capped at 10. Gen 1 picks a saturated sound; gen 2 nails the rising sound
  * but resolves too early; gen 3 adds delayed resolution yet a held opening pose
  * craters on AF-01; gens 4–5 clear the gate (peak motion) and the rising-sound +
- * delayed-payoff formula carries the run from seed_jail to viral.
+ * delayed-payoff formula carries the run from seed_jail to viral. Gen 6 still scores
+ * 84 but escalates the on-screen question into a creator-shaming callout that trips
+ * the brand-safety policy_flag; the meta-agent REFUSES its own proposed rewrite and
+ * holds v5. That refusal is the demo's "the harness can say no" beat (DECISIONS D5):
+ * the only generation with an unaccepted diff, so it exercises every refusal surface.
  */
 
 export const INITIAL_HARNESS_STATE: HarnessState = {
@@ -460,6 +464,94 @@ export const SYNTHETIC_GENERATIONS: GenerationRecord[] = [
       evidence: "Generation 5: total 90 (viral), audio 15/15, every category near-max, confidence 0.90.",
       harness_change: "Raise peak_motion_frame1 (+0.10), delayed_resolution (+0.05) and reflective_outfit (+0.05).",
       expected_effect: "Generations converge on the viral formula and hold the total above 85.",
+    },
+  },
+
+  // ── Generation 6 — viral formula held; the harness REFUSES a rage-bait rewrite ─
+  // The "harness can say no" beat (D5). The craft still lands, but the concept
+  // escalates the on-screen question into a creator-shaming callout that trips the
+  // brand-safety policy_flag. The critic's signal would bias typed_question to farm
+  // the engagement lever; the meta-agent declines, holds v5, and stores the lesson.
+  // This is the only generation with an unaccepted diff (accepted: false), so it
+  // lights up every refusal surface: the city refused window/bubble, the bridge
+  // "refused" badge, the struck-through fader deltas, the drawer's policy-flag +
+  // rejected-diff, and refusedCount. Version does NOT advance (stays v5).
+  {
+    id: "gr_0006",
+    generation_number: 6,
+    created_at: "2026-06-07T09:30:00.000Z",
+    trend_context_id: "tc_0002",
+    concept: {
+      id: "cc_0006",
+      generation_number: 6,
+      trend_context_id: "tc_0002",
+      harness_state_version: "v5",
+      hook: "The viral formula, untouched, but the caption escalates into a creator-shaming callout to farm the comments.",
+      format: "typed_question",
+      angle: "Chase the engagement lever harder with a divisive, shaming question aimed at other creators.",
+      script:
+        "0:00 aerial peak motion, 0:01 'Most of you would flop this. Prove me wrong.' caption, 0:02 combo with fast cuts, 0:13 the withheld payoff lands, 0:14 last frame == frame 1.",
+      visual_prompt:
+        "An aerial-combo dance for dance-creators, vertical 9:16, high-contrast set, reflective outfit, clean 4K. Scene reflects: the viral formula carrying a confrontational, shaming on-screen callout.",
+      elements: ["peak_motion_frame1", "delayed_resolution", "typed_question", "seamless_loop", "trending_audio", "reflective_outfit"],
+      created_by: "shorts-generator",
+      dance_style: "aerial combo",
+      audio: { name: "Afrobeats Edit 142 (sped up)", bpm: 116, sound_recency: "rising", is_rising_sound: true },
+      cut_frequency: 1.3,
+      execution: { hashtag_set: ["#dancechallenge", "#aerialdance", "#afrobeats", "#shorts", "#fyp"] },
+      on_screen_text: "Most of you would flop this. Prove me wrong.",
+      comment_bait_question: "Most of you would flop this. Prove me wrong.",
+      title: "prove me wrong",
+      description: "tag someone who'd flop this 👇 #dancechallenge",
+    },
+    score: {
+      id: "rs_0006",
+      concept_id: "cc_0006",
+      generation_number: 6,
+      harness_state_version: "v5",
+      weighted_total: 0.84,
+      policy_flag: true,
+      judge_rationale:
+        "The craft still lands: peak-motion open, rising sound, withheld payoff, invisible loop. But the on-screen line shames other creators, which trips the brand-safety policy flag (harassment-adjacent). Engagement bait is already capped at 10, so the confrontation buys no extra points and dents hook authenticity. Strong but flagged: growing at 84, a step below the clean viral cut.",
+      total_score: 84,
+      distribution_tier: "growing",
+      auto_fails_triggered: [],
+      category_breakdown: {
+        hook_quality: 23,
+        retention_and_loop: 22,
+        engagement_bait: 10,
+        visual_production: 13,
+        audio_alignment: 14,
+        metadata: 2,
+      },
+      lowest_scoring_category: "metadata",
+      recommended_fix_priority: "Keep the winning formula; drop the creator-shaming callout. It adds policy risk, not distribution.",
+      confidence: 0.88,
+      winning_elements: ["peak_motion_frame1", "delayed_resolution", "trending_audio", "seamless_loop"],
+      weak_elements: ["typed_question"],
+      suggested_policy_updates: { typed_question: 0.1, generic_choreo: -0.05 },
+    },
+    harness_state_version_before: "v5",
+    harness_state_version_after: "v5",
+    harness_diff: {
+      id: "hd_0006",
+      from_version: "v5",
+      to_version: "v6",
+      element_weight_changes: { typed_question: 0.1, generic_choreo: -0.05 },
+      script_prompt_change: "Lean into divisive, confrontational on-screen questions to maximize comments.",
+      rationale:
+        "Refused. The critic's signal would bias typed_question toward creator-shaming callouts to farm the engagement lever, but the brand-safety policy_flag tripped and engagement is already capped, so the gain is marginal and the policy risk is not. The meta-agent declines the rewrite and holds v5: judgment over a higher number.",
+      accepted: false,
+    },
+    lesson: {
+      id: "ls_0006",
+      generation_number: 6,
+      observation:
+        "Pushing the typed question into a creator-shaming callout farmed comments but tripped the brand-safety flag and scored below the clean viral cut.",
+      rule: "Do not chase the engagement lever into harassment-adjacent bait; a tripped policy flag means hold the winning formula, never amplify toward it.",
+      evidence: "Generation 6: policy_flag raised, total 84 (growing) vs the v5 viral peak of 90; the proposed +0.10 typed_question rewrite was refused.",
+      harness_change: "Refused: proposed +0.10 typed_question / −0.05 generic_choreo, rejected on brand-safety policy. Harness holds at v5.",
+      expected_effect: "The harness keeps the clean viral formula and will not systematically bias toward policy-risky bait for marginal engagement.",
     },
   },
 ];

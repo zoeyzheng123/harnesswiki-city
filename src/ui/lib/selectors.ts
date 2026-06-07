@@ -86,16 +86,23 @@ export type CurvePoint = {
   auto_failed: boolean;
   auto_fail_code?: string;
   lowest_scoring_category?: string;
+  refused: boolean; // the meta-agent rejected this generation's harness rewrite (D5)
+  held_version?: string; // the version the harness held at when a rewrite was refused
 };
 
 export function curvePoints(records: GenerationRecord[]): CurvePoint[] {
-  return records.map((r) => ({
-    generation_number: r.generation_number,
-    total_score: r.score.total_score ?? Math.round((r.score.weighted_total ?? 0) * 100),
-    auto_failed: (r.score.auto_fails_triggered?.length ?? 0) > 0,
-    auto_fail_code: r.score.auto_fails_triggered?.[0],
-    lowest_scoring_category: r.score.lowest_scoring_category,
-  }));
+  return records.map((r) => {
+    const refused = !!r.harness_diff && !r.harness_diff.accepted;
+    return {
+      generation_number: r.generation_number,
+      total_score: r.score.total_score ?? Math.round((r.score.weighted_total ?? 0) * 100),
+      auto_failed: (r.score.auto_fails_triggered?.length ?? 0) > 0,
+      auto_fail_code: r.score.auto_fails_triggered?.[0],
+      lowest_scoring_category: r.score.lowest_scoring_category,
+      refused,
+      held_version: refused ? r.harness_diff?.from_version : undefined,
+    };
+  });
 }
 
 export type LessonEntry = { lesson: Lesson; record: GenerationRecord };

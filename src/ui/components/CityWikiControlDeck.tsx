@@ -55,7 +55,7 @@ type WikiArchiveEntry = {
 };
 
 const SWEEP_MS = 250;
-const WINDOW_COUNT = 5;
+const WINDOW_COUNT = 6;
 
 const BUILDINGS: BuildingConfig[] = [
   {
@@ -124,9 +124,13 @@ function recordStatus(record: GenerationRecord, previous: GenerationRecord | und
   return "ok";
 }
 
+// The wiki/lesson surface describes the harness rewrite, so a refused diff is the
+// salient outcome and must win over a policy / auto-fail flag (a generation can be
+// both, e.g. a policy_flag that causes the refusal). `recordStatus` keeps flag-first
+// because the score/window surfaces are about the content, not the rewrite.
 function lessonStatus(record: GenerationRecord, previous: GenerationRecord | undefined): WikiArchiveEntry["status"] {
-  if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
   if (record.harness_diff && !record.harness_diff.accepted) return "refused";
+  if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
   if (previous && totalScore(record) < totalScore(previous)) return "review";
   return "ok";
 }
@@ -381,7 +385,7 @@ function StateWindows({
   label: string;
 }) {
   return (
-    <div className="grid grid-cols-5 gap-1" aria-label={`${label} state windows`}>
+    <div className="grid grid-cols-3 gap-1" aria-label={`${label} state windows`}>
       {windows.map((state, i) => (
         <span
           key={`${state}-${i}`}
@@ -418,15 +422,20 @@ function CityBuildingNode({
         onClick={onOpen}
         disabled={!actionable}
         aria-label={`${node.title}. ${node.value}. ${STATE_LABEL[node.state]} state.${actionable ? " Open details." : ""}`}
-        className="city-building material-surface relative flex min-h-[11.25rem] w-full flex-col overflow-hidden rounded-xl border bg-surface-0/78 p-3 text-left transition-colors disabled:cursor-default"
+        className="city-building material-surface relative flex min-h-[11.25rem] w-full flex-col overflow-hidden rounded-xl border-t-2 p-3 text-left transition-colors disabled:cursor-default"
         style={{
-          borderColor: node.state === "standby" ? "var(--color-line)" : node.color,
+          borderTopColor:
+            node.state === "standby" ? `color-mix(in oklch, ${node.color} 40%, var(--color-line))` : node.color,
+          backgroundColor:
+            node.state === "standby"
+              ? "transparent"
+              : `color-mix(in oklch, ${node.color} 7%, transparent)`,
           boxShadow:
             node.state === "active"
               ? `0 0 0 1px ${node.color}, 0 18px 44px -24px ${node.color}`
-          : node.state === "standby"
-                ? "var(--glow-soft)"
-                : `0 0 0 1px color-mix(in oklch, ${node.color} 24%, transparent)`,
+              : node.state === "standby"
+                ? "none"
+                : `inset 0 0 0 1px color-mix(in oklch, ${node.color} 14%, transparent)`,
         }}
       >
         <div className="relative z-10 flex items-start justify-between gap-3">
@@ -444,7 +453,7 @@ function CityBuildingNode({
           </span>
         </div>
 
-        <div className="relative z-10 mt-4">
+        <div className="relative z-10 mt-4 mb-6">
           <StateWindows windows={node.windows} color={node.color} label={node.title} />
         </div>
 
@@ -472,9 +481,9 @@ function SignalTrace({
   const progress = activeIndex < 0 ? 0 : Math.min(1, activeIndex / Math.max(1, BUILDINGS.length - 1));
   return (
     <>
-      <span className="absolute left-[10%] right-[10%] top-[5.9rem] hidden h-px bg-line/70 lg:block" aria-hidden="true" />
+      <span className="absolute left-[10%] right-[10%] top-[9rem] hidden h-px bg-line/70 lg:block" aria-hidden="true" />
       <motion.span
-        className="absolute left-[10%] top-[5.9rem] hidden h-px origin-left lg:block"
+        className="absolute left-[10%] top-[9rem] hidden h-px origin-left lg:block"
         style={{
           background: "linear-gradient(90deg, var(--color-scout), var(--color-generator), var(--color-critic), var(--color-meta), var(--color-memory))",
           boxShadow: "0 0 22px color-mix(in oklch, var(--color-accent) 45%, transparent)",
@@ -490,7 +499,7 @@ function SignalTrace({
 
 function ElementLinkChip({ elementKey }: { elementKey: string }) {
   return (
-    <span className="rounded-md border border-memory/45 bg-memory/10 px-2 py-0.5 font-mono text-[0.6875rem] text-memory">
+    <span className="rounded-md border border-memory/45 bg-memory/10 px-2 py-0.5 font-mono text-xs text-memory">
       [[{elementLabel(elementKey)}]]
     </span>
   );
@@ -513,7 +522,7 @@ function WikiLessonArtifact({
       initial="hidden"
       animate="show"
       exit={{ opacity: 0 }}
-      className="rounded-lg border border-line/75 bg-surface-1/45 p-3"
+      className="py-3 first:pt-0 last:pb-0"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
@@ -532,7 +541,7 @@ function WikiLessonArtifact({
         <button
           type="button"
           onClick={onOpen}
-          className="rounded-md border border-line px-2.5 py-1 font-mono text-[0.6875rem] text-muted transition-colors hover:border-memory hover:text-memory"
+          className="rounded-md border border-line px-2.5 py-1 font-mono text-xs text-muted transition-colors hover:border-memory hover:text-memory"
           aria-label={`Open generation ${entry.generationNumber} lesson details`}
         >
           inspect
@@ -549,15 +558,15 @@ function WikiLessonArtifact({
 
       <div className="mt-3 grid gap-2 text-sm leading-relaxed">
         <p className="text-muted">
-          <span className="font-mono text-[0.6875rem] tracking-wide text-faint uppercase">Evidence </span>
+          <span className="font-mono text-xs tracking-wide text-faint uppercase">Evidence </span>
           {truncate(entry.lesson.evidence, 130)}
         </p>
         <p className={entry.status === "refused" ? "text-flag" : "text-positive"}>
-          <span className="font-mono text-[0.6875rem] tracking-wide text-faint uppercase">Harness </span>
+          <span className="font-mono text-xs tracking-wide text-faint uppercase">Harness </span>
           {truncate(entry.lesson.harness_change, 120)}
         </p>
         <p className="text-muted">
-          <span className="font-mono text-[0.6875rem] tracking-wide text-faint uppercase">Expected </span>
+          <span className="font-mono text-xs tracking-wide text-faint uppercase">Expected </span>
           {truncate(entry.lesson.expected_effect, 120)}
         </p>
       </div>
@@ -600,14 +609,14 @@ function WikiArchivePanel({
       </header>
 
       {entries.length === 0 ? (
-        <div className="relative z-10 grid flex-1 place-items-center rounded-lg border border-dashed border-line bg-surface-1/25 p-5 text-center">
+        <div className="relative z-10 grid flex-1 place-items-center rounded-lg border border-dashed border-line/70 p-5 text-center">
           <div>
             <p className="font-display text-base text-ink">Archive quiet</p>
             <p className="mt-1 text-sm text-muted">Run the loop to store the first wiki lesson.</p>
           </div>
         </div>
       ) : (
-        <motion.div layout className="relative z-10 flex flex-col gap-3 overflow-y-auto pr-1 lg:max-h-[18.5rem]">
+        <motion.div layout className="relative z-10 flex flex-col divide-y divide-line/60 overflow-y-auto [overflow-anchor:none] pr-1 lg:max-h-[18.5rem]">
           <AnimatePresence initial={false}>
             {entries.map((entry) => {
               const index = records.findIndex((record) => record.id === entry.record.id);

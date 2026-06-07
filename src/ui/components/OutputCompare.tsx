@@ -54,7 +54,7 @@ function Side({
 function WaitingComparison({ nextGeneration }: { nextGeneration: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-[12rem_1fr] xl:grid-cols-[13rem_1fr]">
-      <div className="mx-auto grid aspect-[9/16] w-48 shrink-0 place-items-center rounded-xl border border-dashed border-line bg-surface-1/40 p-3 text-center sm:mx-0 xl:w-52">
+      <div className="mx-auto grid aspect-[9/16] w-48 shrink-0 place-items-center rounded-xl border border-dashed border-line/70 bg-surface-1/20 p-3 text-center sm:mx-0 xl:w-52">
         <div>
           <svg width="22" height="22" viewBox="0 0 24 24" className="mx-auto text-faint" fill="none" aria-hidden="true">
             <path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -137,7 +137,7 @@ export function OutputCompare({
       <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-5">
         <Side record={baseline} label="baseline" accent="var(--color-muted)" playerRef={baseRef} />
 
-        <div className="relative flex flex-col items-center justify-center gap-3 rounded-lg border border-line/70 bg-surface-1/35 p-4">
+        <div className="relative flex flex-col items-center justify-center gap-3 px-4">
           <MetricLabel>proof delta</MetricLabel>
           <button
             type="button"

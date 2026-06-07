@@ -12,6 +12,7 @@ import {
 } from "./lib/selectors";
 import { useDemoLoop } from "./lib/useDemoLoop";
 import { tierFor, TIER_LABELS } from "./lib/format";
+import { videoForRecord } from "./lib/videos";
 import { staggerContainer } from "./styles/motion";
 import { CityWikiControlDeck } from "./components/CityWikiControlDeck";
 import { HeroCurve } from "./components/HeroCurve";
@@ -22,6 +23,11 @@ import { GenerationDetail } from "./components/GenerationDetail";
 import { DemoLoopControls } from "./components/DemoLoopControls";
 import { OutputCompare } from "./components/OutputCompare";
 import { LearningBridgePanel } from "./components/LearningBridgePanel";
+
+/** ACOE total for a record (0–100), tolerant of the legacy weighted_total field. */
+function scoreOf(record: GenerationRecord): number {
+  return record.score.total_score ?? Math.round((record.score.weighted_total ?? 0) * 100);
+}
 
 export function App() {
   const [records, setRecords] = useState<GenerationRecord[] | null>(null);
@@ -114,18 +120,27 @@ export function App() {
     .slice(0, step)
     .filter((r) => r.harness_diff && !r.harness_diff.accepted).length;
   const baseline = records.find((r) => r.generation_number === 1);
-  const best = records.find((r) => r.generation_number === 5);
+  // "Best" = the highest-scoring generation that has a rendered clip, derived from
+  // the data (not a fixed generation number) so the baseline-vs-best evidence stays
+  // correct and keeps video on both sides once the real loop replaces the synthetic arc.
+  const best = records
+    .filter((r) => videoForRecord(r))
+    .reduce<GenerationRecord | undefined>((b, r) => (!b || scoreOf(r) > scoreOf(b) ? r : b), undefined);
 
   // Announced to assistive tech on each generation (the visual update is silent otherwise).
   const liveMessage = (() => {
     if (!currentRecord) return "Idle. Run the loop to generate the first Short.";
     const sc = currentRecord.score;
-    const totalScore = sc.total_score ?? Math.round((sc.weighted_total ?? 0) * 100);
+    const totalScore = scoreOf(currentRecord);
     const af = sc.auto_fails_triggered ?? [];
     if (af.length > 0) {
       return `Generation ${currentRecord.generation_number} of ${total}. Auto-fail ${af[0]}: total score overridden to 0.`;
     }
-    return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${TIER_LABELS[tierFor(totalScore)]} tier. Harness updated to ${state.version}.`;
+    const tierLabel = TIER_LABELS[tierFor(totalScore)];
+    if (currentRecord.harness_diff && !currentRecord.harness_diff.accepted) {
+      return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${tierLabel} tier. Harness rewrite refused${sc.policy_flag ? " on a policy flag" : ""}; held ${state.version}.`;
+    }
+    return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${tierLabel} tier. Harness updated to ${state.version}.`;
   })();
 
   return (
@@ -188,7 +203,7 @@ export function App() {
           initial="hidden"
           animate="show"
           variants={staggerContainer(0.08)}
-          className="mt-4 grid gap-4 lg:grid-cols-2"
+          className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start"
         >
           <WeightShiftPanel
             state={state}

@@ -19,7 +19,9 @@ export function CriticLearning({
   const winning = score.winning_elements ?? [];
   const weak = score.weak_elements ?? [];
   const suggested = score.suggested_policy_updates;
-  const applied = diff?.element_weight_changes ?? {};
+  // A refused diff applied nothing: the bridge must not show its deltas as applied.
+  const refused = !!diff && !diff.accepted;
+  const applied = diff?.accepted ? (diff.element_weight_changes ?? {}) : {};
   const suggestedEntries = suggested ? Object.entries(suggested) : [];
   // The honest bridge is the UNION of what the critic suggested and what the
   // harness applied, so harness-initiated changes aren't silently dropped.
@@ -84,7 +86,13 @@ export function CriticLearning({
               const harnessAdded = s === undefined && a !== undefined;
               const amplified = s !== undefined && a !== undefined && a !== s;
               const appliedColor =
-                a === undefined ? "text-faint" : harnessAdded || amplified ? "text-accent" : "text-positive";
+                a === undefined
+                  ? refused
+                    ? "text-flag"
+                    : "text-faint"
+                  : harnessAdded || amplified
+                    ? "text-accent"
+                    : "text-positive";
               return (
                 <div key={key} className="flex items-center gap-2.5 text-sm">
                   <span className="min-w-0 flex-1 truncate text-muted">{elementLabel(key)}</span>
@@ -96,7 +104,9 @@ export function CriticLearning({
                   <span className="font-mono text-xs text-faint">→</span>
                   <span className={`w-32 text-right font-mono text-xs tabular-nums ${appliedColor}`}>
                     {a === undefined
-                      ? "not applied"
+                      ? refused
+                        ? "refused"
+                        : "not applied"
                       : `${signedDelta(a)}${harnessAdded ? " harness-added" : amplified ? " amplified" : ""}`}
                   </span>
                 </div>
@@ -110,6 +120,11 @@ export function CriticLearning({
           }) && (
             <p className="mt-2 text-xs leading-relaxed text-muted">
               The meta-agent applies its own judgment: it amplifies some deltas and adds changes the critic did not suggest.
+            </p>
+          )}
+          {refused && (
+            <p className="mt-2 text-xs leading-relaxed text-muted">
+              The meta-agent refused this rewrite, so none of the critic&apos;s suggested deltas were applied; the harness held its previous version.
             </p>
           )}
         </div>

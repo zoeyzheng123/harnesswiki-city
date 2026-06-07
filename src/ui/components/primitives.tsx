@@ -14,7 +14,7 @@ export function MetricLabel({
 }) {
   return (
     <span
-      className={`font-mono text-[0.6875rem] font-medium tracking-[0.14em] text-faint uppercase ${className}`}
+      className={`font-mono text-xs font-medium tracking-[0.12em] text-faint uppercase ${className}`}
     >
       {children}
     </span>
@@ -132,7 +132,7 @@ export function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[0.6875rem] font-medium tracking-wide uppercase ${BADGE_TONE[tone]} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-xs font-medium tracking-wide uppercase ${BADGE_TONE[tone]} ${className}`}
     >
       {children}
     </span>
@@ -154,7 +154,7 @@ export function TierBadge({ tier, className = "" }: { tier: Tier; className?: st
   const color = TIER_COLOR[tier];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[0.6875rem] font-medium tracking-wide uppercase ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-xs font-medium tracking-wide uppercase ${className}`}
       style={{ borderColor: color, color, backgroundColor: `color-mix(in oklch, ${color} 14%, transparent)` }}
     >
       <span className="size-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
