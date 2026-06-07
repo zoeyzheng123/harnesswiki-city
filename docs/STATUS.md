@@ -33,7 +33,6 @@ _Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.
 ## Known placeholders
 
 - `pnpm dev` points at `pnpm dev:ui`; the Python generation loop is not implemented.
-- The dashboard still renders an AI-founder synthetic arc (`src/ui/lib/synthetic.ts`) and the legacy 0..1 `dimensions`; it migrates to ACOE per `docs/DASHBOARD_MIGRATION.md`.
-- `RewardScore` carries both the ACOE outputs and the transitional legacy `dimensions` (`weighted_total = total_score/100`); the dimensions retire once the dashboard migrates (DECISIONS.md D11).
+- The 8 `RewardScore.dimensions` are **demoted to optional + deprecated** (DECISIONS.md D14) — the dashboard migrated to ACOE `category_breakdown`/tiers; the critic and stubs no longer emit them. Follow-up (Eng 4): drop `legacyDims()` from `src/ui/lib/synthetic.ts`. Full `RewardDimensions` removal is post-demo.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
 - `loop_core/` (Eng 1) runs against its own lean internal contracts; the canonical bridge adapter (`docs/LOOP_CORE_BRIDGE.md`) maps its output to `data/generations.latest.json` for the dashboard (DECISIONS.md D12).

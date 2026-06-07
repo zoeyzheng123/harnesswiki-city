@@ -24,7 +24,6 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from harness.contracts import (
     ContentConcept,
     HarnessState,
-    RewardDimensions,
     RewardScore,
     TrendContext,
 )
@@ -987,15 +986,6 @@ def score_concept(
         evidence=evidence,
         judge=judge,
     )
-    quality = result.general_quality
-    hook = result.category_breakdown["hook_quality"].score / 30
-    audio = result.category_breakdown["audio_alignment"].score / 5
-    trend_fit = (audio + quality.music_motion_alignment) / 2
-    clarity = (
-        quality.prompt_detail
-        + quality.prompt_clarity
-        + quality.sequence_flow
-    ) / 3
     raw_policy_score = result.headline_score / 100
     weighted_total = max(
         0.0,
@@ -1023,16 +1013,7 @@ def score_concept(
         concept_id=concept.id,
         generation_number=concept.generation_number,
         harness_state_version=concept.harness_state_version,
-        dimensions=RewardDimensions(
-            hook_strength=hook,
-            trend_fit=trend_fit,
-            brand_fit=quality.vibe_coherence,
-            novelty=quality.originality,
-            clarity=clarity,
-            cringe_risk=result.cringe_risk,
-            policy_risk=result.policy_risk,
-            visual_feasibility=quality.video_model_feasibility,
-        ),
+        # `dimensions` retired — deprecated/optional, unconsumed (DECISIONS.md D14)
         weighted_total=weighted_total,
         predicted_win_prob=pairwise,
         policy_flag=result.policy_risk >= 0.5 or bool(result.auto_fails_triggered),

@@ -32,7 +32,6 @@ from harness.contracts import (  # noqa: E402
     HarnessDiff,
     HarnessState,
     Lesson,
-    RewardDimensions,
     RewardScore,
     TrendContext,
     TrendSignal,
@@ -150,12 +149,7 @@ GENERATION_ONE = GenerationRecord(
         concept_id="cc_0001",
         generation_number=1,
         harness_state_version="v0",
-        # Legacy 0..1 dimensions, mapped from the ACOE categories (transitional; the
-        # dashboard still renders these until it migrates to ACOE — DECISIONS.md D11).
-        dimensions=RewardDimensions(
-            hook_strength=0.87, trend_fit=0.85, brand_fit=0.7, novelty=0.6,
-            clarity=0.78, cringe_risk=0.25, policy_risk=0.05, visual_feasibility=0.8,
-        ),
+        # `dimensions` retired (deprecated/optional) — DECISIONS.md D14
         weighted_total=0.76,  # == total_score / 100
         predicted_win_prob=0.62,
         policy_flag=False,

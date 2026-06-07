@@ -54,16 +54,6 @@
       "concept_id": "cc_0001",
       "generation_number": 1,
       "harness_state_version": "v0",
-      "dimensions": {
-        "hook_strength": 0.87,
-        "trend_fit": 0.85,
-        "brand_fit": 0.7,
-        "novelty": 0.6,
-        "clarity": 0.78,
-        "cringe_risk": 0.25,
-        "policy_risk": 0.05,
-        "visual_feasibility": 0.8
-      },
       "weighted_total": 0.76,
       "predicted_win_prob": 0.62,
       "policy_flag": false,

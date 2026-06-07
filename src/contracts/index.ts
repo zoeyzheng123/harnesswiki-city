@@ -100,7 +100,7 @@ export type RewardScore = {
   concept_id: string;
   generation_number: number;
   harness_state_version: string;
-  dimensions: RewardDimensions;
+  dimensions?: RewardDimensions; // deprecated (D14): unconsumed; weighted_total/predicted_score is the stable target
   weighted_total: number; // risk dims penalize
   predicted_win_prob?: number; // pairwise win prob vs baseline, 0..1
   policy_flag: boolean;

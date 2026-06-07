@@ -1,5 +1,7 @@
 # Dashboard Migration — ACOE-YT-SHORTS-v1.0
 
+> **Status:** the migration is **done** (`14d59c4`, `9009931`) and the 8 `dimensions` are now optional + deprecated (DECISIONS.md **D14**). Remaining cleanup: drop `legacyDims()` from `src/ui/lib/synthetic.ts` and stop setting `dimensions:` on synthetic records. The spec below is retained for reference.
+
 Spec for Eng 4 to migrate `src/ui` from the legacy 0..1 founder rubric to ACOE
 short-form scoring. The contracts are already additive (DECISIONS.md D11), so the
 dashboard compiles today; this migration swaps what it *renders*. Owned by Eng 4.
@@ -15,8 +17,9 @@ dashboard compiles today; this migration swaps what it *renders*. Owned by Eng 4
 `hashtag_set`, `posting_time`, `comment_bait_question`, `on_screen_text`,
 `title`, `description`.
 
-The legacy `dimensions` + `weighted_total` still exist (`weighted_total =
-total_score / 100`), so nothing breaks before you migrate.
+`weighted_total` (≈ `total_score / 100`) is the stable scalar. The 8 `dimensions`
+are now optional + deprecated (D14) and no longer emitted by the critic/stubs —
+drop `legacyDims()` and stop setting `dimensions:` on synthetic records.
 
 ## What to change in `src/ui`
 

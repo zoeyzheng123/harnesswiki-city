@@ -69,7 +69,8 @@ class RewardDimensions(BaseModel):   # keys == docs/JUDGE_RUBRIC.md; risk dims h
 
 class RewardScore(BaseModel):
     id: str; concept_id: str; generation_number: int; harness_state_version: str
-    dimensions: RewardDimensions; weighted_total: float
+    dimensions: RewardDimensions | None = None   # deprecated (D14) — unconsumed
+    weighted_total: float                          # scalar 0..1 — the stable target
     predicted_win_prob: float | None = None; policy_flag: bool = False; judge_rationale: str
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
     # + ACOE (rubric ACOE-YT-SHORTS-v1.0): total_score (0–100), distribution_tier,
@@ -125,10 +126,11 @@ The rubric is **ACOE-YT-SHORTS-v1.0** (`data/policies/ACOE-YT-SHORTS-v1.0.json`)
 referenced by `HarnessState.rubric_version`. `RewardScore` carries its outputs
 additively: `total_score` (0–100), `distribution_tier` (viral/growing/seed_jail),
 `category_breakdown` (the 6 ACOE categories), `auto_fails_triggered`,
-`lowest_scoring_category`, `recommended_fix_priority`. The legacy 0..1
-`dimensions` + `weighted_total` (= `total_score / 100`) remain for the current
-dashboard and are deprecated, retiring once it migrates (DECISIONS.md D11 /
-`docs/JUDGE_RUBRIC.md` / `docs/DASHBOARD_MIGRATION.md`).
+`lowest_scoring_category`, `recommended_fix_priority`. `weighted_total`
+(≈ `total_score / 100`) is the stable, rubric-independent scalar the loop
+optimizes. The 8 `dimensions` are now **optional + deprecated** (DECISIONS.md
+D14) — the dashboard migrated to `category_breakdown`, so the critic and stubs no
+longer emit them; the `RewardDimensions` type lingers pending full removal.
 
 ## Conventions
 

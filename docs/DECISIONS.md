@@ -3,6 +3,28 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Retire the transitional 8 dimensions
+
+### D14. The 8 `RewardDimensions` are demoted to optional + deprecated
+
+Post-dashboard-migration (`14d59c4`), nothing consumes the 8 dims: the dashboard
+renders ACOE `category_breakdown` + tiers, the loop optimizes the scalar
+`predicted_score`/`weighted_total`, and learning is element-level. The required
+`dimensions` field was the last thing forcing fabricated values (`legacyDims()`
+in the dashboard's synthetic data) and an unread mapping in the critic.
+
+So `RewardScore.dimensions` is now **optional + deprecated**. The **scalar**
+`weighted_total`/`predicted_score` is the stable, rubric-independent optimization
+target; ACOE `category_breakdown` is the rubric-specific detail. The critic and
+the stub stop emitting `dimensions`. We did **not** resurface them (no consumer;
+`brand_fit`/`novelty`/`cringe_risk` are founder-era axes — a future cross-rubric
+reward vector, if wanted, should be designed dance-native).
+
+Actions D11's "retire after migration" and closes out D13: Zoey mapped ACOE → the
+8 dims as a stable interface, but no consumer adopted them, so the scalar serves
+that role. Full removal of the `RewardDimensions` type is a post-demo follow-up;
+`src/ui/lib/synthetic.ts` can then drop `legacyDims()` (Eng 4).
+
 ## 2026-06-06 — Dance reward critic (PR #2)
 
 ### D13. The ACOE critic maps into the 8 dimensions + adds a confidence-gated learning signal

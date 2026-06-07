@@ -47,11 +47,11 @@ The Critic emits, in `RewardScore`:
 - `lowest_scoring_category` + `recommended_fix_priority` (drives the loop's fix step)
 - `judge_rationale` (≡ `rationale`), `confidence`
 
-**Transitional:** `RewardScore` also still carries the legacy 0..1 `dimensions`
-(`RewardDimensions`) and `weighted_total` (= `total_score / 100`) so the current
-dashboard keeps rendering until it migrates to ACOE (see
-`docs/DASHBOARD_MIGRATION.md`, DECISIONS.md D11). Those dimensions are deprecated
-and will be removed once the migration lands.
+**Deprecated:** the 8 `dimensions` are now **optional and unconsumed** — the
+dashboard renders `category_breakdown` + tiers and the loop optimizes the scalar
+`weighted_total`/`predicted_score`. The critic and stubs no longer emit
+`dimensions` (DECISIONS.md D14); the `RewardDimensions` type lingers pending full
+removal.
 
 ## Audio note
 

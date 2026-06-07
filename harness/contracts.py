@@ -137,7 +137,7 @@ class RewardScore(BaseModel):
     concept_id: str
     generation_number: int
     harness_state_version: str
-    dimensions: RewardDimensions
+    dimensions: Optional[RewardDimensions] = None  # deprecated (D14): unconsumed; scalar weighted_total/predicted_score is the stable target
     weighted_total: float  # aggregate; risk dims penalize
     predicted_win_prob: Optional[float] = None  # pairwise win prob vs baseline, 0..1
     policy_flag: bool = False  # policy_risk over threshold
