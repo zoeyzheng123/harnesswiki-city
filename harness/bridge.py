@@ -22,7 +22,6 @@ from harness.contracts import (
     GenerationRecord,
     HarnessDiff,
     HarnessState,
-    RewardDimensions,
     RewardScore,
 )
 
@@ -118,16 +117,6 @@ def map_reward_to_canonical(
         concept_id=concept_id,
         generation_number=generation,
         harness_state_version=harness_version,
-        dimensions=RewardDimensions(
-            hook_strength=max(0.1, ps),
-            trend_fit=max(0.1, ps * 0.9),
-            brand_fit=max(0.1, ps * 0.85),
-            novelty=max(0.1, ps * 0.7),
-            clarity=max(0.1, ps * 0.8),
-            cringe_risk=0.25,
-            policy_risk=0.05,
-            visual_feasibility=max(0.1, ps * 0.75),
-        ),
         weighted_total=ps,
         predicted_score=ps,
         predicted_win_prob=pw,

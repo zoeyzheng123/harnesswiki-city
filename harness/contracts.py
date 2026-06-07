@@ -127,18 +127,6 @@ class ContentConcept(BaseModel):
     description: Optional[str] = None  # MD-03 CTA
 
 
-# the judge rubric, as numbers. Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md.
-class RewardDimensions(BaseModel):
-    hook_strength: float
-    trend_fit: float
-    brand_fit: float
-    novelty: float
-    clarity: float
-    cringe_risk: float  # higher = worse
-    policy_risk: float  # higher = worse
-    visual_feasibility: float
-
-
 # 3. RewardScore — produced by B (Critic), consumed by A (Loop core)
 class RewardScore(BaseModel):
     # ── core (render-ready) ──
@@ -146,10 +134,9 @@ class RewardScore(BaseModel):
     concept_id: str
     generation_number: int
     harness_state_version: str
-    dimensions: Optional[RewardDimensions] = None  # deprecated (D14): unconsumed; scalar weighted_total/predicted_score is the stable target
-    weighted_total: float  # aggregate; risk dims penalize
+    weighted_total: float  # aggregate 0..1 reward — the stable scalar target
     predicted_win_prob: Optional[float] = None  # pairwise win prob vs baseline, 0..1
-    policy_flag: bool = False  # policy_risk over threshold
+    policy_flag: bool = False  # critic flagged a policy / brand-safety risk
     judge_rationale: str
     # ── Eng 1 additions (optional) ──
     predicted_score: Optional[float] = None  # ≡ normalized weighted_total, 0..1
@@ -304,10 +291,6 @@ def stub_reward(concept_id: str) -> RewardScore:
         concept_id=concept_id,
         generation_number=1,
         harness_state_version="v0",
-        dimensions=RewardDimensions(
-            hook_strength=0.87, trend_fit=0.85, brand_fit=0.7, novelty=0.6,
-            clarity=0.78, cringe_risk=0.25, policy_risk=0.05, visual_feasibility=0.8,
-        ),
         weighted_total=0.76,
         predicted_win_prob=0.62,
         policy_flag=False,

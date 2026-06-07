@@ -33,9 +33,9 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 
 ## Known placeholders
 
-- `pnpm dev` points at `pnpm dev:ui`; the Python generation loop writes `data/generations.latest.json` but the dashboard still reads synthetic data (`src/ui/lib/data.ts`).
+- `pnpm dev` points at `pnpm dev:ui`; the Python generation loop writes `data/generations.latest.json`. `src/ui/lib/data.ts` defaults to the synthetic arc and reads real output when `VITE_GENERATIONS_URL` is set (falling back to synthetic on absence/error).
 - The loop's stub generator produces generic concepts that score low against the v2 dance rubric (seed_jail); the real `harness/generator.py` is needed to climb out.
-- The 8 `RewardScore.dimensions` are **demoted to optional + deprecated** (DECISIONS.md D14) — the dashboard migrated to ACOE `category_breakdown`/tiers; the critic and stubs no longer emit them. Follow-up (Eng 4): drop `legacyDims()` from `src/ui/lib/synthetic.ts`. Full `RewardDimensions` removal is post-demo.
-- **ACOE v2** is the active rubric (DECISIONS.md D15): audio↑ / engagement↓ + 5 new criteria + AF-05 + `ExecutionMetadata`. Eng 4 follow-up: rebalance `CATEGORY_MAX` to v2 (audio 15, engagement 10) — `docs/DASHBOARD_MIGRATION.md`.
+- The legacy 8 `RewardScore.dimensions` / `RewardDimensions` type were **removed** (DECISIONS.md D14) — the dashboard, critic, and stubs use ACOE `category_breakdown`/tiers and the scalar `weighted_total`; `legacyDims()` is gone from `src/ui/lib/synthetic.ts`.
+- **ACOE v2** is the active rubric (DECISIONS.md D15): audio↑ / engagement↓ + 5 new criteria + AF-05 + `ExecutionMetadata`. The dashboard is migrated to v2 — `CATEGORY_MAX` rebalanced (audio 15, engagement 10), the synthetic arc re-themed, and hashtags read from `execution`.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
 - `loop_core/` (Eng 1) runs against its own lean internal contracts; the bridge adapter (`harness/bridge.py`, DECISIONS D16) maps its output to canonical `GenerationRecord[]` → `data/generations.latest.json`.

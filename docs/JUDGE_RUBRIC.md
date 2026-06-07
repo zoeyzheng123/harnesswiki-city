@@ -48,11 +48,9 @@ The Critic emits, in `RewardScore`:
 - `lowest_scoring_category` + `recommended_fix_priority` (drives the loop's fix step)
 - `judge_rationale` (≡ `rationale`), `confidence`
 
-**Deprecated:** the 8 `dimensions` are now **optional and unconsumed** — the
-dashboard renders `category_breakdown` + tiers and the loop optimizes the scalar
-`weighted_total`/`predicted_score`. The critic and stubs no longer emit
-`dimensions` (DECISIONS.md D14); the `RewardDimensions` type lingers pending full
-removal.
+**Removed:** the legacy 8 `dimensions` / `RewardDimensions` type were dropped
+(DECISIONS.md D14) — the dashboard renders `category_breakdown` + tiers and the
+loop optimizes the scalar `weighted_total`/`predicted_score`.
 
 ## Audio note
 
@@ -68,7 +66,7 @@ generation prompt, offline-deterministic, no LLM needed), `rendered_video`, and
 `partial`. It emits `total_score` / `distribution_tier` / `category_breakdown`
 plus the scalar `weighted_total` (= `total_score/100` minus risk penalties), and
 preserves the full criterion detail in `RewardScore.rubric_breakdown`. (The legacy
-8-`RewardDimensions` mapping was retired — DECISIONS.md D14.)
+8-`RewardDimensions` mapping was removed — DECISIONS.md D14.)
 
 **Confidence-gated learning:** the critic proposes bounded element-weight deltas
 (±0.10) as `suggested_policy_updates` (+ `winning_elements`/`weak_elements`), but

@@ -55,7 +55,7 @@ ground-truth `actual_engagement` loop remains open; v2 is a better-shaped guess.
 - **ExecutionMetadata** submodel (`hashtag_set`, `posting_time`) separates platform execution from the creative concept; top-level `ContentConcept.hashtag_set`/`posting_time` are deprecated; `cut_frequency` is now scored (VP-04).
 - Prompt mechanics in `HarnessState.script_prompt`: "You" hook, micro-curiosity gap (premise 0:00 → payoff ~0:13), conflict phrasing, cut ≤2.5s, rising audio; 13–15s retained.
 
-Done **backend-additive** (build stays green): `RewardDimensions` stays demoted (D14, not deleted); `hashtag_set`/`posting_time` kept deprecated. Deferred to **Eng 4** (`docs/DASHBOARD_MIGRATION.md`): rebalance `CATEGORY_MAX` to v2 (audio 15, engagement 10), drop `legacyDims`, delete `dimensions`, migrate reads to `execution`. Deferred to **Eng 1**: the meta-agent micro-curiosity-gap prompt + consuming `suggested_policy_updates`.
+Done **backend-additive** (build stays green): `hashtag_set`/`posting_time` kept deprecated. **Eng 4 follow-ups now done** (`docs/DASHBOARD_MIGRATION.md`): `CATEGORY_MAX` rebalanced to v2 (audio 15, engagement 10), `legacyDims` + `dimensions` dropped and `RewardDimensions` deleted (D14), reads migrated to `execution`. Deferred to **Eng 1**: the meta-agent micro-curiosity-gap prompt + consuming `suggested_policy_updates`.
 
 ## 2026-06-06 — Retire the transitional 8 dimensions
 
@@ -76,8 +76,12 @@ reward vector, if wanted, should be designed dance-native).
 
 Actions D11's "retire after migration" and closes out D13: Zoey mapped ACOE → the
 8 dims as a stable interface, but no consumer adopted them, so the scalar serves
-that role. Full removal of the `RewardDimensions` type is a post-demo follow-up;
-`src/ui/lib/synthetic.ts` can then drop `legacyDims()` (Eng 4).
+that role.
+
+**Update (Eng 4, done):** the `RewardDimensions` type and the `RewardScore.dimensions`
+field were removed from `harness/contracts.py` and the TS mirror, and `legacyDims()`
+is gone from `src/ui/lib/synthetic.ts`. The scalar `weighted_total`/`predicted_score`
+and ACOE `category_breakdown` are the only score signals.
 
 ## 2026-06-06 — Dance reward critic (PR #2)
 

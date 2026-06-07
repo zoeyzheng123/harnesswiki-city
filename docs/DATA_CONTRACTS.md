@@ -18,7 +18,7 @@ These shapes are a **superset** reconciling Eng 1's lean Pydantic proposal with
 Eng 4's already-built dashboard (DECISIONS.md D8):
 
 - **Core fields** are render-ready and consumed by the dashboard today
-  (embedded `concept`/`score`, the 8-dim `RewardDimensions`, `Lesson`,
+  (embedded `concept`/`score` with ACOE `category_breakdown` + tiers, `Lesson`,
   structured `HarnessDiff`, `element_weights`).
 - **"Eng 1 additions"** are *optional* backend/short-form-video fields pending a
   prune once Eng 1 and Eng 4 align. Some are renames of a core field; the
@@ -64,13 +64,8 @@ class ContentConcept(BaseModel):
     # + ACOE Shorts: comment_bait_question, on_screen_text, title, description
     #   (top-level hashtag_set / posting_time deprecated (v2) -> use execution.*)
 
-class RewardDimensions(BaseModel):   # keys == docs/JUDGE_RUBRIC.md; risk dims higher = worse
-    hook_strength: float; trend_fit: float; brand_fit: float; novelty: float
-    clarity: float; cringe_risk: float; policy_risk: float; visual_feasibility: float
-
 class RewardScore(BaseModel):
     id: str; concept_id: str; generation_number: int; harness_state_version: str
-    dimensions: RewardDimensions | None = None   # deprecated (D14) — unconsumed
     weighted_total: float                          # scalar 0..1 — the stable target
     predicted_win_prob: float | None = None; policy_flag: bool = False; judge_rationale: str
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
@@ -117,10 +112,10 @@ field on one model:
 | hook strength; trend-alignment | the rubric (ACOE categories — `hook_quality`, `audio_alignment`); see `docs/JUDGE_RUBRIC.md` |
 | posting result (engagement, url) | `GenerationRecord.actual_engagement` / `post_url` |
 
-The two scoring criteria refine existing rubric dimensions and are referenced by
-`rubric_version`; they are **not** added as new `RewardDimensions` keys, because
-the dashboard's `DIMENSION_LABELS` is an exhaustive map and a new key would
-break `pnpm typecheck:ui` (DECISIONS.md D10).
+The refined scoring criteria are scoped by `rubric_version` and surface through
+the ACOE `category_breakdown` (six categories) and `rubric_breakdown`, not as
+standalone score fields — adding rubric criteria never changes the `RewardScore`
+shape.
 
 ## ACOE score outputs
 
@@ -130,9 +125,9 @@ additively: `total_score` (0–100), `distribution_tier` (viral/growing/seed_jai
 `category_breakdown` (the 6 ACOE categories), `auto_fails_triggered`,
 `lowest_scoring_category`, `recommended_fix_priority`. `weighted_total`
 (≈ `total_score / 100`) is the stable, rubric-independent scalar the loop
-optimizes. The 8 `dimensions` are now **optional + deprecated** (DECISIONS.md
-D14) — the dashboard migrated to `category_breakdown`, so the critic and stubs no
-longer emit them; the `RewardDimensions` type lingers pending full removal.
+optimizes. The legacy 8 `dimensions` / `RewardDimensions` type were **removed**
+(DECISIONS.md D14) — the dashboard, critic, and stubs use `category_breakdown`
+and tiers.
 
 ## Conventions
 

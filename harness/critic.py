@@ -2,9 +2,10 @@
 
 The critic has two jobs:
 
-1. Apply the ACOE v1 rubric consistently and preserve criterion-level evidence.
-2. Map the richer dance-video judgement back to the canonical eight
-   RewardDimensions consumed by the loop and dashboard.
+1. Apply the ACOE rubric consistently and preserve criterion-level evidence.
+2. Map the richer dance-video judgement into the ACOE outputs the loop and
+   dashboard consume: category_breakdown, distribution_tier, and the scalar
+   weighted_total.
 
 The module works without an API key through a deterministic prompt-preflight
 fallback. Pass a ``judge`` callable to use an LLM with structured JSON output.

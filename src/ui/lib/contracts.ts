@@ -10,7 +10,6 @@ export type {
   TrendSignal,
   TrendContext,
   ContentConcept,
-  RewardDimensions,
   RewardScore,
   HarnessState,
   HarnessDiff,

@@ -89,26 +89,13 @@ export type ContentConcept = {
   description?: string;
 };
 
-// Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md. Risk dims: higher = worse.
-export type RewardDimensions = {
-  hook_strength: number;
-  trend_fit: number;
-  brand_fit: number;
-  novelty: number;
-  clarity: number;
-  cringe_risk: number;
-  policy_risk: number;
-  visual_feasibility: number;
-};
-
 export type RewardScore = {
   // core (render-ready)
   id: string;
   concept_id: string;
   generation_number: number;
   harness_state_version: string;
-  dimensions?: RewardDimensions; // deprecated (D14): unconsumed; weighted_total/predicted_score is the stable target
-  weighted_total: number; // risk dims penalize
+  weighted_total: number; // aggregate 0..1 reward — the stable scalar target
   predicted_win_prob?: number; // pairwise win prob vs baseline, 0..1
   policy_flag: boolean;
   judge_rationale: string;
