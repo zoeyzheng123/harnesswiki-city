@@ -1,0 +1,27 @@
+{
+  "harness_id": "harness_5b4de27f",
+  "generation": 2,
+  "system_prompt": "You generate 8s short-form video concepts. Lead with a strong hook. Use pattern_interrupt_3s when it fits. Use captions_burned_in when it fits.",
+  "tools": [
+    "tavily_search",
+    "seedance_render"
+  ],
+  "element_taxonomy": [
+    "comedy",
+    "90s_aesthetic",
+    "text_hook_frame1",
+    "trending_audio_sync",
+    "slow_pan_intro",
+    "pattern_interrupt_3s",
+    "captions_burned_in"
+  ],
+  "few_shot_examples": [
+    {
+      "concept": "POV 90s cubicle glow-up",
+      "engagement": 15000
+    }
+  ],
+  "rubric_version": "v1",
+  "parent_harness_id": "harness_24827f7d",
+  "diff_summary": "wiki suggests trying [[captions_burned_in]] next"
+}
