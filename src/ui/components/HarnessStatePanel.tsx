@@ -7,7 +7,7 @@ function PromptBlock({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <MetricLabel>{label}</MetricLabel>
-      <p className="mt-1 font-mono text-xs leading-relaxed text-muted">{truncate(value, 180)}</p>
+      <p className="mt-1 max-w-[68ch] font-mono text-xs leading-relaxed text-muted">{truncate(value, 180)}</p>
     </div>
   );
 }

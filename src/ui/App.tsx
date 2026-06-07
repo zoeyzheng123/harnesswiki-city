@@ -125,7 +125,11 @@ export function App() {
     if (af.length > 0) {
       return `Generation ${currentRecord.generation_number} of ${total}. Auto-fail ${af[0]}: total score overridden to 0.`;
     }
-    return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${TIER_LABELS[tierFor(totalScore)]} tier. Harness updated to ${state.version}.`;
+    const tierLabel = TIER_LABELS[tierFor(totalScore)];
+    if (currentRecord.harness_diff && !currentRecord.harness_diff.accepted) {
+      return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${tierLabel} tier. Harness rewrite refused${sc.policy_flag ? " on a policy flag" : ""}; held ${state.version}.`;
+    }
+    return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${tierLabel} tier. Harness updated to ${state.version}.`;
   })();
 
   return (
@@ -188,7 +192,7 @@ export function App() {
           initial="hidden"
           animate="show"
           variants={staggerContainer(0.08)}
-          className="mt-4 grid gap-4 lg:grid-cols-2"
+          className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start"
         >
           <WeightShiftPanel
             state={state}

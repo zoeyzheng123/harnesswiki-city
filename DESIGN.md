@@ -42,12 +42,14 @@ All values OKLCH. Body text clears 7:1 against `--bg`; muted clears 3.5:1.
 ### Brand signals
 | Token | OKLCH | Role |
 |---|---|---|
-| `--primary` | `oklch(0.64 0.150 242)` | Cobalt. `predicted_win_prob` line, primary actions |
-| `--accent` | `oklch(0.82 0.130 200)` | Frost cyan. `weighted_total` line, secondary indicator |
+| `--primary` | `oklch(0.64 0.150 242)` | Cobalt. The hero `total_score` curve (stroked via `--color-primary-bright`), primary actions |
+| `--accent` | `oklch(0.82 0.130 200)` | Frost cyan. Reserved for the Stage-3 relative series (Bradley-Terry win-prob), not live yet; secondary indicator |
 
 `--primary` vs `--accent` differ in both hue (242 vs 200) and lightness
-(0.64 vs 0.82), so the two curve series never read as one. Text on either fill is
-near-white (`--ink`), per the saturated-fill rule.
+(0.64 vs 0.82); when the relative line lands, that gap is what keeps the two
+curve series from reading as one. Today the hero is a single series, so the
+contrast is held in reserve. Text on either fill is near-white (`--ink`), per the
+saturated-fill rule.
 
 ### City role hues
 | Token | OKLCH | Role |
@@ -102,8 +104,15 @@ mono labels (≤ 4 words) may use tracked small caps for the telemetry register.
 - **Wiki lesson artifact** — a readable archive card with score stamp, tier,
   lint/refusal/review badge, wikilink element chips, evidence, harness change,
   expected effect, and a deterministic inspect action.
-- **Hero curve** — a single dark card holding the two-series SVG line chart, the
-  dashed 0.50 baseline, and the headline win-prob count-up. The signature object.
+- **Hero curve** — a single dark card holding a single `total_score` (0–100) SVG
+  line plus tier bands, with dashed growing (65) and viral (85) threshold lines on
+  the 0–100 axis (not a 0..1 baseline) and the headline score count-up. The
+  signature object. A second RELATIVE series (Bradley-Terry win-prob) is a deferred
+  Stage-3 add, not shipped today. That deferred series ties to DECISIONS D18
+  (absolute 0–100 = display vs preference = learning) and
+  `docs/DASHBOARD_MIGRATION.md` "Display-layer viz upgrades"; mind the dual-axis
+  caution: a 0..1 line plotted on the 0–100 axis is misleading, so prefer a
+  separate track (or a candidate-batch relative encoding), NOT a second hero line.
 - **Weight fader** — a read-only vertical rail with tick marks, a tactile knob,
   a mono value, and accepted/refused delta treatments. The harness is visually
   "moving its own controls"; users do not edit weights in the MVP.

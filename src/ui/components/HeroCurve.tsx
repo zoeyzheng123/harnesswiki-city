@@ -52,6 +52,13 @@ function beatFor(point: CurvePoint, prev: CurvePoint | undefined): { title: stri
   if (prev?.auto_failed) {
     return { title: "recovery", detail: "auto-fail cleared", color: "var(--color-positive)" };
   }
+  if (point.refused) {
+    return {
+      title: "refused",
+      detail: point.held_version ? `held ${point.held_version}` : "rewrite refused",
+      color: "var(--color-flag)",
+    };
+  }
   if (point.total_score >= VIRAL_AT) {
     const delta = prev ? point.total_score - prev.total_score : 0;
     return {
@@ -138,7 +145,7 @@ export function HeroCurve({
             </p>
           )}
         </div>
-        <div className="flex flex-col gap-1.5 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
+        <div className="flex flex-col gap-1.5 font-mono text-xs tracking-wide text-muted uppercase">
           <span className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-positive" /> viral 85+
           </span>
@@ -164,6 +171,9 @@ export function HeroCurve({
             : "Awaiting the first generation.") +
           (shown.some((p) => p.auto_failed)
             ? " One generation auto-failed (AF-01) and its total was overridden to 0."
+            : "") +
+          (shown.some((p) => p.refused)
+            ? " One generation's harness rewrite was refused on policy grounds, holding the previous version."
             : "")
         }
       >
@@ -261,6 +271,9 @@ export function HeroCurve({
           return (
             <g key={`pt-${p.generation_number}`}>
               {p.auto_failed && <circle cx={c.x} cy={c.y} r={11} fill="none" stroke="var(--color-flag)" strokeWidth={1.5} strokeOpacity={0.85} />}
+              {!p.auto_failed && p.refused && (
+                <circle cx={c.x} cy={c.y} r={10} fill="none" stroke="var(--color-flag)" strokeWidth={1.5} strokeOpacity={0.8} strokeDasharray="2 3" />
+              )}
               <motion.circle
                 cx={c.x}
                 cy={c.y}
@@ -284,8 +297,13 @@ export function HeroCurve({
           const labelH = 32;
           const labelX = clamp(c.x - labelW / 2, PAD.l + 2, W - PAD.r - labelW - 4);
           const labelY = c.y < PAD.t + 54 ? c.y + 14 : c.y - labelH - 14;
+          const isLatest = i === shown.length - 1;
           return (
-            <g key={`beat-${p.generation_number}`} opacity={i === shown.length - 1 ? 1 : 0.78}>
+            <g
+              key={`beat-${p.generation_number}`}
+              opacity={isLatest ? 1 : 0.78}
+              className={isLatest ? undefined : "max-[700px]:hidden"}
+            >
               <rect
                 x={labelX}
                 y={labelY}
@@ -294,7 +312,7 @@ export function HeroCurve({
                 rx={6}
                 fill="var(--color-bg)"
                 stroke={beat.color}
-                strokeOpacity={i === shown.length - 1 ? 0.8 : 0.42}
+                strokeOpacity={isLatest ? 0.8 : 0.42}
               />
               <text x={labelX + 8} y={labelY + 13} className="font-mono" style={{ fontSize: 9, fill: beat.color, letterSpacing: "0.04em" }}>
                 g{p.generation_number} · {beat.title}
