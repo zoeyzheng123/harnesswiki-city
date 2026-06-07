@@ -9,20 +9,45 @@
       "generation_number": 1,
       "trend_context_id": "tc_0001",
       "harness_state_version": "v0",
-      "hook": "Your AI startup isn't a wrapper problem. It's a taste problem.",
-      "format": "contrarian_hook",
-      "angle": "Distribution and taste are the real moats, not the model.",
-      "script": "Everyone says you're just a GPT wrapper. Cool - so was every SaaS a 'database wrapper.' The moat was never the model. It's taste, distribution, and the thousand product decisions nobody screenshots. Here's how to tell if yours is real...",
-      "visual_prompt": "A clean, modern talking-head explainer for ai-founders. Visual style: minimal, high-contrast, on-screen captions. Scene reflects: distribution and taste as moats.",
+      "hook": "Frame 1: a mid-air freeze on the beat against a neon-magenta void.",
+      "format": "peak_motion_loop",
+      "angle": "A hip-hop power-move combo locked to the drop, looped invisibly.",
+      "script": "0:00 hard cut into a mid-air freeze, then a power-move combo locked to the beat; the final pose returns to the opening frame for an invisible loop.",
+      "visual_prompt": "A single dancer, hip-hop power moves, mid-peak motion, isolated on a solid neon-magenta background, metallic reflective outfit catching light, 4K, no artifacts. Loop-ready.",
       "elements": [
-        "contrarian_hook"
+        "peak_motion_frame1",
+        "high_contrast_bg",
+        "seamless_loop",
+        "trending_audio",
+        "beat_sync"
       ],
       "created_by": "content-generator",
-      "element_weights": {
-        "contrarian_hook": 0.5
-      },
+      "element_weights": {},
       "storyboard": [],
-      "duration_sec": 30
+      "duration_sec": 14,
+      "dance_style": "hip-hop power moves",
+      "audio": {
+        "name": "Bruno Mars - I Just Might",
+        "bpm": 110.0,
+        "sound_recency": "rising",
+        "is_rising_sound": true
+      },
+      "cut_frequency": 2.0,
+      "hashtag_set": [
+        "#aidance",
+        "#aiart",
+        "#aianimation",
+        "#shorts",
+        "#viral",
+        "#fyp",
+        "#trending",
+        "#brunomars"
+      ],
+      "posting_time": "2026-06-06T17:00:00Z",
+      "comment_bait_question": "Name a song harder than this",
+      "on_screen_text": "Name a song harder than this",
+      "title": "Name a song harder than this #aidance #shorts",
+      "description": "AI dance to Bruno Mars - I Just Might. Drop the song you want next below."
     },
     "score": {
       "id": "rs_0001",
@@ -30,23 +55,37 @@
       "generation_number": 1,
       "harness_state_version": "v0",
       "dimensions": {
-        "hook_strength": 0.82,
-        "trend_fit": 0.78,
+        "hook_strength": 0.87,
+        "trend_fit": 0.85,
         "brand_fit": 0.7,
-        "novelty": 0.68,
-        "clarity": 0.74,
-        "cringe_risk": 0.18,
+        "novelty": 0.6,
+        "clarity": 0.78,
+        "cringe_risk": 0.25,
         "policy_risk": 0.05,
         "visual_feasibility": 0.8
       },
-      "weighted_total": 0.71,
-      "predicted_win_prob": 0.5,
+      "weighted_total": 0.76,
+      "predicted_win_prob": 0.62,
       "policy_flag": false,
-      "judge_rationale": "Strong contrarian hook with clear trend fit and good clarity; novelty is moderate. Low cringe and policy risk. Baseline generation, so the win probability is anchored at 0.5.",
-      "predicted_score": 0.71,
-      "pairwise_winprob": 0.5,
-      "confidence": 0.6,
-      "scored_by": "stub-critic"
+      "judge_rationale": "Strong frame-1 peak motion, stark background, and a smooth loop. Weakest on engagement bait - the comment-bait question is present but not polarizing enough to force typed replies. Growing tier; one fix from viral.",
+      "predicted_score": 0.76,
+      "pairwise_winprob": 0.62,
+      "confidence": 0.7,
+      "scored_by": "stub-critic-ACOE",
+      "rationale": "engagement_bait is the ceiling at 11/20; see category_breakdown.",
+      "total_score": 76.0,
+      "distribution_tier": "growing",
+      "auto_fails_triggered": [],
+      "category_breakdown": {
+        "hook_quality": 26,
+        "retention_and_loop": 18,
+        "engagement_bait": 11,
+        "visual_production": 12,
+        "audio_alignment": 4,
+        "metadata": 5
+      },
+      "lowest_scoring_category": "engagement_bait",
+      "recommended_fix_priority": "Sharpen the comment-bait question into a polarizing, typed-answer prompt and keep it on-screen the full duration (EB-01/EB-02/EB-03)."
     },
     "harness_state_version_before": "v0",
     "harness_state_version_after": "v1",
@@ -55,25 +94,25 @@
       "from_version": "v0",
       "to_version": "v1",
       "element_weight_changes": {
-        "contrarian_hook": 0.1,
-        "generic_listicle": -0.1
+        "comment_bait_question": 0.15,
+        "polarizing_angle": 0.1
       },
-      "script_prompt_change": "Add an explicit instruction to name the consensus view before subverting it.",
-      "rationale": "The contrarian hook scored highest on hook_strength and trend_fit; reinforce it and suppress generic listicles.",
+      "script_prompt_change": "Require a polarizing, ranked/comparison typed-answer question burned on-screen for the full duration.",
+      "rationale": "engagement_bait was the lowest category (11/20); reinforce comment bait + polarization to lift the total toward the viral threshold.",
       "accepted": true
     },
     "lesson": {
       "id": "ls_0001",
       "generation_number": 1,
-      "observation": "The contrarian hook outscored generic framings on hook_strength and trend_fit for the AI-founder audience.",
-      "rule": "For founder-facing AI content, prefer contrarian or diagnostic hooks over generic listicles.",
-      "evidence": "Generation 1: contrarian_hook concept scored 0.82 hook_strength and 0.78 trend_fit, weighted_total 0.71.",
-      "harness_change": "Increase contrarian_hook weight (+0.1) and decrease generic_listicle (-0.1); reinforce in script_prompt.",
-      "expected_effect": "Later generations open with sharper, consensus-subverting hooks and avoid generic listicles, lifting the predicted win probability."
+      "observation": "The video scored well on hook and loop but engagement_bait capped the total at 76 (growing) - the question was answerable with an emoji.",
+      "rule": "Use polarizing, typed-answer comment bait (ranking/comparison) kept on-screen the full duration.",
+      "evidence": "Generation 1 ACOE: hook_quality 26/30, engagement_bait 11/20, total 76 -> growing tier.",
+      "harness_change": "Raise comment_bait_question (+0.15) and polarizing_angle (+0.10); update script_prompt to demand a polarizing typed-answer question.",
+      "expected_effect": "engagement_bait climbs toward 18-20/20, pushing the total past 85 into the viral tier."
     },
     "harness_id": "hs_0001",
-    "predicted_score": 0.71,
-    "rubric_version": "v1",
+    "predicted_score": 0.76,
+    "rubric_version": "ACOE-YT-SHORTS-v1.0",
     "selected": true
   }
 ]

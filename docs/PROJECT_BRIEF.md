@@ -5,48 +5,43 @@ not.
 
 ## One-Liner
 
-HarnessWiki City is a Weave-traced control room for self-improving content-agent
-teams.
+HarnessWiki City is a Weave-traced control room for a self-improving harness that
+generates AI **YouTube Shorts dance videos** and climbs from Seed-Jail to Viral.
 
 ## Core Claim
 
-Trend intelligence plus reward feedback can improve the content *harness* over
-generations — by updating prompts, element weights, and living memory, not just
-producing one-off assets.
+Trend intelligence plus a concrete reward policy (ACOE-YT-SHORTS-v1.0) can improve
+the content *harness* over generations — updating prompts, element weights, and
+living memory so each generation scores higher and reaches a better distribution
+tier, not just producing one-off videos.
 
 ## Golden Path
 
-1. Scout/load TrendContext (Tavily).
-2. Generate a ContentConcept (with the inner-loop element weights).
-3. Score the concept with the Reward Critic.
-4. Inner loop: nudge the element weights from the score.
+1. Scout the trend + a rising track from the approved audio pool (Tavily).
+2. Generate a dance-Short ContentConcept (peak-motion hook, seamless loop, comment bait) from TrendContext + HarnessState.
+3. Score it with the Reward Critic against **ACOE-YT-SHORTS-v1.0** → `total_score` (0–100), `distribution_tier`, `category_breakdown`, auto-fails.
+4. Inner loop: nudge element weights from the score (toward the lowest category).
 5. Store a GenerationRecord.
-6. Outer loop: the Meta-Agent rewrites HarnessState.
-7. Repeat for N generations; the dashboard shows the score climbing and the weights shifting.
+6. Outer loop: the Meta-Agent rewrites HarnessState; auto-fails force a regenerate.
+7. Repeat; the dashboard shows the score climbing toward the **viral** tier.
 
-The exact loop and the definition of "improved" live in `docs/HARNESS_LOOP.md`.
+The exact loop and the definition of "improved" live in `docs/HARNESS_LOOP.md`;
+the rubric in `docs/JUDGE_RUBRIC.md`.
 
 ## Stack
 
 Polyglot: Python backend (Pydantic contracts + loop), TypeScript dashboard
-(Vite + React). Tools: Weave (tracing), Tavily (trends), Seedance (video),
-Anthropic (generation + critic). See `docs/ARCHITECTURE.md`.
-
-## Theme
-
-Examples use a founder-facing AI-content narrative (matching the dashboard). The
-contracts also carry short-form-video fields (storyboard, Seedance prompt,
-engagement) so the TikTok-style direction is ready when the real loop + Seedance
-render land (DECISIONS.md D9).
+(Vite + React). Tools: Weave (tracing), Tavily (trends/audio), Seedance (dance
+video), Anthropic (generation + critic). See `docs/ARCHITECTURE.md`.
 
 ## Explicit Non-Goals
 
-- No full social-media scheduler.
-- Posting is optional — `actual_engagement`/`post_url` stay empty until/unless a concept is posted.
-- No rendering every generation (render the winner at most).
+- No actual auto-publishing to YouTube — `actual_engagement`/`post_url` stay empty until/unless a video is posted by a human.
+- No real ad spend or bot engagement.
+- No rendering every generation (render the selected concept at most).
 - No complex city simulation.
-- No production-grade engagement predictor.
 - Redis is a stretch; JSON files are the storage for now.
+- Music ships only from the platform's licensed library (the policy lists chart references, not audio files).
 
 If a task isn't on the golden path and isn't required to demo it, it's out of
 scope for this weekend.

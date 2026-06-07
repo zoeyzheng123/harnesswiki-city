@@ -8,23 +8,22 @@ vague notes.
 Living memory is two things, both persisted as JSON:
 
 1. The **GenerationRecord** rows (the "wiki") — one per generation, each
-   embedding the concept, score, harness diff, and a distilled `Lesson`.
+   embedding the concept, the ACOE score, the harness diff, and a distilled `Lesson`.
 2. The **harness lineage** — the chain of `HarnessState` versions linked by
-   `parent_harness_id`, each carrying a `diff_summary` of what the meta-agent
-   changed.
+   `parent_harness_id`, each carrying a `diff_summary` of what the meta-agent changed.
 
 The meta-agent reads these to rewrite the harness; the dashboard reads them to
-draw the curve, the weight shift, and the lessons panel.
+draw the score curve, the weight shift, and the lessons panel.
 
 ## What counts as a lesson
 
 A `Lesson` must include all five parts (enforced by the `Lesson` type):
 
-- **observation** — what we noticed in the data.
+- **observation** — what we noticed in the ACOE breakdown.
 - **rule** — the generalizable guidance it implies.
-- **evidence** — the concrete generation + scores that support it.
+- **evidence** — the concrete generation + category scores that support it.
 - **harness_change** — the change made to HarnessState (which weights/prompts).
-- **expected_effect** — what we expect to improve next.
+- **expected_effect** — which category/total we expect to lift next.
 
 A note missing any of these is not a lesson; do not write it. (The terse
 `diff_summary` on a `HarnessDiff`/`HarnessState` is a one-line companion, not a
@@ -32,32 +31,32 @@ substitute for a `Lesson`.)
 
 ## Element weights live here, conceptually
 
-Lessons mutate `HarnessState.element_weights` (e.g. raise `contrarian_hook`,
-lower `generic_listicle`) over the `element_taxonomy` (the action space). These
-are *generation biases*, not rubric dimensions — see `docs/DATA_CONTRACTS.md` →
-"Three vocabularies".
+Lessons mutate `HarnessState.element_weights` (e.g. raise `comment_bait_question`,
+`polarizing_angle`) over the `element_taxonomy` (the action space). These are
+*generation biases*, not ACOE categories — see `docs/DATA_CONTRACTS.md` → "Three
+vocabularies".
 
 ## Example
 
 ```
 Observation:
-Generic listicle hooks scored low on novelty and hook_strength for the
-AI-founder audience.
+The video scored well on hook and loop but engagement_bait capped the total
+at 76 (Growing) — the on-screen question was answerable with an emoji.
 
 Rule:
-For founder-facing AI content, prefer contrarian or diagnostic hooks.
+Use polarizing, typed-answer comment bait (ranking/comparison) kept on-screen
+the full duration.
 
 Evidence:
-Generation 1: contrarian_hook concept scored 0.82 hook_strength / 0.78
-trend_fit (weighted_total 0.71), beating generic framings.
+Generation 1 ACOE: hook_quality 26/30, engagement_bait 11/20, total 76 →
+Growing tier.
 
 Harness change:
-Decrease `generic_listicle` weight (-0.1). Increase `contrarian_hook`
-weight (+0.1). Reinforce in `script_prompt`.
+Raise `comment_bait_question` (+0.15) and `polarizing_angle` (+0.10); update
+`script_prompt` to demand a polarizing typed-answer question.
 
 Expected effect:
-Later generations open with sharper, consensus-subverting hooks, lifting
-predicted win probability.
+engagement_bait climbs toward 18–20/20, pushing the total past 85 into Viral.
 ```
 
 This mirrors the lesson in `data/stubs/generation-records.sample.json`.

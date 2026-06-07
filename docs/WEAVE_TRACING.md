@@ -31,6 +31,7 @@ Across the loop, these must appear in the trace:
 - `trend_context_id`
 - `concept_id`
 - `weighted_total` (and `predicted_score`) + the `dimensions`
+- `total_score` (0–100), `distribution_tier`, `category_breakdown`, `auto_fails_triggered` (ACOE)
 - `predicted_win_prob` (≡ `pairwise_winprob`)
 - `element_weights` before and after (inner loop)
 - `harness_diff` (and `diff_summary`) + `parent_harness_id`

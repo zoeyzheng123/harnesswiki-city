@@ -1,65 +1,64 @@
 # Agent Roles
 
-Owner of *agent responsibilities*. Makes the multi-agent orchestration legible
-to humans and to coding agents. Owners map to the team in the README
-(workstreams A–D); the runtime roles align with the dashboard districts
-(`scout` / `generator` / `critic` / `meta`).
+Owner of *agent responsibilities*. Makes the multi-agent orchestration legible.
+Owners map to the team in the README (workstreams A–D); the runtime roles align
+with the dashboard districts (`scout` / `generator` / `critic` / `meta`).
 
 ## Trend Scout
 
 Produces TrendContext.
 
-- **Inputs:** stub trend data (`data/stubs/trend-contexts.json`); later, Tavily.
-- **Outputs:** `TrendContext`
+- **Inputs:** trending dances + the approved trending-audio pool (`data/policies/ACOE-YT-SHORTS-v1.0.json` → `audio_alignment`); stub data today, Tavily later.
+- **Outputs:** `TrendContext` (with a rising track in `audio`).
 - **Allowed tools:** Tavily search; file read (MVP).
-- **Failure modes:** stale or off-audience trends; hallucinated signals.
+- **Failure modes:** stale trend; picks a non-pool or controversy-adjacent track (AF-04 / `avoid` list).
 - **Owner:** Eng 3 (C — Content Pipeline)
 
 ## Content Generator
 
-Produces ContentConcept from TrendContext + HarnessState (and the inner-loop weights, snapshotted onto the concept).
+Produces a dance-Short ContentConcept from TrendContext + HarnessState (snapshotting the inner-loop weights).
 
-- **Inputs:** `TrendContext`, `HarnessState` (`script_prompt`/`system_prompt`, `element_weights`, `seedance_prompt_template`)
-- **Outputs:** `ContentConcept`
+- **Inputs:** `TrendContext`, `HarnessState` (`script_prompt`, `element_weights`, `seedance_prompt_template`)
+- **Outputs:** `ContentConcept` (dance_style, audio, on-screen comment bait, hashtag set, seamless-loop framing)
 - **Allowed tools:** Anthropic; the seedance prompt builder.
-- **Failure modes:** ignores element weights; generic hook; drifts off the trend.
+- **Failure modes:** static frame 1 (AF-01); missing on-screen text (AF-02); off-pool audio (AF-04); generic question.
 - **Owner:** Eng 3 (C)
 
 ## Reward Critic
 
-Produces RewardScore. **Owns the rubric** (referenced elsewhere only by `rubric_version`) — generation is kept separate from evaluation.
+Produces RewardScore by applying **ACOE-YT-SHORTS-v1.0**. **Owns the rubric** (referenced elsewhere only by `rubric_version`).
 
-- **Inputs:** `ContentConcept`, the rubric (`docs/JUDGE_RUBRIC.md`, `rubric_version`)
-- **Outputs:** `RewardScore` (`dimensions`, `weighted_total`, `predicted_win_prob`/`pairwise_winprob`, `confidence`)
+- **Inputs:** `ContentConcept`, the policy (`docs/JUDGE_RUBRIC.md` / the JSON)
+- **Outputs:** `RewardScore` (`total_score`, `distribution_tier`, `category_breakdown`, `auto_fails_triggered`, `lowest_scoring_category`, `recommended_fix_priority`)
 - **Allowed tools:** Anthropic as judge.
-- **Failure modes:** inconsistent scoring; rewards cringe; misses policy risk.
+- **Failure modes:** misses an auto-fail; inconsistent category scoring.
 - **Owner:** Eng 2 (B — Reward Critic)
 
 ## Loop Core (inner loop)
 
-Adjusts element weights from the RewardScore and writes the GenerationRecord.
+Adjusts element weights from the RewardScore (toward the lowest category) and writes the GenerationRecord.
 
 - **Inputs:** `RewardScore`, current weights
 - **Outputs:** updated `element_weights`; `GenerationRecord`
-- **Failure modes:** thrashes weights; overreacts to one score.
+- **Failure modes:** thrashes weights; ignores `lowest_scoring_category`.
 - **Owner:** Eng 1 (A — Loop Core)
 
 ## Meta-Agent / Harness Rewriter (outer loop)
 
-Reads GenerationRecords and proposes HarnessState changes once per generation.
+Reads GenerationRecords and rewrites HarnessState once per generation.
 
 - **Inputs:** recent `GenerationRecord[]`, current `HarnessState`
 - **Outputs:** `HarnessDiff` (+ `parent_harness_id`, `diff_summary` lineage)
 - **Allowed tools:** Anthropic; read access to memory.
-- **Failure modes:** overfits to one generation; raises `policy_risk`.
+- **Failure modes:** overfits to one video; introduces an auto-fail.
 - **Owner:** Eng 1 (A)
 
 ## Renderer
 
-Renders the selected concept to video (stretch / optional).
+Renders the selected concept to a dance video (stretch / optional).
 
-- **Inputs:** selected `ContentConcept` (`seedance_prompt`)
-- **Outputs:** a rendered asset; later `post_url` + `actual_engagement`
+- **Inputs:** selected `ContentConcept` (`seedance_prompt`, `audio`)
+- **Outputs:** a rendered Short; later `post_url` + `actual_engagement`
 - **Allowed tools:** Seedance.
 - **Owner:** Eng 3 (C)
 
@@ -70,7 +69,7 @@ Turns generation history into living-memory lessons.
 - **Inputs:** `GenerationRecord`, `RewardScore`, `HarnessDiff`
 - **Outputs:** `Lesson` (see `docs/HARNESS_MEMORY.md`)
 - **Allowed tools:** Anthropic; memory write.
-- **Failure modes:** vague lessons with no rule or evidence; duplicates.
+- **Failure modes:** vague lessons with no rule or evidence.
 - **Owner:** Eng 1 (A)
 
 ## Demo Narrator

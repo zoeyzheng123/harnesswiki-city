@@ -3,6 +3,34 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Pivot to the short-form-video vertical
+
+### D11. Pivot to AI YouTube Shorts dance, scored by ACOE-YT-SHORTS-v1.0
+
+The product pivots to AI-generated YouTube Shorts dance videos. The Reward
+Critic's evaluation policy is **ACOE-YT-SHORTS-v1.0**, stored verbatim as
+`data/policies/ACOE-YT-SHORTS-v1.0.json` (canonical, machine-readable) and
+referenced by `HarnessState.rubric_version`. It scores 0–100 across 6 weighted
+categories, maps to viral/growing/seed-jail tiers, and applies category-zeroing
+auto-fails.
+
+Integration (chosen approach):
+- **Additive-first.** `RewardScore` gains optional ACOE outputs (`total_score`,
+  `distribution_tier`, `auto_fails_triggered`, `category_breakdown`,
+  `lowest_scoring_category`, `recommended_fix_priority`); `ContentConcept` gains
+  optional Shorts fields (`comment_bait_question`, `on_screen_text`, `title`,
+  `description`, plus the D10 block). The legacy 0..1 `RewardDimensions` stay
+  (transitional, `weighted_total = total_score / 100`) so `pnpm typecheck:ui` and
+  Eng 4's dashboard keep compiling. The founder dimensions retire once the
+  dashboard migrates.
+- **Dashboard owned by Eng 4.** `src/ui` is left untouched; the migration to ACOE
+  rendering is specced in `docs/DASHBOARD_MIGRATION.md`.
+- **Content re-themed** to the dance vertical: stubs, `element_taxonomy`,
+  `policy_rules` (the auto-fails), prompts, and all docs.
+
+Supersedes D9's "examples stay AI-founder". Additions stay optional/additive,
+consistent with D8/D10.
+
 ## 2026-06-06 — Short-form-video contract fields
 
 ### D10. Eng 1's short-form-video features land on ContentConcept + the rubric

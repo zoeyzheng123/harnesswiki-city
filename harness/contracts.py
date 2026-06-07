@@ -111,6 +111,11 @@ class ContentConcept(BaseModel):
     cut_frequency: Optional[float] = None  # cuts per second
     hashtag_set: Optional[list[str]] = None
     posting_time: Optional[datetime] = None  # recommended/planned post time
+    # ── ACOE Shorts generation attributes (optional) ──
+    comment_bait_question: Optional[str] = None  # EB-01 typed-response question
+    on_screen_text: Optional[str] = None  # HQ-03 / AF-02 overlay
+    title: Optional[str] = None  # MD-01
+    description: Optional[str] = None  # MD-03 CTA
 
 
 # the judge rubric, as numbers. Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md.
@@ -144,6 +149,13 @@ class RewardScore(BaseModel):
     scored_by: Optional[str] = None
     rationale: Optional[str] = None  # ≡ judge_rationale
     scored_at: Optional[datetime] = None
+    # ── ACOE-YT-SHORTS-v1.0 outputs (rubric_version; additive — see DECISIONS.md D11) ──
+    total_score: Optional[float] = None  # 0–100
+    distribution_tier: Optional[str] = None  # "viral" | "growing" | "seed_jail"
+    auto_fails_triggered: Optional[list[str]] = None  # e.g. ["AF-02"]
+    category_breakdown: Optional[dict] = None  # points per ACOE category
+    lowest_scoring_category: Optional[str] = None
+    recommended_fix_priority: Optional[str] = None
 
 
 # 4. HarnessState — the mutable scaffold. Read by C (Generator). Rewritten by A (Meta-agent).
@@ -224,16 +236,18 @@ class GenerationRecord(BaseModel):
 
 
 # ---- STUB FACTORIES: unblock yourself before the real producer exists ----
-# Themed to match the dashboard's AI-founder demo narrative (see scripts/dump_stubs.py
-# for the canonical, deterministic stub content written to data/stubs/).
+# Themed to the dance vertical (see scripts/dump_stubs.py for the canonical,
+# deterministic stub content written to data/stubs/).
 def stub_trend() -> TrendContext:
     return TrendContext(
         id="tc_0001",
-        platform="x",
-        audience="ai-founders",
-        trend_summary="Founders push back on 'AI wrapper' criticism; distribution and taste are the real moats.",
-        signals=[TrendSignal(label="format: contrarian take", strength=0.8)],
+        platform="youtube_shorts",
+        audience="gen-z-dance",
+        trend_summary="A dance challenge to a rising approved track is surging; single-color-background loops win.",
+        signals=[TrendSignal(label="format: peak-motion loop", strength=0.85)],
         source="stub",
+        audio="Bruno Mars - I Just Might",
+        format="peak_motion_loop",
     )
 
 
@@ -241,13 +255,13 @@ def stub_harness(generation: int = 0) -> HarnessState:
     return HarnessState(
         id="hs_0001",
         version=f"v{generation}",
-        element_weights={"contrarian_hook": 0.5, "diagnostic_hook": 0.4, "generic_listicle": 0.2},
-        script_prompt="Write a 30-second short-form video script for a founder-facing AI audience. Lead with a strong hook.",
-        seedance_prompt_template="A clean, modern talking-head explainer for {{audience}}. Scene reflects: {{angle}}.",
-        judge_rubric="Score the 8 dimensions in docs/JUDGE_RUBRIC.md; penalize risk dimensions.",
-        policy_rules=["No unverifiable claims about named companies."],
-        element_taxonomy=["contrarian_hook", "diagnostic_hook", "founder_story", "data_drop", "generic_listicle"],
-        rubric_version="v1",
+        element_weights={"peak_motion_frame1": 0.6, "seamless_loop": 0.55, "comment_bait_question": 0.4},
+        script_prompt="Generate an 8-15s AI dance Short: peak motion in frame 1, stark background, on-screen comment bait, seamless loop, beat-synced to an approved track.",
+        seedance_prompt_template="A single dancer, {{dance_style}}, mid-peak motion, isolated on a {{background}} background. On-screen text: \"{{on_screen_text}}\". Loop-ready.",
+        judge_rubric="Score with ACOE-YT-SHORTS-v1.0 (data/policies/ACOE-YT-SHORTS-v1.0.json). See docs/JUDGE_RUBRIC.md.",
+        policy_rules=["AF-01 no static frame 1", "AF-02 on-screen text in first 2s", "AF-03 duration 13-20s", "AF-04 approved trending audio only"],
+        element_taxonomy=["peak_motion_frame1", "high_contrast_bg", "seamless_loop", "trending_audio", "beat_sync", "comment_bait_question", "polarizing_angle"],
+        rubric_version="ACOE-YT-SHORTS-v1.0",
         generation=generation,
     )
 
@@ -257,13 +271,17 @@ def stub_concept(trend_id: str, generation: int = 1) -> ContentConcept:
         generation_number=generation,
         trend_context_id=trend_id,
         harness_state_version="v0",
-        hook="Your AI startup isn't a wrapper problem. It's a taste problem.",
-        format="contrarian_hook",
-        angle="Distribution and taste are the real moats, not the model.",
-        script="Everyone says you're just a GPT wrapper...",
-        visual_prompt="A clean, modern talking-head explainer for ai-founders. Scene reflects: taste as a moat.",
-        elements=["contrarian_hook"],
-        element_weights={"contrarian_hook": 0.5},
+        hook="Frame 1: a mid-air freeze on the beat against a neon-magenta void.",
+        format="peak_motion_loop",
+        angle="A power-move combo locked to the drop, looped invisibly.",
+        script="Hard cut into a mid-air freeze, then a power-move combo on the beat; final pose returns to frame 1.",
+        visual_prompt="A single dancer, hip-hop power moves, isolated on a neon-magenta background, reflective outfit, 4K, loop-ready.",
+        elements=["peak_motion_frame1", "high_contrast_bg", "seamless_loop"],
+        element_weights={"peak_motion_frame1": 0.6},
+        dance_style="hip-hop power moves",
+        audio=Audio(name="Bruno Mars - I Just Might", bpm=110, is_rising_sound=True),
+        comment_bait_question="Name a song harder than this",
+        duration_sec=14,
     )
 
 
@@ -273,15 +291,19 @@ def stub_reward(concept_id: str) -> RewardScore:
         generation_number=1,
         harness_state_version="v0",
         dimensions=RewardDimensions(
-            hook_strength=0.82, trend_fit=0.78, brand_fit=0.7, novelty=0.68,
-            clarity=0.74, cringe_risk=0.18, policy_risk=0.05, visual_feasibility=0.8,
+            hook_strength=0.87, trend_fit=0.85, brand_fit=0.7, novelty=0.6,
+            clarity=0.78, cringe_risk=0.25, policy_risk=0.05, visual_feasibility=0.8,
         ),
-        weighted_total=0.71,
-        predicted_win_prob=0.5,
+        weighted_total=0.76,
+        predicted_win_prob=0.62,
         policy_flag=False,
-        judge_rationale="Strong contrarian hook; baseline win probability anchored at 0.5.",
-        predicted_score=0.71,
-        pairwise_winprob=0.5,
-        confidence=0.6,
-        scored_by="stub-critic",
+        judge_rationale="Strong hook + loop; engagement_bait is the ceiling. Growing tier.",
+        predicted_score=0.76,
+        confidence=0.7,
+        scored_by="stub-critic-ACOE",
+        total_score=76,
+        distribution_tier="growing",
+        auto_fails_triggered=[],
+        category_breakdown={"hook_quality": 26, "retention_and_loop": 18, "engagement_bait": 11, "visual_production": 12, "audio_alignment": 4, "metadata": 5},
+        lowest_scoring_category="engagement_bait",
     )

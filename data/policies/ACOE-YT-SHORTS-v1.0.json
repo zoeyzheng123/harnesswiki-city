@@ -1,0 +1,331 @@
+{
+  "policy_id": "ACOE-YT-SHORTS-v1.0",
+  "policy_name": "Algorithmic Content Optimization Engine — Video Rating Policy",
+  "description": "Evaluation policy for AI-generated YouTube Shorts dance videos. Score each criterion, compute weighted total, and map to a distribution tier.",
+  "max_score": 100,
+
+  "distribution_tiers": {
+    "viral": {
+      "min_score": 85,
+      "expected_views": "14000+",
+      "label": "Viral Tier"
+    },
+    "growing": {
+      "min_score": 65,
+      "expected_views": "1000–13999",
+      "label": "Growing"
+    },
+    "seed_jail": {
+      "min_score": 0,
+      "expected_views": "0–199",
+      "label": "Seed Audience Jail"
+    }
+  },
+
+  "auto_fail_conditions": [
+    {
+      "id": "AF-01",
+      "label": "Standing Start",
+      "description": "Frame 1 shows a static or near-static pose before movement begins.",
+      "result": "Score overridden to 0. Video must be regenerated."
+    },
+    {
+      "id": "AF-02",
+      "label": "No On-Screen Text",
+      "description": "No text overlay present in the first 2 seconds.",
+      "result": "Hook and Engagement Bait categories both score 0."
+    },
+    {
+      "id": "AF-03",
+      "label": "Duration Violation",
+      "description": "Video duration is below 13 seconds or above 20 seconds.",
+      "result": "Retention/Loop category scores 0."
+    },
+    {
+      "id": "AF-04",
+      "label": "No Trending Audio",
+      "description": "Audio track is not sourced from the approved trending audio pool.",
+      "result": "Audio Alignment category scores 0."
+    }
+  ],
+
+  "categories": {
+
+    "hook_quality": {
+      "weight_percent": 30,
+      "max_points": 30,
+      "description": "Evaluates the first 1.5 seconds. The hook must arrest scroll behavior immediately.",
+      "criteria": [
+        {
+          "id": "HQ-01",
+          "label": "Peak Motion in Frame 1",
+          "description": "The very first frame must show the dancer mid-peak movement, not a lead-in or static pose.",
+          "points": 10,
+          "evaluation": {
+            "pass": "Frame 1 captures a dynamic, high-energy motion pose.",
+            "fail": "Frame 1 is static, fading in, or shows a pre-movement stance."
+          }
+        },
+        {
+          "id": "HQ-02",
+          "label": "High-Contrast Background",
+          "description": "Background must be visually stark (black, white, or single-color neon) to isolate the dancer from competing feed visuals.",
+          "points": 8,
+          "evaluation": {
+            "pass": "Background is a single solid or neon color with no visual noise.",
+            "partial": "Background has minimal texture or gradient. Deduct 4 points.",
+            "fail": "Background is busy, realistic, or indistinct from the dancer."
+          }
+        },
+        {
+          "id": "HQ-03",
+          "label": "Pattern Interrupt Element",
+          "description": "A visual or textual element in the first 1.5s that is unexpected or dissonant enough to break scroll momentum.",
+          "points": 7,
+          "evaluation": {
+            "pass": "On-screen text or visual effect is bold, large, and appears within 0–1.5 seconds.",
+            "partial": "Text appears but is small or low contrast. Deduct 3 points.",
+            "fail": "No pattern interrupt element present in first 1.5 seconds."
+          }
+        },
+        {
+          "id": "HQ-04",
+          "label": "No Introductory Build-Up",
+          "description": "Zero tolerance for fade-ins, title cards, logo animations, or any non-motion frame before the dance begins.",
+          "points": 5,
+          "evaluation": {
+            "pass": "Dance motion begins at 0:00:00.",
+            "fail": "Any non-dance frame appears before motion begins."
+          }
+        }
+      ]
+    },
+
+    "retention_and_loop": {
+      "weight_percent": 25,
+      "max_points": 25,
+      "description": "Evaluates video length and loop engineering to maximize rewatch multiplier.",
+      "criteria": [
+        {
+          "id": "RL-01",
+          "label": "Duration Sweet Spot",
+          "description": "Video must be between 13–15 seconds to maximize forced-rewatch retention percentage above 100%.",
+          "points": 8,
+          "evaluation": {
+            "pass": "Duration is 13–15 seconds.",
+            "partial": "Duration is 16–18 seconds. Deduct 4 points.",
+            "fail": "Duration is below 13s or above 18s."
+          }
+        },
+        {
+          "id": "RL-02",
+          "label": "Seamless Loop — Final Frame Match",
+          "description": "The final frame must visually blend into frame 1. Dancer's body position and camera angle should be within 5 degrees of identical to enable an invisible loop.",
+          "points": 10,
+          "evaluation": {
+            "pass": "Final frame and frame 1 are visually near-identical. Loop is imperceptible.",
+            "partial": "Minor positional mismatch but the loop is smooth enough to pass. Deduct 4 points.",
+            "fail": "Final frame is visually disconnected from frame 1. Hard cut on loop is visible."
+          }
+        },
+        {
+          "id": "RL-03",
+          "label": "Consistent Pacing — No Dead Zones",
+          "description": "No moment in the video should have static or low-energy movement. Energy must be uniform or escalating throughout.",
+          "points": 7,
+          "evaluation": {
+            "pass": "All frames contain visible, dynamic motion.",
+            "partial": "One brief low-energy transition present. Deduct 3 points.",
+            "fail": "Two or more static or low-energy segments detected."
+          }
+        }
+      ]
+    },
+
+    "engagement_bait": {
+      "weight_percent": 20,
+      "max_points": 20,
+      "description": "Evaluates whether the video mechanically forces the viewer to open the keyboard, which loops the video in the background.",
+      "criteria": [
+        {
+          "id": "EB-01",
+          "label": "Typed-Response Question Present",
+          "description": "An open-ended, polarizing, or completion-style question must be embedded as on-screen text. Emoji-only responses are a failure signal — the question must demand a typed answer.",
+          "points": 10,
+          "evaluation": {
+            "pass": "Question is specific and demands a typed response (e.g., 'Name a song harder than this', 'Rate 1–10', 'Drop the next song below').",
+            "partial": "Question is vague or could be answered with one tap/emoji. Deduct 5 points.",
+            "fail": "No question present, or question is yes/no answerable."
+          }
+        },
+        {
+          "id": "EB-02",
+          "label": "Question Visibility",
+          "description": "The comment bait text must be legible throughout the full video duration, not just a brief flash.",
+          "points": 5,
+          "evaluation": {
+            "pass": "Text is present from 0:00 to end, large, bold, high-contrast.",
+            "partial": "Text appears for less than 70% of duration or is small. Deduct 2 points.",
+            "fail": "Text appears for less than 3 seconds or is illegible."
+          }
+        },
+        {
+          "id": "EB-03",
+          "label": "Polarization Potential",
+          "description": "The question or concept should have a divisive or competitive angle that triggers disagreement-based comments.",
+          "points": 5,
+          "evaluation": {
+            "pass": "Question invites comparison, ranking, or opinion (e.g., 'harder than this', 'better than X').",
+            "fail": "Question is neutral or generic (e.g., 'What do you think?')."
+          }
+        }
+      ]
+    },
+
+    "visual_production": {
+      "weight_percent": 15,
+      "max_points": 15,
+      "description": "Evaluates the AI-generation quality and visual composition of the video.",
+      "criteria": [
+        {
+          "id": "VP-01",
+          "label": "Dancer Isolation",
+          "description": "Dancer must be the sole visual focal point. No environmental distractions.",
+          "points": 5,
+          "evaluation": {
+            "pass": "Dancer is centered, depth-of-field isolates them from background.",
+            "partial": "Minor background elements visible but not distracting. Deduct 2 points.",
+            "fail": "Background competes with dancer for visual attention."
+          }
+        },
+        {
+          "id": "VP-02",
+          "label": "Reflective or Dynamic Outfit",
+          "description": "Outfit must catch and interact with light dynamically to add visual interest within each frame.",
+          "points": 4,
+          "evaluation": {
+            "pass": "Outfit is metallic, reflective, or high-contrast with visible light interaction.",
+            "partial": "Outfit is bold but not reflective. Deduct 2 points.",
+            "fail": "Outfit is plain or low-contrast with background."
+          }
+        },
+        {
+          "id": "VP-03",
+          "label": "Render Quality",
+          "description": "Video must appear crisp at 4K or equivalent with no AI artifact distortion visible in motion.",
+          "points": 6,
+          "evaluation": {
+            "pass": "No visible generation artifacts, blur, or morphing distortion during peak motion.",
+            "partial": "Minor artifacts in non-focal areas only. Deduct 2 points.",
+            "fail": "Visible AI distortion or morphing artifacts on dancer body or face."
+          }
+        }
+      ]
+    },
+
+    "audio_alignment": {
+      "weight_percent": 5,
+      "max_points": 5,
+      "description": "Evaluates whether the audio track is sourced from the current trending audio pool and is rhythmically matched to the dance.",
+      "criteria": [
+        {
+          "id": "AA-01",
+          "label": "Track Source — Trending Pool",
+          "description": "Audio must come from the approved trending audio pool (current Billboard Hot 100 or recent major album release).",
+          "points": 3,
+          "evaluation": {
+            "pass": "Track is in the current Billboard Hot 100 top 20 or from an album released within the last 30 days.",
+            "partial": "Track is Hot 100 but ranked 21–50. Deduct 1 point.",
+            "fail": "Track is not trending or is unlicensed original audio."
+          },
+          "approved_audio_pool_as_of": "2026-06-06",
+          "priority_tracks": [
+            { "rank": 1, "artist": "Bruno Mars", "title": "I Just Might", "chart_position": 8 },
+            { "rank": 2, "artist": "Drake", "title": "Shabang", "chart_position": 4 },
+            { "rank": 3, "artist": "Olivia Rodrigo", "title": "The Cure", "chart_position": 5 },
+            { "rank": 4, "artist": "Taylor Swift", "title": "The Fate of Ophelia", "chart_position": null, "note": "Dominant Spotify streams — peak hype window" },
+            { "rank": 5, "artist": "Ella Langley", "title": "Be Her", "chart_position": 3 }
+          ],
+          "avoid": [
+            { "artist": "Drake", "title": "Janice STFU", "reason": "Controversy-adjacent — unpredictable comment section suppression risk" }
+          ]
+        },
+        {
+          "id": "AA-02",
+          "label": "Beat Sync",
+          "description": "Dance movement peaks must align with audio beat drops or rhythmic accents.",
+          "points": 2,
+          "evaluation": {
+            "pass": "Dancer motion is visibly synchronized with at least 3 distinct beat hits.",
+            "partial": "Loose sync only. Deduct 1 point.",
+            "fail": "Dance is out of sync or audio is purely background with no choreographic alignment."
+          }
+        }
+      ]
+    },
+
+    "metadata": {
+      "weight_percent": 5,
+      "max_points": 5,
+      "description": "Evaluates title, description, and hashtag strategy for algorithmic discoverability.",
+      "criteria": [
+        {
+          "id": "MD-01",
+          "label": "Comment Bait Mirrored in Title",
+          "description": "The title must echo the on-screen question to reinforce the engagement loop in the browse feed.",
+          "points": 2,
+          "evaluation": {
+            "pass": "Title includes the comment bait question or a direct variant.",
+            "fail": "Title is generic with no engagement prompt."
+          }
+        },
+        {
+          "id": "MD-02",
+          "label": "Hashtag Mix Ratio",
+          "description": "Must follow the 3-niche / 4-broad / 3-audio-anchor ratio to balance discoverability pools.",
+          "points": 2,
+          "evaluation": {
+            "pass": "At least 3 niche tags (#aidance, #aiart), 4 broad tags (#shorts, #viral, #fyp, #trending), and 1+ audio-anchor tag (artist name).",
+            "partial": "Missing one category. Deduct 1 point.",
+            "fail": "All hashtags are broad only or audio-anchor only."
+          },
+          "required_hashtag_categories": {
+            "niche": ["#aidance", "#aiart", "#aianimation"],
+            "broad": ["#shorts", "#viral", "#fyp", "#trending"],
+            "audio_anchor": "dynamic — must match whichever track from approved_audio_pool is used"
+          }
+        },
+        {
+          "id": "MD-03",
+          "label": "Description CTA",
+          "description": "Description must contain a call-to-action that reinforces the comment bait question.",
+          "points": 1,
+          "evaluation": {
+            "pass": "Description contains a line directing viewers to comment (e.g., 'Drop the song you want next below').",
+            "fail": "Description is empty or contains no CTA."
+          }
+        }
+      ]
+    }
+  },
+
+  "scoring_engine": {
+    "method": "weighted_sum",
+    "formula": "sum of all earned points across all categories",
+    "auto_fail_override": "If any auto_fail_condition is triggered, the relevant category scores 0 regardless of individual criterion scores.",
+    "output_fields": [
+      "total_score",
+      "distribution_tier",
+      "auto_fails_triggered",
+      "category_breakdown",
+      "lowest_scoring_category",
+      "recommended_fix_priority"
+    ]
+  },
+
+  "post_rating_action_map": {
+    "score_85_to_100": "Publish immediately. Post follow-up optimized video within 48 hours to compound Honeymoon Phase.",
+    "score_65_to_84": "Fix lowest-scoring category before publishing. Do not waste Honeymoon Phase on a sub-optimal video.",
+    "score_0_to_64": "Do not publish. Regenerate video using ACOE prompt with auto_fail corrections applied first."
+  }
+}

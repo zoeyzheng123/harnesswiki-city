@@ -1,64 +1,66 @@
 # Judge Rubric
 
 Owner of *scoring*. The Reward Critic and the Meta-Agent optimize against this
-doc. The whole project depends on the evaluator not being arbitrary, so the
-criteria are made concrete here. The rubric is **owned by the Critic** and
-referenced elsewhere only by `rubric_version` (currently `v1`) — generation is
-kept separate from evaluation.
+doc. The rubric is the project's evaluation policy:
 
-The eight dimensions below are exactly the keys of `RewardScore.dimensions`
-(`RewardDimensions` in `harness/contracts.py`, mirrored in `src/contracts/index.ts`).
-Keep them in sync.
+> **ACOE-YT-SHORTS-v1.0** — canonical machine-readable form at
+> `data/policies/ACOE-YT-SHORTS-v1.0.json`. `HarnessState.rubric_version` points
+> at it. This doc is the human-readable explanation.
 
-## Dimensions
+ACOE scores an AI-generated YouTube Shorts **dance** video out of **100**, maps
+the total to a distribution tier, and applies hard auto-fails. Generation is kept
+separate from evaluation: the critic owns this rubric; the rest of the system
+references it only by `rubric_version`.
 
-Score each ContentConcept 0..1 on:
+## Categories (weights sum to 100)
 
-**Higher is better**
+| Category | Max | Evaluates |
+|----------|-----|-----------|
+| `hook_quality` | 30 | First 1.5s: peak motion in frame 1, high-contrast background, pattern-interrupt text, no build-up. |
+| `retention_and_loop` | 25 | 13–15s sweet spot, seamless final-frame→frame-1 loop, no dead zones. |
+| `engagement_bait` | 20 | A polarizing **typed-answer** on-screen question, legible full-duration, divisive enough to drive comments. |
+| `visual_production` | 15 | Dancer isolation, reflective/dynamic outfit, clean 4K render (no AI artifacts). |
+| `audio_alignment` | 5 | Track from the approved trending pool + beat-synced motion. |
+| `metadata` | 5 | Comment bait mirrored in title, 3-niche/4-broad/3-audio hashtag mix, description CTA. |
 
-- **hook_strength** — does the opening stop the scroll in the first 1–3 seconds? (Short-form video: motion or a face in frame 1.)
-- **trend_fit** — does it ride the supplied TrendContext — aligned with an existing wave (e.g. a rising sound), not a generic theme?
-- **brand_fit** — on-voice for the audience and brand?
-- **novelty** — fresh angle vs. recycled consensus?
-- **clarity** — is the single idea unmistakable in one pass?
+Per-criterion points and pass/partial/fail rules live in the JSON.
 
-**Higher is worse (penalize in the weighted total)**
+## Distribution tiers
 
-- **cringe_risk** — try-hard, dated, or embarrassing?
-- **policy_risk** — violates `HarnessState.policy_rules`? Above threshold sets `policy_flag` (and the meta-agent rejects the resulting diff).
+- **viral** — total ≥ 85 (expected 14k+ views)
+- **growing** — total ≥ 65 (1k–13,999)
+- **seed_jail** — total < 65 (0–199)
 
-**Feasibility**
+## Auto-fail conditions (override scores)
 
-- **visual_feasibility** — can the `visual_prompt` / `seedance_prompt` plausibly be rendered without heroics?
+- **AF-01 Standing Start** — static frame 1 → total **overridden to 0**, regenerate.
+- **AF-02 No On-Screen Text** (first 2s) → `hook_quality` + `engagement_bait` = 0.
+- **AF-03 Duration Violation** (<13s or >20s) → `retention_and_loop` = 0.
+- **AF-04 No Trending Audio** → `audio_alignment` = 0.
 
 ## Score surface
 
 The Critic emits, in `RewardScore`:
 
-- `dimensions` (the 8 above) and `weighted_total` (aggregate; risk dims subtract).
-- `predicted_win_prob` — pairwise win probability vs the baseline concept (≡ Eng 1's `pairwise_winprob`); `predicted_score` is the normalized headline.
-- `confidence`, `judge_rationale` (≡ `rationale`), and `policy_flag`.
+- `total_score` (0–100), `distribution_tier`, `auto_fails_triggered` (e.g. `["AF-02"]`)
+- `category_breakdown` — points per ACOE category (keys = the 6 above)
+- `lowest_scoring_category` + `recommended_fix_priority` (drives the loop's fix step)
+- `judge_rationale` (≡ `rationale`), `confidence`
 
-## Pairwise comparison
+**Transitional:** `RewardScore` also still carries the legacy 0..1 `dimensions`
+(`RewardDimensions`) and `weighted_total` (= `total_score / 100`) so the current
+dashboard keeps rendering until it migrates to ACOE (see
+`docs/DASHBOARD_MIGRATION.md`, DECISIONS.md D11). Those dimensions are deprecated
+and will be removed once the migration lands.
 
-For `predicted_win_prob`: estimate the probability that concept A would
-outperform concept B for the target audience **while staying on-brand and
-policy-safe**. Generation 1 is the baseline, anchored at 0.5.
+## Audio note
 
-## Short-form-video rubric (rubric_version `v2`, planned)
-
-When the build switches to short-form video, the Critic weighs additional signals
-— **cut frequency**, **audio recency / BPM / is-it-a-rising-sound**, **length**,
-**posting time**, **hashtag set** — as *inputs* that feed the existing dimensions
-(e.g. cut frequency and frame-1 motion → `hook_strength`; a rising sound →
-`trend_fit`; length/cuts → `visual_feasibility`). These ride under a new
-`rubric_version` and do **not** add keys to `RewardDimensions` (the dashboard's
-`DIMENSION_LABELS` is exhaustive — a new key breaks `pnpm typecheck:ui`; see
-DECISIONS.md D10). The video attributes themselves live on `ContentConcept`
-(`docs/DATA_CONTRACTS.md` → "Short-form-video attributes").
+The "approved trending audio pool" must be sourced from the platform's licensed
+/ cleared music library — the policy lists chart references, not files to ship.
 
 ## Not the same as element weights or taxonomy
 
-These dimensions describe *how we score*. They are distinct from
-`HarnessState.element_weights` (generation biases) and `element_taxonomy` (the
-action space) — see `docs/DATA_CONTRACTS.md` → "Three vocabularies".
+These categories describe *how we score*. They are distinct from
+`HarnessState.element_weights` (generation biases, e.g. `peak_motion_frame1`) and
+`element_taxonomy` (the action space) — see `docs/DATA_CONTRACTS.md` → "Three
+vocabularies".

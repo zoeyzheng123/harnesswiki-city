@@ -61,6 +61,7 @@ class ContentConcept(BaseModel):
     elements: list[str] = []; created_by: str = "content-generator"
     # + Eng 1: element_weights (inner-loop snapshot), storyboard, seedance_prompt, duration_sec, ...
     # + short-form video: dance_style, audio (Audio: bpm/sound_recency/is_rising_sound), cut_frequency, hashtag_set, posting_time
+    # + ACOE Shorts: comment_bait_question, on_screen_text, title, description
 
 class RewardDimensions(BaseModel):   # keys == docs/JUDGE_RUBRIC.md; risk dims higher = worse
     hook_strength: float; trend_fit: float; brand_fit: float; novelty: float
@@ -71,6 +72,8 @@ class RewardScore(BaseModel):
     dimensions: RewardDimensions; weighted_total: float
     predicted_win_prob: float | None = None; policy_flag: bool = False; judge_rationale: str
     # + Eng 1: predicted_score, pairwise_winprob, confidence, scored_by, rationale, scored_at
+    # + ACOE (rubric ACOE-YT-SHORTS-v1.0): total_score (0–100), distribution_tier,
+    #   auto_fails_triggered, category_breakdown, lowest_scoring_category, recommended_fix_priority
 
 class HarnessState(BaseModel):
     id: str; version: str; element_weights: dict; script_prompt: str
@@ -113,6 +116,17 @@ The two scoring criteria refine existing rubric dimensions and are referenced by
 `rubric_version`; they are **not** added as new `RewardDimensions` keys, because
 the dashboard's `DIMENSION_LABELS` is an exhaustive map and a new key would
 break `pnpm typecheck:ui` (DECISIONS.md D10).
+
+## ACOE score outputs
+
+The rubric is **ACOE-YT-SHORTS-v1.0** (`data/policies/ACOE-YT-SHORTS-v1.0.json`),
+referenced by `HarnessState.rubric_version`. `RewardScore` carries its outputs
+additively: `total_score` (0–100), `distribution_tier` (viral/growing/seed_jail),
+`category_breakdown` (the 6 ACOE categories), `auto_fails_triggered`,
+`lowest_scoring_category`, `recommended_fix_priority`. The legacy 0..1
+`dimensions` + `weighted_total` (= `total_score / 100`) remain for the current
+dashboard and are deprecated, retiring once it migrates (DECISIONS.md D11 /
+`docs/JUDGE_RUBRIC.md` / `docs/DASHBOARD_MIGRATION.md`).
 
 ## Conventions
 

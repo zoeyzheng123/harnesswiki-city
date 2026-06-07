@@ -75,6 +75,11 @@ export type ContentConcept = {
   cut_frequency?: number; // cuts per second
   hashtag_set?: string[];
   posting_time?: string; // ISO-8601, recommended/planned post time
+  // ACOE Shorts generation attributes (optional)
+  comment_bait_question?: string;
+  on_screen_text?: string;
+  title?: string;
+  description?: string;
 };
 
 // Keys MUST equal the dimensions in docs/JUDGE_RUBRIC.md. Risk dims: higher = worse.
@@ -107,6 +112,13 @@ export type RewardScore = {
   scored_by?: string;
   rationale?: string; // ≡ judge_rationale
   scored_at?: string;
+  // ACOE-YT-SHORTS-v1.0 outputs (additive — see DECISIONS.md D11)
+  total_score?: number; // 0–100
+  distribution_tier?: string; // "viral" | "growing" | "seed_jail"
+  auto_fails_triggered?: string[];
+  category_breakdown?: Record<string, number>;
+  lowest_scoring_category?: string;
+  recommended_fix_priority?: string;
 };
 
 export type HarnessState = {
