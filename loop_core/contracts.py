@@ -1,6 +1,10 @@
 """
-contracts.py — single source of truth for the data objects that flow between
-the four workstreams. Import this everywhere. Build against the stubs until the
+contracts.py — the loop core's INTERNAL data model (lean / flat). NOT the
+cross-workstream source of truth: that is the canonical `harness/contracts.py`
+(render-ready + ACOE), which the dashboard and the other workstreams import.
+Only loop_core imports this module; the loop's lean output is mapped to the
+canonical GenerationRecord[] by a one-way bridge adapter (see
+docs/LOOP_CORE_BRIDGE.md, DECISIONS.md D12). Build against the stubs until the
 real producers land.
 
 FLOW:

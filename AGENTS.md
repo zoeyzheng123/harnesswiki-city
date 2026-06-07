@@ -24,7 +24,7 @@ The repo is polyglot (DECISIONS.md D7):
 
 ## Non-Negotiables
 
-1. **The canonical schema is `harness/contracts.py`.** Do not change a contract without updating, in the same change: the TS mirror `src/contracts/index.ts`, `docs/DATA_CONTRACTS.md`, and (re)running `python scripts/dump_stubs.py`. The three must never disagree.
+1. **The canonical schema is `harness/contracts.py`.** Do not change a contract without updating, in the same change: the TS mirror `src/contracts/index.ts`, `docs/DATA_CONTRACTS.md`, and (re)running `python scripts/dump_stubs.py`. The three must never disagree. `loop_core/contracts.py` is the loop's *internal* model, **not** canonical — it reaches the dashboard via the bridge adapter (`docs/LOOP_CORE_BRIDGE.md`), never by being imported by other workstreams (DECISIONS.md D12).
 2. **All generation-loop functions must be Weave-traced** per `docs/WEAVE_TRACING.md`.
 3. **Keep the MVP path working at all times.** `pnpm typecheck`, `pnpm typecheck:ui`, and `python scripts/dump_stubs.py` must stay green.
 4. **Prefer simple files / JSON over infrastructure** unless something is already integrated. Stub data lives in `data/stubs/` (generated).

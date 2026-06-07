@@ -13,7 +13,8 @@ _Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.
 | Evaluation policy | `data/policies/ACOE-YT-SHORTS-v1.0.json` | ✅ Done — validated (weights sum 100, tiers, auto-fails) |
 | Stub data | `data/stubs/*.json` via `scripts/dump_stubs.py` | ✅ Done — dance-vertical, ACOE-scored, generated + validated |
 | Documentation pack | `README.md`, `AGENTS.md`, `docs/*` | ✅ Done — re-themed to the short-form pivot |
-| Harness loop | `harness/loop.py` | ⬜ Not started |
+| Harness loop (Workstream A) | `loop_core/` (PR #1) | 🟦 Landed — lean internal model + meta-agent; needs the canonical bridge (`docs/LOOP_CORE_BRIDGE.md`) |
+| Loop → canonical bridge | `harness/bridge.py` (planned) | ⬜ Not started — spec in `docs/LOOP_CORE_BRIDGE.md` (Eng 1) |
 | HarnessState + meta-agent | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
 | Reward critic (ACOE) | `harness/critic.py` | ⬜ Not started — applies `data/policies/ACOE-YT-SHORTS-v1.0.json` |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
@@ -35,3 +36,4 @@ _Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.
 - The dashboard still renders an AI-founder synthetic arc (`src/ui/lib/synthetic.ts`) and the legacy 0..1 `dimensions`; it migrates to ACOE per `docs/DASHBOARD_MIGRATION.md`.
 - `RewardScore` carries both the ACOE outputs and the transitional legacy `dimensions` (`weighted_total = total_score/100`); the dimensions retire once the dashboard migrates (DECISIONS.md D11).
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
+- `loop_core/` (Eng 1) runs against its own lean internal contracts; the canonical bridge adapter (`docs/LOOP_CORE_BRIDGE.md`) maps its output to `data/generations.latest.json` for the dashboard (DECISIONS.md D12).

@@ -3,6 +3,31 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-06 — Loop-core contract layering
+
+### D12. Canonical contract vs the loop's internal model (two layers + bridge)
+
+PR #1 (`loop_core/`, Workstream A) is built against its own lean
+`loop_core/contracts.py`. Rather than force two competing "sources of truth", we
+make the layering explicit:
+
+- **`harness/contracts.py` is the single canonical cross-workstream + dashboard
+  contract** (superset, render-ready, ACOE). Workstreams B/C and the dashboard
+  code against it.
+- **`loop_core/contracts.py` is the loop's INTERNAL model** (lean/flat, for the
+  policy math). Only `loop_core` imports it; its "single source of truth / import
+  this everywhere" docstring was demoted to say so.
+- A **one-way bridge adapter** maps the loop's lean output → canonical
+  `GenerationRecord[]` → `data/generations.latest.json` (the dashboard's
+  `src/ui/lib/data.ts` seam). No refactor of the tested loop — spec in
+  `docs/LOOP_CORE_BRIDGE.md`, owned by Eng 1 (the loop_core PR earmarked it as
+  the "next PR").
+
+ACOE scoring (`total_score` / `category_breakdown` / tiers) is produced by the
+real critic (Workstream B); until then the adapter derives `total_score` + tier
+from the loop's `predicted_score`. This is the ports-and-adapters pattern, not a
+drift.
+
 ## 2026-06-06 — Pivot to the short-form-video vertical
 
 ### D11. Pivot to AI YouTube Shorts dance, scored by ACOE-YT-SHORTS-v1.0
