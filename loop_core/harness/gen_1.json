@@ -1,0 +1,26 @@
+{
+  "harness_id": "harness_24827f7d",
+  "generation": 1,
+  "system_prompt": "You generate 8s short-form video concepts. Lead with a strong hook. Use pattern_interrupt_3s when it fits.",
+  "tools": [
+    "tavily_search",
+    "seedance_render"
+  ],
+  "element_taxonomy": [
+    "comedy",
+    "90s_aesthetic",
+    "text_hook_frame1",
+    "trending_audio_sync",
+    "slow_pan_intro",
+    "pattern_interrupt_3s"
+  ],
+  "few_shot_examples": [
+    {
+      "concept": "POV 90s cubicle glow-up",
+      "engagement": 15000
+    }
+  ],
+  "rubric_version": "v1",
+  "parent_harness_id": "harness_bd5aab66",
+  "diff_summary": "wiki suggests trying [[pattern_interrupt_3s]] next"
+}

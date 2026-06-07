@@ -1,0 +1,14 @@
+{
+  "record_id": "rec_3ecfa643",
+  "generation": 1,
+  "trend_id": "trend_b84deb1d",
+  "concept_id": "concept_83698069",
+  "harness_id": "harness_24827f7d",
+  "predicted_score": 0.74,
+  "actual_engagement": null,
+  "harness_diff": "wiki suggests trying [[pattern_interrupt_3s]] next",
+  "rubric_version": "v1",
+  "selected": true,
+  "post_url": null,
+  "created_at": "2026-06-06T23:40:11.580454Z"
+}

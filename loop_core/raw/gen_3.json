@@ -1,0 +1,14 @@
+{
+  "record_id": "rec_b0594dbb",
+  "generation": 3,
+  "trend_id": "trend_93916fe6",
+  "concept_id": "concept_49b61d04",
+  "harness_id": "harness_5f077159",
+  "predicted_score": 0.87,
+  "actual_engagement": null,
+  "harness_diff": "wiki suggests trying [[duet_bait_ending]] next",
+  "rubric_version": "v1",
+  "selected": true,
+  "post_url": null,
+  "created_at": "2026-06-06T23:40:11.581288Z"
+}
