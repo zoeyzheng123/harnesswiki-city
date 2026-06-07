@@ -10,9 +10,14 @@ import {
   signedPts,
   tierFor,
   truncate,
-  type Tier,
 } from "../lib/format";
-import { Badge, MetricLabel, TierBadge } from "./primitives";
+import {
+  archiveStatusTone,
+  storedLessons,
+  totalScore,
+  type MemoryArchiveEntry,
+} from "../lib/archive";
+import { Badge, ElementLinkChip, MetricLabel, TierBadge } from "./primitives";
 import { fadeRise, springSoft } from "../styles/motion";
 
 type CityBuildingKind = "trend" | "concept" | "critic" | "meta" | "memory";
@@ -40,18 +45,6 @@ type CityNode = BuildingConfig & {
   windows: CityWindowState[];
   bubble: Bubble | null;
   disabled: boolean;
-};
-
-type WikiArchiveEntry = {
-  id: string;
-  generationNumber: number;
-  score: number;
-  tier: Tier;
-  lesson: LessonEntry["lesson"];
-  record: GenerationRecord;
-  elementKeys: string[];
-  status: "ok" | "review" | "flag" | "refused";
-  statusLabel: string;
 };
 
 const SWEEP_MS = 250;
@@ -113,32 +106,14 @@ const STATE_CLASS: Record<CityWindowState, string> = {
   refused: "border-flag/70 bg-flag/10 text-flag",
 };
 
-function totalScore(record: GenerationRecord): number {
-  return record.score.total_score ?? Math.round((record.score.weighted_total ?? 0) * 100);
-}
-
+// The score/window surfaces are about the content, so this keeps flag-first.
+// The wiki/lesson surface is about the rewrite, so its status (in lib/archive.ts)
+// is refused-first — a refused diff outranks the policy flag that caused it.
 function recordStatus(record: GenerationRecord, previous: GenerationRecord | undefined): CityWindowState {
   if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
   if (record.harness_diff && !record.harness_diff.accepted) return "refused";
   if (previous && totalScore(record) < totalScore(previous)) return "review";
   return "ok";
-}
-
-// The wiki/lesson surface describes the harness rewrite, so a refused diff is the
-// salient outcome and must win over a policy / auto-fail flag (a generation can be
-// both, e.g. a policy_flag that causes the refusal). `recordStatus` keeps flag-first
-// because the score/window surfaces are about the content, not the rewrite.
-function lessonStatus(record: GenerationRecord, previous: GenerationRecord | undefined): WikiArchiveEntry["status"] {
-  if (record.harness_diff && !record.harness_diff.accepted) return "refused";
-  if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
-  if (previous && totalScore(record) < totalScore(previous)) return "review";
-  return "ok";
-}
-
-function uniqueElementKeys(record: GenerationRecord): string[] {
-  const fromConcept = record.concept.elements ?? [];
-  const fromDiff = Object.keys(record.harness_diff?.element_weight_changes ?? {});
-  return Array.from(new Set([...fromDiff, record.concept.format, ...fromConcept])).filter(Boolean);
 }
 
 function recentWindowStates(
@@ -308,42 +283,6 @@ function cityNodes({
   });
 }
 
-function archiveEntries(records: GenerationRecord[], lessons: LessonEntry[]): WikiArchiveEntry[] {
-  const indexById = new Map(records.map((record, index) => [record.id, index]));
-  return [...lessons].reverse().map((entry) => {
-    const index = indexById.get(entry.record.id) ?? -1;
-    const previous = index > 0 ? records[index - 1] : undefined;
-    const score = totalScore(entry.record);
-    const status = lessonStatus(entry.record, previous);
-    const statusLabel =
-      status === "flag"
-        ? entry.record.score.auto_fails_triggered?.[0] ?? "Policy flag"
-        : status === "refused"
-          ? "Diff refused"
-          : status === "review"
-            ? "Review"
-            : "Lint OK";
-    return {
-      id: entry.lesson.id,
-      generationNumber: entry.lesson.generation_number,
-      score,
-      tier: tierFor(score),
-      lesson: entry.lesson,
-      record: entry.record,
-      elementKeys: uniqueElementKeys(entry.record).slice(0, 5),
-      status,
-      statusLabel,
-    };
-  });
-}
-
-function statusTone(status: WikiArchiveEntry["status"]): "positive" | "negative" | "flag" | "accent" {
-  if (status === "ok") return "positive";
-  if (status === "review") return "negative";
-  if (status === "refused" || status === "flag") return "flag";
-  return "accent";
-}
-
 function AttentionBubble({
   bubble,
   onClick,
@@ -497,24 +436,16 @@ function SignalTrace({
   );
 }
 
-function ElementLinkChip({ elementKey }: { elementKey: string }) {
-  return (
-    <span className="rounded-md border border-memory/45 bg-memory/10 px-2 py-0.5 font-mono text-xs text-memory">
-      [[{elementLabel(elementKey)}]]
-    </span>
-  );
-}
-
 function WikiLessonArtifact({
   entry,
-  previous,
   onOpen,
 }: {
-  entry: WikiArchiveEntry;
-  previous: GenerationRecord | undefined;
+  entry: MemoryArchiveEntry;
   onOpen: () => void;
 }) {
-  const delta = previous ? entry.score - totalScore(previous) : null;
+  const lesson = entry.lesson;
+  if (!lesson) return null; // teaser is fed storedLessons(); empty entries never reach here
+  const delta = entry.scoreDelta;
   return (
     <motion.article
       layout
@@ -534,9 +465,9 @@ function WikiLessonArtifact({
               g{entry.generationNumber} · {pts(entry.score)}/100
             </span>
             <TierBadge tier={entry.tier} />
-            <Badge tone={statusTone(entry.status)}>{entry.statusLabel}</Badge>
+            <Badge tone={archiveStatusTone(entry.status)}>{entry.statusLabel}</Badge>
           </div>
-          <h3 className="mt-2 font-display text-base leading-snug text-ink">{truncate(entry.lesson.rule, 88)}</h3>
+          <h3 className="mt-2 font-display text-base leading-snug text-ink">{truncate(lesson.rule, 88)}</h3>
         </div>
         <button
           type="button"
@@ -550,7 +481,7 @@ function WikiLessonArtifact({
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {entry.elementKeys.length > 0 ? (
-          entry.elementKeys.map((key) => <ElementLinkChip key={key} elementKey={key} />)
+          entry.elementKeys.slice(0, 5).map((key) => <ElementLinkChip key={key} elementKey={key} />)
         ) : (
           <span className="font-mono text-xs text-faint">[[no element tags]]</span>
         )}
@@ -559,15 +490,15 @@ function WikiLessonArtifact({
       <div className="mt-3 grid gap-2 text-sm leading-relaxed">
         <p className="text-muted">
           <span className="font-mono text-xs tracking-wide text-faint uppercase">Evidence </span>
-          {truncate(entry.lesson.evidence, 130)}
+          {truncate(lesson.evidence, 130)}
         </p>
         <p className={entry.status === "refused" ? "text-flag" : "text-positive"}>
           <span className="font-mono text-xs tracking-wide text-faint uppercase">Harness </span>
-          {truncate(entry.lesson.harness_change, 120)}
+          {truncate(lesson.harness_change, 120)}
         </p>
         <p className="text-muted">
           <span className="font-mono text-xs tracking-wide text-faint uppercase">Expected </span>
-          {truncate(entry.lesson.expected_effect, 120)}
+          {truncate(lesson.expected_effect, 120)}
         </p>
       </div>
 
@@ -583,12 +514,10 @@ function WikiLessonArtifact({
 
 function WikiArchivePanel({
   entries,
-  records,
-  onSelect,
+  onOpen,
 }: {
-  entries: WikiArchiveEntry[];
-  records: GenerationRecord[];
-  onSelect: (record: GenerationRecord) => void;
+  entries: MemoryArchiveEntry[];
+  onOpen: (record: GenerationRecord) => void;
 }) {
   const newest = entries[0];
   return (
@@ -603,9 +532,20 @@ function WikiArchivePanel({
           <h2 className="mt-1 font-display text-lg text-ink">Memory Archive</h2>
           <p className="mt-1 text-sm text-muted">Lessons, wikilinks, evidence, and lint state.</p>
         </div>
-        <Badge tone={entries.length ? "accent" : "neutral"} className={entries.length ? "border-memory/50 bg-memory/10 text-memory" : ""}>
-          {entries.length} lessons
-        </Badge>
+        <div className="flex flex-col items-end gap-2">
+          <Badge tone={entries.length ? "accent" : "neutral"} className={entries.length ? "border-memory/50 bg-memory/10 text-memory" : ""}>
+            {entries.length} lessons
+          </Badge>
+          {newest && (
+            <button
+              type="button"
+              onClick={() => onOpen(newest.record)}
+              className="rounded-md border border-memory/50 px-2.5 py-1 font-mono text-xs text-memory transition-colors hover:bg-memory/10"
+            >
+              Enter archive →
+            </button>
+          )}
+        </div>
       </header>
 
       {entries.length === 0 ? (
@@ -618,25 +558,16 @@ function WikiArchivePanel({
       ) : (
         <motion.div layout className="relative z-10 flex flex-col divide-y divide-line/60 overflow-y-auto [overflow-anchor:none] pr-1 lg:max-h-[18.5rem]">
           <AnimatePresence initial={false}>
-            {entries.map((entry) => {
-              const index = records.findIndex((record) => record.id === entry.record.id);
-              const previous = index > 0 ? records[index - 1] : undefined;
-              return (
-                <WikiLessonArtifact
-                  key={entry.id}
-                  entry={entry}
-                  previous={previous}
-                  onOpen={() => onSelect(entry.record)}
-                />
-              );
-            })}
+            {entries.map((entry) => (
+              <WikiLessonArtifact key={entry.id} entry={entry} onOpen={() => onOpen(entry.record)} />
+            ))}
           </AnimatePresence>
         </motion.div>
       )}
 
       {newest && (
         <div className="relative z-10 mt-3 flex flex-wrap items-center gap-2 border-t border-line/60 pt-3">
-          <Badge tone={statusTone(newest.status)}>{newest.statusLabel}</Badge>
+          <Badge tone={archiveStatusTone(newest.status)}>{newest.statusLabel}</Badge>
           <span className="font-mono text-xs text-faint">latest source: g{newest.generationNumber}</span>
         </div>
       )}
@@ -652,6 +583,7 @@ export function CityWikiControlDeck({
   trend,
   lessons,
   onSelect,
+  onOpenMemory,
 }: {
   records: GenerationRecord[];
   step: number;
@@ -660,6 +592,7 @@ export function CityWikiControlDeck({
   trend: TrendContext | undefined;
   lessons: LessonEntry[];
   onSelect: (record: GenerationRecord) => void;
+  onOpenMemory: (record: GenerationRecord | null) => void;
 }) {
   const reduce = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -698,7 +631,7 @@ export function CityWikiControlDeck({
       }),
     [activeIndex, current, lessons, previousRecord, records, step, trend],
   );
-  const archive = useMemo(() => archiveEntries(records, lessons), [records, lessons]);
+  const archive = useMemo(() => storedLessons(records, step), [records, step]);
 
   const openCurrent = () => {
     if (current) onSelect(current);
@@ -729,13 +662,18 @@ export function CityWikiControlDeck({
             className="relative z-10 grid gap-3 md:grid-cols-2 lg:grid-cols-5"
           >
             {nodes.map((node, i) => (
-              <CityBuildingNode key={node.kind} node={node} index={i} onOpen={openCurrent} />
+              <CityBuildingNode
+                key={node.kind}
+                node={node}
+                index={i}
+                onOpen={node.kind === "memory" ? () => onOpenMemory(current) : openCurrent}
+              />
             ))}
           </motion.ol>
         </div>
       </div>
 
-      <WikiArchivePanel entries={archive} records={records} onSelect={onSelect} />
+      <WikiArchivePanel entries={archive} onOpen={onOpenMemory} />
     </section>
   );
 }
