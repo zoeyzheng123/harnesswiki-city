@@ -2,7 +2,7 @@
 
 Per-engineer next actions, grounded in the current build. See `docs/STATUS.md` for the
 component table and `docs/DECISIONS.md` for the *why*. Ordered by priority within each
-section. **🔴 blocks the "show the climb" demo · 🟡 Stage 2 (learning from real outcomes) · ⚪ polish/observability.**
+section. **🔴 blocks the "show the climb" demo · 🟢 demo-optional · 🟡 Stage 2 (learning from real outcomes) · ⚪ polish/observability.**
 
 _Last updated: 2026-06-07 (from the workstream survey)._
 
@@ -14,14 +14,36 @@ concepts with the real ACOE-YT-SHORTS-v2.0 critic and writes canonical
 compelling yet: the **stub generator** emits generic 8s / no-on-screen-text concepts that
 trip auto-fails (AF-02, AF-03), so scores **plateau in seed_jail** instead of climbing.
 
-**Critical path to "watch the harness improve":** Eng 3 generator + scout → Eng 1
-candidate-capture → Eng 4 wire real data → (Stage 2) outcome ingestion + real-data
-calibration.
+**Critical path to "watch the harness improve":** Eng 3 **generator squad** → Eng 1
+candidate-capture + squad wiring → Eng 4 wire real data + viz. (Scout is demo-optional;
+the ground-truth loop — outcome ingestion + real-data calibration — is **post-demo / Stage 2**.)
 
 **Reward representation (Stage 3, D18):** 0–100 is display/diagnosis; the *learning* target
 moves to a **Bradley-Terry preference reward**. The offline prototype is landed
 (`scripts/calibrate.py` — it beats the absolute proxy on held-out pairwise winners,
 0.64 vs 0.55); the live wiring is the Eng-2 + Eng-1 🟡 items below.
+
+## Build vs. integrate vs. defer
+
+**Principle: build the brain, buy the limbs, defer the real-world plumbing.** Our edge is the
+harness (squad + loop + policy + critic + viz); models / crawlers / renderers / metrics APIs
+are commodities; the real posting/outcome loop is heavy and not demo-blocking (the synthetic
+calibration seed already proves the method).
+
+- **Build ourselves (our IP):** the 4-agent squad prompts + orchestration (3‑1); parallel-loop
+  wiring + candidate capture + `strategy_weights` (1‑1, 1‑6, 3‑3); dashboard real-data wiring +
+  now-doable viz (4‑1 + provenance/trajectory/tier); the Bradley-Terry live wiring (1‑5, 2‑5 —
+  model already built in `calibrate.py`); formal `Lesson`s (1‑3); the tests (1‑4, 2‑3, 3‑4).
+- **Integrate, don't build:** OpenAI → generators + judge (3‑1, 2‑1, 2‑5); **Tavily → scout
+  (3‑2, landed in `harness/scout.py`)**; Seedance → renderer (3‑5); YouTube Data API →
+  outcome-metrics fetch (1‑2). Wrap the API; don't reinvent the model / crawler / renderer / metrics infra.
+- **Defer / synthesize for the demo:** the ground-truth loop — outcome ingestion + posting
+  (1‑2), real-data calibration (2‑2), rendered-video judge (2‑1), renderer (3‑5); plus
+  audio-pool admin (2‑4) and the gated viz panels (4: proxy-vs-truth / candidate-batch). The
+  synthetic seed + the scout's curated fallback substitute.
+
+**Demo-critical build path:** squad (3‑1) → wire it + candidate capture + `strategy_weights`
+(1‑6 / 1‑1 / 3‑3) → dashboard real-data + viz (4‑1). Everything else integrates or defers.
 
 ---
 
@@ -129,10 +151,13 @@ _Done, no action:_ ACOE v2 rubric, 23-criterion preflight, AF-01..05, the learni
    tag `created_by=<agent>`. *Why:* the stub scores 0.06 (seed_jail); the squad is the
    single change that lets the loop climb. Verify with `harness.critic.score_concept`.
 
-2. 🔴 **`harness/scout.py`** (M) — `trend_source() -> TrendContext` via Tavily (fallback
-   to a curated file if no key). MUST select `audio` from the approved pool (AF-04) and
-   prefer **rising** sounds (AA-03); populate `signals`, `topic`, `format`, `source_urls`.
-   *Why:* replaces the single hardcoded stub trend so the loop responds to real trends.
+2. 🟢 **`harness/scout.py` — LANDED** (demo-optional; integrate, not build) —
+   `make_scout() -> trend_source() -> TrendContext`. Tavily live path (opt-in:
+   `pip install tavily-python` + `TAVILY_API_KEY`) + a **deterministic offline fallback**;
+   audio is gated to the critic's approved pool (AF-04) and prefers rising (AA-03), reusing
+   `harness.critic.PRIORITY_AUDIO_TITLES` as the source of truth. Tests: `tests/test_scout.py`
+   (offline). **Remaining:** wire `trend_source=make_scout()` into `loop_core/loop.py __main__`
+   (one line — that's Eng-3 #3 below).
 
 3. 🔴 **Wire scout + generator into the loop** (S) — pass the real callables into
    `run_generation_loop` in `loop_core/loop.py __main__` (mirror how `make_acoe_critic()`
@@ -173,6 +198,20 @@ The ACOE v2 control room is **done**. Remaining is small and mostly blocked on E
      (relative encoding). Needs candidate-capture.
 
    *(Headline stays 0–100 — don't swap for Elo; DECISIONS D18.)*
+
+---
+
+## Stretch / opportunities
+
+- **CopilotKit — agentic dashboard layer** (evaluated; sequence *after* the core demo). The
+  "frontend stack for agentic UX" (CoAgents / generative UI / human-in-the-loop, via the AG-UI
+  protocol). Two fits, by wow-vs-effort: (1) **HITL approval of the meta-agent's `HarnessDiff`**
+  — a human ratifies/edits each self-edit before it applies → the demo's wow *and* the honest
+  answer to "is it real learning or proxy theater?"; needs the loop to run interactively (an
+  AG-UI bridge to the Python loop, which isn't LangGraph). (2) **"Talk to the harness" copilot**
+  — chat/generative-UI over the existing `GenerationRecord[]` / `HarnessState` ("why did
+  Audio-Anchor win gen 3? what did the meta-agent change?"); the cheap entry, no deep backend.
+  Lives in `src/ui` (Eng 4). **Pick one, after the demo-critical path.**
 
 ---
 
