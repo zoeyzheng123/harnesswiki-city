@@ -19,6 +19,8 @@ export type DemoLoop = {
   pause: () => void;
   toggle: () => void;
   stepForward: () => void;
+  stepBack: () => void;
+  skipToEnd: () => void;
   reset: () => void;
 };
 
@@ -42,6 +44,16 @@ export function useDemoLoop(total: number): DemoLoop {
   const stepForward = useCallback(() => {
     pause();
     setStep((s) => (s < total ? s + 1 : s));
+  }, [pause, total]);
+
+  const stepBack = useCallback(() => {
+    pause();
+    setStep((s) => (s > 0 ? s - 1 : s));
+  }, [pause]);
+
+  const skipToEnd = useCallback(() => {
+    pause();
+    setStep(total);
   }, [pause, total]);
 
   const reset = useCallback(() => {
@@ -84,6 +96,8 @@ export function useDemoLoop(total: number): DemoLoop {
     pause,
     toggle,
     stepForward,
+    stepBack,
+    skipToEnd,
     reset,
   };
 }

@@ -18,7 +18,18 @@ export function HarnessDiffView({ diff }: { diff: HarnessDiff }) {
     <div style={{ opacity: diff.accepted ? 1 : 0.92 }}>
       <div className="flex items-center justify-between gap-3">
         <span className="font-mono text-sm text-ink tabular-nums">
-          {diff.from_version} <span className="text-faint">→</span> {diff.to_version}
+          {diff.accepted ? (
+            <>
+              {diff.from_version} <span className="text-faint">→</span> {diff.to_version}
+            </>
+          ) : (
+            <>
+              {diff.from_version}{" "}
+              <span className="text-flag" title="proposed version — never created">⊘</span>{" "}
+              <span className="text-faint line-through">{diff.to_version}</span>
+              <span className="ml-1 text-xs text-faint">proposed</span>
+            </>
+          )}
         </span>
         <Badge tone={diff.accepted ? "positive" : "flag"}>
           {diff.accepted ? "accepted" : "rejected"}

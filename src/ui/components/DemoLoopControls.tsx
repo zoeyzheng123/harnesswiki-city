@@ -4,9 +4,10 @@ const PRIMARY =
   "rounded-md px-3.5 py-1.5 font-mono text-xs font-semibold tracking-wide uppercase text-ink transition-colors";
 const GHOST =
   "rounded-md border border-line px-3 py-1.5 font-mono text-xs font-medium tracking-wide uppercase text-muted transition-colors hover:border-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-line disabled:hover:text-muted";
+const KBD = "rounded border border-line px-1 py-px text-muted";
 
 export function DemoLoopControls({ loop, version }: { loop: DemoLoop; version: string }) {
-  const { step, total, isPlaying, atStart, atEnd, toggle, stepForward, reset } = loop;
+  const { step, total, isPlaying, atStart, atEnd, toggle, stepForward, skipToEnd, reset } = loop;
   const playLabel = isPlaying ? "Pause" : atEnd ? "Replay loop" : atStart ? "Run loop" : "Resume";
 
   return (
@@ -33,18 +34,41 @@ export function DemoLoopControls({ loop, version }: { loop: DemoLoop; version: s
         <button
           type="button"
           onClick={toggle}
+          title={`${isPlaying ? "Pause" : "Play"} (space)`}
           className={PRIMARY}
           style={{ backgroundColor: "var(--color-primary)", boxShadow: "0 6px 22px -8px var(--color-primary)" }}
         >
           {playLabel}
         </button>
-        <button type="button" onClick={stepForward} disabled={atEnd} className={GHOST}>
+        <button type="button" onClick={stepForward} disabled={atEnd} title="Step forward (right arrow)" className={GHOST}>
           Step
         </button>
-        <button type="button" onClick={reset} disabled={atStart} className={GHOST}>
+        <button type="button" onClick={skipToEnd} disabled={atEnd} title="Skip to final generation (End)" className={GHOST}>
+          Skip
+        </button>
+        <button type="button" onClick={reset} disabled={atStart} title="Reset (R)" className={GHOST}>
           Reset
         </button>
       </div>
+      <p className="hidden w-full justify-end gap-3 font-mono text-[0.625rem] tracking-wide text-faint lg:flex" aria-hidden="true">
+        <span>
+          <kbd className={KBD}>space</kbd> play
+        </span>
+        <span>
+          <kbd className={KBD}>←</kbd>
+          <kbd className={KBD}>→</kbd> step
+        </span>
+        <span>
+          <kbd className={KBD}>end</kbd> skip
+        </span>
+        <span>
+          <kbd className={KBD}>r</kbd> reset
+        </span>
+      </p>
+      <p className="sr-only">
+        Keyboard shortcuts: Space plays or pauses; Right and Left arrows step forward and back; End skips to the final
+        generation; R resets.
+      </p>
     </div>
   );
 }

@@ -166,16 +166,37 @@ export function HeroCurve({
           </text>
         ))}
 
+        {/* empty state: ghost the full win-prob arc so the climb is previewed before the first click */}
+        {shown.length === 0 && points.length > 0 && (
+          <g aria-hidden="true">
+            <path
+              d={linePath(points.map(win))}
+              fill="none"
+              stroke="var(--color-primary-bright)"
+              strokeOpacity={0.16}
+              strokeWidth={2}
+              strokeDasharray="2 6"
+              strokeLinecap="round"
+            />
+            {points.map((p) => {
+              const c = win(p);
+              return (
+                <circle key={`ghost-${p.generation_number}`} cx={c.x} cy={c.y} r={2.5} fill="var(--color-primary-bright)" opacity={0.22} />
+              );
+            })}
+          </g>
+        )}
+
         {/* empty-state hint */}
         {shown.length === 0 && (
           <text
             x={PAD.l + INNER_W / 2}
             y={PAD.t + INNER_H / 2}
             textAnchor="middle"
-            className="fill-faint font-mono"
-            style={{ fontSize: 13, letterSpacing: "0.12em" }}
+            className="fill-muted font-mono"
+            style={{ fontSize: 13, letterSpacing: "0.12em", paintOrder: "stroke", stroke: "var(--color-surface-0)", strokeWidth: 5 }}
           >
-            press “Run loop” to begin the climb
+            press “Run loop” to watch the score climb
           </text>
         )}
 

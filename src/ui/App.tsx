@@ -52,6 +52,43 @@ export function App() {
     if (step === 0) setSelected(null);
   }, [step]);
 
+  // Keyboard shortcuts so the demo can be driven and scrubbed without the mouse.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (selected) return; // drawer open: its own Escape handler owns the keyboard
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName ?? "";
+      if (t?.isContentEditable || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      switch (e.key) {
+        case " ":
+          if (tag === "BUTTON" || tag === "A") return; // let a focused control handle Space natively
+          e.preventDefault();
+          loop.toggle();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          loop.stepForward();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          loop.stepBack();
+          break;
+        case "End":
+          e.preventDefault();
+          loop.skipToEnd();
+          break;
+        case "r":
+        case "R":
+          loop.reset();
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [loop, selected]);
+
   if (!records || !initial) {
     return (
       <main className="grid min-h-dvh place-items-center">
