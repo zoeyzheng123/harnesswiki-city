@@ -22,6 +22,7 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 | Trend scout | `harness/scout.py` · `tests/test_scout.py` | ✅ Done — Tavily live path + deterministic offline fallback; audio pool-gated (AF-04) + rising (AA-03). **Not yet wired** into the loop (`stub_trend_source` is still the default) — Eng-3 wiring below. |
 | Content generator + renderer | `harness/generator.py` (the 4-agent squad — `docs/INNER_LOOP_SPEC.md`), `harness/seedance.py` | ⬜ Not started — the **#1 demo bottleneck** (loop plateaus in seed_jail) |
 | Weave tracing | `harness/weave_trace.py` · `loop_core/loop.py` | ✅ Done — `op` + idempotent `init_weave()`, offline-safe; the loop (generate/score/meta) + critic (`score_concept`/`judge_concept`) trace. Enable: `pip install weave` + `wandb login` (`WEAVE_PROJECT`, default `sia-social-loop`). |
+| Prompt/outcome training memory | `harness/outcomes.py` · `harness/training_data.py` · `harness/redis_dataset.py` · publish scripts | ✅ Bootstrap landed — retains every candidate; traces prompt + critic result + seven-day synthetic views; append-only JSONL; versioned W&B Table/Artifact; optional Registry link; Redis Cloud dataset mirror. Real YouTube outcome replacement still pending. |
 | Dashboard | `src/ui/` | ✅ Done — ACOE v2 control room (0–100, tiers, 6 categories, auto-fail badges, critic-learning panel); data seam reads `VITE_GENERATIONS_URL` with synthetic fallback (DECISIONS D15). Stage-1 UI panels (outcome / candidates batch / provenance badges) pending Eng-1 producers. |
 
 ## Next up — the critical path to a "show the climb" demo
@@ -32,9 +33,9 @@ concepts (AF-02/AF-03). Per-engineer TO-DOs are in **`docs/TODO.md`**; the criti
 
 1. **`harness/generator.py`** (Eng 3) — the 4-agent squad (`docs/INNER_LOOP_SPEC.md`): real dance-Short `ContentConcept`s that escape the auto-fails and score ≥ growing. **This is the bottleneck** — without it the loop can't climb.
 2. **Wire `make_scout()` into the loop** (Eng 3) — `harness/scout.py` is landed; pass it as `trend_source=` in `loop_core/loop.py __main__` (one line, mirrors `make_acoe_critic()`).
-3. **Candidate-batch capture** (Eng 1) — ~5-line `on_generation` extension → `GenerationRecord.candidates` (the contrastive signal).
+3. ~~**Candidate-batch capture**~~ — ✅ all candidates now persist with selected/exploration flags and synthetic week-one outcomes.
 4. **Wire `VITE_GENERATIONS_URL`** (Eng 4) — point the dashboard at the real bridge output (1-line; today it falls back to synthetic).
-5. **Stage 2 (ground truth):** outcome ingestion (render→post→metrics → `Outcome`, Eng 1/3) + real-data calibration & the LLM judge (Eng 2).
+5. **Stage 2 (ground truth):** replace synthetic labels with render→post→YouTube metrics `Outcome`s, then calibrate on real data and add the LLM judge.
 6. ~~`harness/weave_trace.py`~~ — ✅ **done**: Weave wired (loop + critic trace; offline-safe; the WeaveHacks gate).
 
 ## Known placeholders
@@ -46,4 +47,4 @@ concepts (AF-02/AF-03). Per-engineer TO-DOs are in **`docs/TODO.md`**; the criti
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
 - `loop_core/` (Eng 1) runs against its own lean internal contracts; the bridge adapter (`harness/bridge.py`, DECISIONS D16) maps its output to canonical `GenerationRecord[]` → `data/generations.latest.json`.
 - **Stage-1 ground-truth contracts landed (backend-additive, DECISIONS D17):** typed `Outcome`, the `Candidate` contrastive batch, and `RewardScore.score_type`/`evidence_coverage` are in `harness/contracts.py` + the TS mirror; the critic emits provenance and the bridge passes it through. `actual_engagement` is deprecated in favor of `outcome`. The **synthetic-data + calibration seed also landed** — `scripts/synth_outcomes.py` (deterministic `Outcome`s from a hidden model ≠ ACOE weights), `scripts/calibrate.py` (pure-Python OLS), `tests/test_calibrate.py`: fitted weights recover the latent ranking (Spearman 0.76 vs a 0.53 ACOE-echo baseline) and beat raw ACOE on a held-out grouped split — the Stage-2 seed demonstrating *proxy ≠ truth*. (`data/synthetic/` is gitignored, regenerated on demand.)
-- **Real outcome producers pending** (specced in `docs/LOOP_CORE_BRIDGE.md` "Producers (pending)"): (1) Eng-1 loop candidate-capture (accumulate the K `(concept, reward)` pairs/generation → `GenerationRecord.candidates` via the `on_generation` hook, ~5 lines additive); (2) outcome ingestion (render → post → fetch real metrics → `Outcome`). Until then `outcome.source` stays `stub`/`synthetic` and live `candidates`/`outcome` are unpopulated.
+- **Candidate capture + synthetic outcomes landed (D19):** live records now retain the full K-candidate batch and attach deterministic `source="synthetic"` seven-day outcomes. The append-only prompt memory is published as a W&B dataset Artifact. The remaining producer is real outcome ingestion (render → post → fetch YouTube metrics → replace the bootstrap label in a new dataset version).

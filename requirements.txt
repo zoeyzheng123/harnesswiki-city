@@ -3,6 +3,8 @@
 
 pydantic>=2,<3
 weave            # W&B Weave tracing (sponsor) — offline-safe via harness/weave_trace.py
+wandb             # versioned prompt/outcome Tables + dataset Artifacts / Registry
+redis>=5,<7       # optional Redis Cloud mirror for prompt/outcome training memory
 
 # Optional (offline fallbacks exist; install for the live paths — see docs/STATUS.md):
 #   tavily-python    # trend scouting (harness/scout.py live path)

@@ -13,16 +13,27 @@ from __future__ import annotations
 
 import json
 import math
+import uuid
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 import loop_core.contracts as lean
 from harness.contracts import (
+    Candidate,
     ContentConcept,
     GenerationRecord,
     HarnessDiff,
     HarnessState,
     RewardScore,
+)
+from harness.outcomes import synthetic_week_one_outcome
+from harness.training_data import (
+    DEFAULT_DATASET_PATH,
+    DatasetPublishResult,
+    append_jsonl,
+    load_jsonl,
+    publish_wandb_dataset,
+    rows_from_records,
 )
 
 
@@ -200,9 +211,11 @@ def build_canonical_record(
 class BridgeCollector:
     """Collects canonical GenerationRecords as the loop runs."""
 
-    def __init__(self):
+    def __init__(self, run_id: Optional[str] = None):
         self.records: list[GenerationRecord] = []
         self._prev_harness: Optional[HarnessState] = None
+        self.run_id = run_id or f"loop-{uuid.uuid4().hex[:12]}"
+        self._training_contexts: dict[str, dict[str, Any]] = {}
 
     def on_generation(
         self,
@@ -210,14 +223,39 @@ class BridgeCollector:
         reward: Any,
         lean_harness: lean.HarnessState,
         lean_record: lean.GenerationRecord,
+        candidate_pairs: Optional[list[tuple[lean.ContentConcept, Any]]] = None,
+        trend: Optional[lean.TrendContext] = None,
     ) -> None:
         gen = lean_harness.generation
         ver = f"v{gen}"
 
-        canonical_concept = lean_concept_to_canonical(concept, gen, ver)
-        canonical_score = map_reward_to_canonical(
-            reward, canonical_concept.id, gen, ver,
+        pairs = candidate_pairs or [(concept, reward)]
+        canonical_candidates: list[Candidate] = []
+        for index, (candidate_concept, candidate_reward) in enumerate(pairs):
+            mapped_concept = lean_concept_to_canonical(candidate_concept, gen, ver)
+            mapped_score = map_reward_to_canonical(
+                candidate_reward, mapped_concept.id, gen, ver,
+            )
+            selected = candidate_concept.concept_id == concept.concept_id
+            canonical_candidates.append(
+                Candidate(
+                    variant_id=f"g{gen:03d}_c{index}",
+                    concept=mapped_concept,
+                    score=mapped_score,
+                    selected=selected,
+                    exploration=not selected,
+                    outcome=synthetic_week_one_outcome(
+                        mapped_concept,
+                        mapped_score,
+                    ),
+                )
+            )
+
+        selected_candidate = next(
+            candidate for candidate in canonical_candidates if candidate.selected
         )
+        canonical_concept = selected_candidate.concept
+        canonical_score = selected_candidate.score
 
         # Build minimal canonical harness states
         harness_before = HarnessState(
@@ -250,18 +288,58 @@ class BridgeCollector:
             lean_record, canonical_concept, canonical_score,
             harness_before, harness_after,
         )
+        rec.candidates = canonical_candidates
+        rec.outcome = selected_candidate.outcome
         self.records.append(rec)
+        self._training_contexts[rec.id] = {
+            "harness_prompt": lean_harness.system_prompt,
+            "trend": (
+                trend.model_dump(mode="json")
+                if trend is not None
+                else {}
+            ),
+        }
 
-    def write(self, path: str = "data/generations.latest.json") -> None:
+    def write(
+        self,
+        path: str = "data/generations.latest.json",
+        *,
+        training_path: str | Path = DEFAULT_DATASET_PATH,
+        publish_wandb: bool = True,
+        registry_path: Optional[str] = None,
+    ) -> DatasetPublishResult:
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
         data = [r.model_dump(mode="json", exclude_none=True) for r in self.records]
         p.write_text(json.dumps(data, indent=2))
 
+        batch_rows = rows_from_records(
+            self.records,
+            run_id=self.run_id,
+            contexts=self._training_contexts,
+        )
+        append_jsonl(batch_rows, training_path)
+        cumulative_rows = load_jsonl(training_path)
+        if not publish_wandb:
+            return DatasetPublishResult(
+                False,
+                len(cumulative_rows),
+                "dance-prompt-engagement",
+                "disabled by caller",
+            )
+        return publish_wandb_dataset(
+            cumulative_rows,
+            dataset_path=training_path,
+            registry_path=registry_path,
+            run_id=self.run_id,
+        )
 
-def make_bridge_hook() -> tuple[Callable, BridgeCollector]:
+
+def make_bridge_hook(
+    run_id: Optional[str] = None,
+) -> tuple[Callable, BridgeCollector]:
     """Return an on_generation hook and its collector."""
-    collector = BridgeCollector()
+    collector = BridgeCollector(run_id=run_id)
     return collector.on_generation, collector
 
 

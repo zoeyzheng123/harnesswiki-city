@@ -46,6 +46,14 @@ pnpm dev:ui                                 # the control-room dashboard
 
 # Checks
 pnpm typecheck && pnpm typecheck:ui         # contracts mirror + UI
+
+# Seed the prompt -> seven-day-views dataset and publish it to W&B
+wandb login
+.venv/bin/python scripts/publish_wandb_dataset.py
+
+# Mirror the same rows to Redis Cloud (URL stays in your environment)
+REDIS_URL='redis://user:password@host:port' \
+  .venv/bin/python scripts/publish_redis_dataset.py
 ```
 
 ## Stack
@@ -74,7 +82,12 @@ contracts, merge, and short-form pivot landed where they did.
 ## Sponsor Usage
 
 We use **W&B Weave** to trace every generation, reward score, harness rewrite,
-and memory update. See `docs/WEAVE_TRACING.md`.
+and memory update. Every candidate prompt is also appended to
+`data/training/prompt_outcomes.jsonl` and published as the versioned
+`dance-prompt-engagement` W&B dataset Artifact. Set `WANDB_REGISTRY_PATH` to
+link each version into a W&B Registry collection. The same rows can be mirrored
+to a namespaced Redis dataset using `scripts/publish_redis_dataset.py`; Redis
+credentials are accepted only through `REDIS_URL`. See `docs/WEAVE_TRACING.md`.
 
 ## Team
 

@@ -3,6 +3,37 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-07 — Prompt/outcome training memory
+
+### D19. Every candidate is a training example; W&B Artifacts version the dataset
+
+The loop now retains all K candidate prompts, not only the argmax. The bridge
+wraps them as canonical `Candidate[]` and attaches a deterministic seven-day
+synthetic `Outcome` whose views remain inside the ACOE tier's published view
+band. Each candidate is flattened into one row containing the generation prompt,
+shared harness prompt, trend snapshot, generator identity, critic outputs,
+provenance, and `views_at_168h` / `log1p(views)` targets.
+
+Rows are traced through `prompt_result_row`, appended to
+`data/training/prompt_outcomes.jsonl`, and published cumulatively as a W&B Table
+inside the versioned `dance-prompt-engagement` dataset Artifact. If
+`WANDB_REGISTRY_PATH` is configured, the version is also linked to that Registry
+collection. The loop remains offline-safe when W&B is missing or unauthenticated.
+For Redis Cloud testing, `harness/redis_dataset.py` mirrors the same rows into a
+versioned namespace using a HASH plus score/view ZSETs, tier SETs, and a manifest.
+The connection URL is runtime-only through `REDIS_URL`; credentials are never
+persisted in source or dataset metadata.
+
+**Hard boundary:** synthetic labels are pipeline bootstrap data, not ground
+truth. Every row carries `label_source`; future YouTube API outcomes create a new
+dataset version and training/evaluation must keep synthetic and observed labels
+separable. No model-quality claim may be based only on the tier-derived labels.
+The separate `scripts/synth_outcomes.py` calibration benchmark remains
+deliberately proxy-disagreeing. W&B seeding instead uses
+`scripts/synth_prompt_outcomes.py`: five visibly different prompt-quality bands,
+scored by the actual deterministic critic, then labeled by the tier-consistent
+outcome producer.
+
 ## 2026-06-07 — Preference-based reward (Stage 3 design)
 
 ### D18. Bradley-Terry preference reward is the learning target; 0–100 stays for display + diagnosis

@@ -51,20 +51,19 @@ calibration seed already proves the method).
 
 Loop, meta-agent, inner-loop policy, and bridge are **landed and working**. Remaining:
 
-1. 🔴 **Candidate-batch capture** (S) — `loop_core/loop.py::run_generation_loop`.
-   Accumulate all K `(concept, reward)` pairs per generation (not just the argmax), wrap
-   as `Candidate[]` (`selected=True` for the winner, `exploration=True` for the rest), and
-   extend the `on_generation` hook payload. The bridge already passes `candidates`
-   through, so `GenerationRecord.candidates` then populates. ~5 lines, additive.
-   *Why:* the contrastive signal for credit assignment + Stage-2 preference learning, and
-   the dashboard's candidates panel — currently discarded. Spec in `docs/LOOP_CORE_BRIDGE.md`.
+1. ✅ **Candidate-batch capture + W&B training memory** — landed in
+   `loop_core/loop.py`, `harness/bridge.py`, and `harness/training_data.py`.
+   All K candidates persist with selected/exploration flags; each prompt/result/outcome
+   becomes an append-only JSONL row and a versioned W&B dataset row.
 
-2. 🟡 **Outcome ingestion** (L) — new producer (e.g. `harness/outcomes.py`). After
+2. 🟡 **Real outcome ingestion** (L) — bootstrap producer now exists in
+   `harness/outcomes.py`; it emits deterministic seven-day `source="synthetic"` labels.
+   After
    render→post (Eng 3's renderer), poll the platform API for
    views/APV/likes/comments/shares/follows/retention → build a typed
    `Outcome(source="youtube_api")` and attach to `GenerationRecord.outcome` + the matching
-   `Candidate.outcome`. *Why:* the ground truth (D17); until it lands, outcomes are
-   `stub`/`synthetic` and Stage 2 can't run on real data.
+   `Candidate.outcome`, then publish a new W&B dataset version. *Why:* synthetic labels
+   test plumbing but cannot establish the real prompt→engagement relationship.
 
 3. 🟡 **Formal `Lesson` objects** (M) — `loop_core/meta_agent.py`. Emit a structured
    `Lesson` (observation / rule / evidence / harness_change / expected_effect) per

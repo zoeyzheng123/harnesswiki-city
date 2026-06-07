@@ -11,22 +11,48 @@ Project name:         WEAVE_PROJECT env  (default "sia-social-loop").
 
 from __future__ import annotations
 
+import functools
 import os
 
-try:
-    import weave  # type: ignore
-except Exception:  # pragma: no cover — weave is optional
+if os.getenv("WEAVE_DISABLE"):
     weave = None  # type: ignore
+else:
+    try:
+        import weave  # type: ignore
+    except Exception:  # pragma: no cover — weave is optional
+        weave = None  # type: ignore
 
 DEFAULT_PROJECT = "sia-social-loop"
 
-if weave is not None:
-    op = weave.op  # weave.op supports both @op and @op()
-else:
-    def op(fn=None, **_):  # dual-form identity decorator — usable as @op or @op()
-        return (lambda f: f) if fn is None else fn
-
 _initialized = False
+
+
+def op(fn=None, **op_kwargs):
+    """Offline-safe dual-form Weave decorator, usable as ``@op`` or ``@op()``.
+
+    Importing Weave's decorator directly can start client work before
+    ``init_weave`` has established that tracing is usable. This wrapper only
+    enters the traced callable after successful initialization; otherwise it
+    executes the original function without contacting W&B.
+    """
+    if fn is None:
+        return lambda wrapped: op(wrapped, **op_kwargs)
+    if weave is None or os.getenv("WEAVE_DISABLE"):
+        return fn
+
+    traced = weave.op(fn, **op_kwargs)
+
+    @functools.wraps(fn)
+    def wrapped(*args, **kwargs):
+        if os.getenv("WEAVE_DISABLE"):
+            return fn(*args, **kwargs)
+        if not _initialized:
+            init_weave()
+        if not _initialized:
+            return fn(*args, **kwargs)
+        return traced(*args, **kwargs)
+
+    return wrapped
 
 
 def init_weave(project: str | None = None) -> bool:

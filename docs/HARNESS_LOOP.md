@@ -30,8 +30,16 @@ For each generation:
    - **Exploration floor:** every element ≥ 0.03 so new candidates get tried.
 6. Write a **GenerationRecord** (`record_generation`) embedding the concept + score (+ a distilled `Lesson`).
 7. Outer loop: `rewrite_harness` → **HarnessDiff**; if accepted, `apply_harness_diff` → new HarnessState.
-8. The bridge hook (`on_generation`) captures the winning `(concept, reward)` → translates lean → canonical → `data/generations.latest.json`.
-9. Continue until `generations` is reached. Optionally `render_concept` (Seedance); once posted, `actual_engagement`/`post_url` fill in.
+8. The bridge hook (`on_generation`) captures **all** candidate `(concept, reward)` pairs,
+   marks the winner, and translates the batch into canonical `Candidate[]`.
+9. Until real YouTube metrics exist, attach a deterministic seven-day synthetic
+   `Outcome` to every candidate. Its view count stays inside the ACOE tier's view band and
+   is always marked `source="synthetic"`.
+10. Write the dashboard records to `data/generations.latest.json`; append one flat
+    prompt/result/outcome row per candidate to `data/training/prompt_outcomes.jsonl`;
+    publish the cumulative rows as a versioned W&B dataset Artifact when W&B is available.
+11. Continue until `generations` is reached. Once posting is built, real YouTube outcomes
+    replace the bootstrap label in a new dataset version.
 
 ## Post-rating action (from ACOE)
 

@@ -18,17 +18,22 @@ Signatures they must match:
 
 from __future__ import annotations
 import math
+import sys
 from pathlib import Path
-from contracts import (TrendContext, ContentConcept, RewardScore,
-                       HarnessState, GenerationRecord, stub_trend, stub_harness)
 
-# ---- Weave spine (WeaveHacks gate). No-op if weave isn't installed. ----
+# Make both ``python loop_core/loop.py`` and ``import loop_core.loop`` work.
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 try:
-    import weave
-    weave_op = weave.op
-except Exception:
-    def weave_op(fn=None, **_):
-        return (lambda f: f) if fn is None else fn
+    from .contracts import (TrendContext, ContentConcept, RewardScore,
+                            HarnessState, GenerationRecord, stub_trend, stub_harness)
+except ImportError:
+    from contracts import (TrendContext, ContentConcept, RewardScore,
+                           HarnessState, GenerationRecord, stub_trend, stub_harness)
+
+from harness.weave_trace import init_weave, op as weave_op
 
 
 # ---- INNER loop: policy over element weights (workstream A owns this) ----
@@ -133,11 +138,11 @@ def stub_meta(harness, records) -> HarnessState:
 
 
 # ---- Weave-traced call sites (the spine) ----
-@weave_op()
+@weave_op
 def traced_generate(generator, trend, harness, policy): return generator(trend, harness, policy)
-@weave_op()
+@weave_op
 def traced_score(critic, concept, harness): return critic(concept, harness)
-@weave_op()
+@weave_op
 def traced_meta(meta, harness, records): return meta(harness, records)
 
 
@@ -156,7 +161,7 @@ def load_records() -> list[GenerationRecord]:
 
 
 # ---- THE backbone ----
-@weave_op()
+@weave_op
 def run_generation_loop(n_generations=5, concepts_per_gen=4,
                         generator=stub_generator, critic=stub_critic,
                         meta=stub_meta, trend_source=stub_trend_source, eta=0.4,
@@ -169,9 +174,11 @@ def run_generation_loop(n_generations=5, concepts_per_gen=4,
         sync_policy(policy, harness.element_taxonomy)
         trend = trend_source()
         best = None
+        candidate_pairs = []
         for _ in range(concepts_per_gen):
             concept = traced_generate(generator, trend, harness, dict(policy))
             reward = traced_score(critic, concept, harness)
+            candidate_pairs.append((concept, reward))
             update_policy(policy, concept, reward, baseline_state, eta)          # INNER loop
             if best is None or reward.predicted_score > best[1].predicted_score:
                 best = (concept, reward)
@@ -180,25 +187,24 @@ def run_generation_loop(n_generations=5, concepts_per_gen=4,
             concept_id=concept.concept_id, harness_id=harness.harness_id,
             predicted_score=reward.predicted_score, harness_diff=harness.diff_summary,
             rubric_version=harness.rubric_version, selected=True)
-        # Bridge hook: notify external observers of the winning concept + score
+        # Bridge hook: retain the winner and the full contrastive candidate batch.
         if on_generation is not None:
-            on_generation(concept, reward, harness, rec)
+            on_generation(
+                concept,
+                reward,
+                harness,
+                rec,
+                candidate_pairs,
+                trend,
+            )
         save_harness(harness); save_record(rec); records.append(rec)
         harness = traced_meta(meta, harness, records)            # OUTER loop
     return records
 
 
 if __name__ == "__main__":
-    # Ensure the project root is on sys.path so harness.bridge is importable.
-    import sys, os
-    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if _ROOT not in sys.path:
-        sys.path.insert(0, _ROOT)
-
-    try:
-        import weave; weave.init("sia-social-loop")
-    except Exception:
-        print("(weave not installed — running without tracing)\n")
+    if not init_weave():
+        print("(weave tracing inactive — running without traces)\n")
 
     # Wire the real ACOE critic (falls back to stub if unavailable).
     critic_fn = stub_critic
@@ -222,5 +228,15 @@ if __name__ == "__main__":
 
     # Write bridge output for the dashboard.
     if collector and collector.records:
-        collector.write()
+        dataset_result = collector.write()
         print(f"wrote {len(collector.records)} canonical GenerationRecords to data/generations.latest.json  [ok]")
+        if dataset_result.published:
+            print(
+                f"published {dataset_result.rows} prompt/outcome rows to "
+                f"W&B artifact {dataset_result.artifact_name}:latest  [ok]"
+            )
+        else:
+            print(
+                f"saved {dataset_result.rows} prompt/outcome rows locally; "
+                f"W&B publish skipped ({dataset_result.reason})"
+            )
