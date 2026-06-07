@@ -20,6 +20,7 @@ import { WeightShiftPanel } from "./components/WeightShiftPanel";
 import { HarnessStatePanel } from "./components/HarnessStatePanel";
 import { GenerationTable } from "./components/GenerationTable";
 import { GenerationDetail } from "./components/GenerationDetail";
+import { MemoryArchiveRoom } from "./components/memory/MemoryArchiveRoom";
 import { DemoLoopControls } from "./components/DemoLoopControls";
 import { OutputCompare } from "./components/OutputCompare";
 import { LearningBridgePanel } from "./components/LearningBridgePanel";
@@ -34,6 +35,8 @@ export function App() {
   const [initial, setInitial] = useState<HarnessState | null>(null);
   const [trendList, setTrendList] = useState<TrendContext[]>([]);
   const [selected, setSelected] = useState<GenerationRecord | null>(null);
+  const [memoryRoomOpen, setMemoryRoomOpen] = useState(false);
+  const [selectedMemoryRecord, setSelectedMemoryRecord] = useState<GenerationRecord | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -54,15 +57,27 @@ export function App() {
 
   const trends = useMemo(() => indexTrends(trendList), [trendList]);
 
-  // Clear an open drawer when the loop is reset to the empty state.
+  // Clear any open drawer/room when the loop is reset to the empty state.
   useEffect(() => {
-    if (step === 0) setSelected(null);
+    if (step === 0) {
+      setSelected(null);
+      setMemoryRoomOpen(false);
+      setSelectedMemoryRecord(null);
+    }
   }, [step]);
+
+  // Open the Memory Archive room focused on `record` (or the newest lesson when
+  // null). Single drawer at a time: opening the room dismisses the detail.
+  const openMemoryRoom = (record: GenerationRecord | null) => {
+    setSelected(null);
+    setSelectedMemoryRecord(record);
+    setMemoryRoomOpen(true);
+  };
 
   // Keyboard shortcuts so the demo can be driven and scrubbed without the mouse.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (selected) return; // drawer open: its own Escape handler owns the keyboard
+      if (selected || memoryRoomOpen) return; // a drawer/room is open: its own Escape owns the keyboard
       const t = e.target as HTMLElement | null;
       const tag = t?.tagName ?? "";
       if (t?.isContentEditable || tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -94,7 +109,7 @@ export function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [loop, selected]);
+  }, [loop, selected, memoryRoomOpen]);
 
   if (!records || !initial) {
     return (
@@ -173,6 +188,7 @@ export function App() {
             trend={currentTrend}
             lessons={lessons}
             onSelect={setSelected}
+            onOpenMemory={openMemoryRoom}
           />
         </div>
 
@@ -239,6 +255,19 @@ export function App() {
         record={selected}
         trend={selected ? trends.get(selected.trend_context_id) : undefined}
         onClose={() => setSelected(null)}
+      />
+
+      <MemoryArchiveRoom
+        open={memoryRoomOpen}
+        records={records}
+        step={step}
+        lineage={lineage}
+        focusRecord={selectedMemoryRecord}
+        onClose={() => setMemoryRoomOpen(false)}
+        onInspectSource={(record) => {
+          setMemoryRoomOpen(false);
+          setSelected(record);
+        }}
       />
     </div>
   );

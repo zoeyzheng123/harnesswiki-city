@@ -124,6 +124,43 @@ mono labels (≤ 4 words) may use tracked small caps for the telemetry register.
   (`category_breakdown`), the diff with an ACCEPTED / REJECTED badge, the five-part lesson.
 - **Lesson card** — five labeled fields (observation, rule, evidence, change,
   expected effect), the change field tinted `--positive`.
+- **Memory Archive room** — the canonical **building-room** pattern: a
+  full-height right drawer (`min(920px, 92vw)`) opened from the Memory Archive
+  building, its attention bubbles, or the deck's wiki teaser. It presents living
+  memory spatially in four rails and is read-only, deterministic, and built only
+  from existing contract fields (`memoryArchive()` in `lib/archive.ts`, the one
+  home for the lesson vocabulary the deck teaser and the room both read). Other
+  building rooms reuse this shell. Its parts:
+  - **Archive windows** (left) — one illuminated slot per revealed generation
+    (g1…revealed), toned by lint state (stored / review / flag / refused / empty);
+    a vertical stack on desktop, a horizontal strip on narrow screens. Selecting
+    a window swaps the belief in view.
+  - **Wiki artifact** (center) — the selected belief as a stamped archival folder:
+    score stamp, tier, lint state, the lesson **rule as the title**, `[[wikilink]]`
+    element chips, and four inspect regions (evidence/score, harness change,
+    lineage, expected effect). A **refused** belief headlines `Refused` (refused
+    wins over the policy flag that caused it), surfaces the flag as the cause, and
+    renders its proposed weights struck/dimmed as *proposed, not applied* —
+    "held vX". Earlier beliefs stack below as compact folders.
+  - **Element index** (right) — the elements the belief touches, the re-weighted
+    ones marked by signed delta; rows cross-light with the artifact's wikilink
+    chips.
+  - **Belief graph** (right) — a quiet, fully deterministic schematic (no force
+    sim): lesson → the element weights it moved → the targeted
+    `lowest_scoring_category` + realized lift, drawn with thin `.belief-edge`
+    lines. A refused belief's weight nodes are dashed and the outcome reads
+    "held vX — score not chased".
+  - **Quick inspect** (bottom) — deterministic buttons (Why score moved · Show
+    diff · Show lesson · Show lineage · Video receipt) that focus the matching
+    artifact region or drop into the source detail drawer.
+
+  The room mirrors the detail drawer's focus contract (inert background, Tab
+  trap, close-button focus on open, Escape to close) and is single-drawer-at-a-
+  time with it: opening *inspect source* closes the room and opens the detail.
+  A future **Archive Interpreter** (CopilotKit) may add controlled lens cards
+  driven by typed props from the archive entry — **future-only and
+  controlled-component-only**: no arbitrary generated UI, no open-ended chat; the
+  authored archive stays the source of truth.
 - **Stat** — a mono count-up number with a small label; the atomic readout.
 
 Borders are hairline `--line`; elevation is surface-lightness + a faint inner
@@ -140,7 +177,7 @@ Single dark shell, max content ~1280px, generous gutters.
 ├ Why the line moved ────────────────────────────────────────┤
 ├ Fader board ───────────────────┬ Current harness state ────┤
 ├ Generation history table ──────────────────────────────────┤
-└ (Detail drawer slides over from the right) ────────────────┘
+└ (Detail drawer / Memory Archive room slide over from right) ┘
 ```
 
 Flexbox for 1D rows (districts, controls), Grid for the 2D panel zone. Responsive

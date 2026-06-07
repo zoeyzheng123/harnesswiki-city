@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { useCountUp } from "../lib/useCountUp";
-import { signedDelta, TIER_COLOR, TIER_LABELS, type Tier } from "../lib/format";
+import { elementLabel, signedDelta, TIER_COLOR, TIER_LABELS, type Tier } from "../lib/format";
 import { fadeRise } from "../styles/motion";
 
 /** A small mono, tracked label for the telemetry register. */
@@ -147,6 +147,34 @@ export function DeltaPill({ value, className = "" }: { value: number; className?
       {signedDelta(value)}
     </span>
   );
+}
+
+/**
+ * A compact `[[wikilink]]` chip for an element key (the living-wiki grammar).
+ * Renders as a button when `onClick` is set so the archive room can use it to
+ * cross-highlight the element index; otherwise a static span for the deck.
+ */
+export function ElementLinkChip({
+  elementKey,
+  onClick,
+  active = false,
+}: {
+  elementKey: string;
+  onClick?: () => void;
+  active?: boolean;
+}) {
+  const cls = `rounded-md border px-2 py-0.5 font-mono text-xs transition-colors ${
+    active ? "border-memory bg-memory/20 text-memory" : "border-memory/45 bg-memory/10 text-memory"
+  }`;
+  const label = `[[${elementLabel(elementKey)}]]`;
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} aria-pressed={active} className={`${cls} hover:border-memory`}>
+        {label}
+      </button>
+    );
+  }
+  return <span className={cls}>{label}</span>;
 }
 
 /** Distribution-tier pill, colored by the ordinal tier ramp. */

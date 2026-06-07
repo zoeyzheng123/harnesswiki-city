@@ -63,7 +63,8 @@ the numbers and the motion do the persuading.
    `policy_flag` tripped, that is a feature to surface proudly, not an error to
    hide. A system with judgment is more trustworthy than one that only climbs.
 6. **City outside, wiki inside.** The city is a spatial model of the loop; the
-   wiki is the readable memory inside it.
+   wiki is the readable memory inside it. The Memory Archive room is where judges
+   inspect how the harness converted feedback into durable operating memory.
 
 ## Accessibility & Inclusion
 
