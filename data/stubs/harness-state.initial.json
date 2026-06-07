@@ -3,31 +3,42 @@
   "version": "v0",
   "element_weights": {
     "peak_motion_frame1": 0.6,
+    "you_hook": 0.5,
     "high_contrast_bg": 0.55,
     "seamless_loop": 0.55,
+    "delayed_resolution": 0.5,
+    "conflict_phrasing": 0.45,
+    "fast_cuts": 0.5,
     "trending_audio": 0.6,
+    "rising_audio": 0.55,
     "beat_sync": 0.5,
-    "comment_bait_question": 0.4,
-    "polarizing_angle": 0.3,
+    "comment_bait_question": 0.3,
+    "polarizing_angle": 0.25,
     "reflective_outfit": 0.35,
     "hashtag_mix": 0.4
   },
-  "script_prompt": "Generate an 8-15s AI dance Short. Open ON peak motion in frame 1 against a stark single-color background - no fade-in or title card. Burn a large, polarizing typed-answer question on-screen for the full duration. Engineer a seamless loop (final frame ~= frame 1). Sync motion peaks to the beat drops of an approved trending track.",
+  "script_prompt": "Generate a 13-15s AI dance Short. Open ON peak motion in frame 1 (no fade-in or title card) against a stark single-color background, with bold second-person on-screen text ('You'/'Your') in the first 2s. Set up a micro-curiosity gap at 0:00 and withhold the payoff until ~0:13. Phrase multi-part text with conflict transitions (But/However/Suddenly), not additive ones (And/Also). Change the visual at least every 2.5s (cut/zoom/pan/light shift). Sync motion peaks to the beat drops of a RISING approved trending track. Engineer a seamless loop (final frame ~= frame 1).",
   "seedance_prompt_template": "A single dancer, {{dance_style}}, mid-peak motion, isolated on a {{background}} background, reflective outfit catching light, 4K, no artifacts. On-screen text: \"{{on_screen_text}}\". Loop-ready.",
-  "judge_rubric": "Score with ACOE-YT-SHORTS-v1.0 (data/policies/ACOE-YT-SHORTS-v1.0.json): hook_quality 30, retention_and_loop 25, engagement_bait 20, visual_production 15, audio_alignment 5, metadata 5; map the total to viral/growing/seed_jail and apply the auto-fail conditions. See docs/JUDGE_RUBRIC.md.",
+  "judge_rubric": "Score with ACOE-YT-SHORTS-v2.0 (data/policies/ACOE-YT-SHORTS-v2.0.json): hook_quality 30, retention_and_loop 25, engagement_bait 10, visual_production 15, audio_alignment 15, metadata 5; map the total to viral/growing/seed_jail and apply auto-fails AF-01..05. See docs/JUDGE_RUBRIC.md.",
   "policy_rules": [
     "AF-01 Standing Start: frame 1 must show peak motion, never a static pose.",
     "AF-02 No On-Screen Text: a text overlay must appear within the first 2 seconds.",
     "AF-03 Duration Violation: keep duration between 13 and 20 seconds.",
-    "AF-04 No Trending Audio: use only the approved trending audio pool."
+    "AF-04 No Trending Audio: use only the approved trending audio pool.",
+    "AF-05 Brand Safety: no explicit content, hate speech, or brand-safety violations."
   ],
   "generation": 0,
   "tools": [],
   "element_taxonomy": [
     "peak_motion_frame1",
+    "you_hook",
     "high_contrast_bg",
     "seamless_loop",
+    "delayed_resolution",
+    "conflict_phrasing",
+    "fast_cuts",
     "trending_audio",
+    "rising_audio",
     "beat_sync",
     "comment_bait_question",
     "polarizing_angle",
@@ -35,5 +46,5 @@
     "hashtag_mix"
   ],
   "few_shot_examples": [],
-  "rubric_version": "ACOE-YT-SHORTS-v1.0"
+  "rubric_version": "ACOE-YT-SHORTS-v2.0"
 }

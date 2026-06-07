@@ -54,7 +54,7 @@ def _weave_op(function):
     return weave.op()(function)
 
 
-RUBRIC_VERSION = "ACOE-YT-SHORTS-v1.0"  # must match data/policies/<policy_id>.json
+RUBRIC_VERSION = "ACOE-YT-SHORTS-v2.0"  # must match data/policies/<policy_id>.json
 APPROVED_AUDIO_POOL_AS_OF = "2026-06-06"
 PRIORITY_AUDIO_TITLES = {
     "i just might",
@@ -65,45 +65,51 @@ PRIORITY_AUDIO_TITLES = {
 }
 AVOID_AUDIO_TITLES = {"janice stfu"}
 
+# v2 rubric (ACOE-YT-SHORTS-v2.0) — must match data/policies/ACOE-YT-SHORTS-v2.0.json
 ACOE_RUBRIC: dict[str, dict[str, Any]] = {
     "hook_quality": {
         "max_points": 30,
         "criteria": {
-            "HQ-01": {"max_points": 10, "partial_points": 0},
-            "HQ-02": {"max_points": 8, "partial_points": 4},
-            "HQ-03": {"max_points": 7, "partial_points": 4},
+            "HQ-01": {"max_points": 9, "partial_points": 0},
+            "HQ-02": {"max_points": 6, "partial_points": 3},
+            "HQ-03": {"max_points": 5, "partial_points": 2},
             "HQ-04": {"max_points": 5, "partial_points": 0},
+            "HQ-05": {"max_points": 5, "partial_points": 2},
         },
     },
     "retention_and_loop": {
         "max_points": 25,
         "criteria": {
-            "RL-01": {"max_points": 8, "partial_points": 4},
-            "RL-02": {"max_points": 10, "partial_points": 6},
-            "RL-03": {"max_points": 7, "partial_points": 4},
+            "RL-01": {"max_points": 5, "partial_points": 2},
+            "RL-02": {"max_points": 9, "partial_points": 5},
+            "RL-03": {"max_points": 4, "partial_points": 2},
+            "RL-04": {"max_points": 4, "partial_points": 2},
+            "RL-05": {"max_points": 3, "partial_points": 0},
         },
     },
     "engagement_bait": {
-        "max_points": 20,
+        "max_points": 10,
         "criteria": {
-            "EB-01": {"max_points": 10, "partial_points": 5},
-            "EB-02": {"max_points": 5, "partial_points": 3},
-            "EB-03": {"max_points": 5, "partial_points": 0},
+            "EB-01": {"max_points": 5, "partial_points": 2},
+            "EB-02": {"max_points": 3, "partial_points": 1},
+            "EB-03": {"max_points": 2, "partial_points": 0},
         },
     },
     "visual_production": {
         "max_points": 15,
         "criteria": {
-            "VP-01": {"max_points": 5, "partial_points": 3},
-            "VP-02": {"max_points": 4, "partial_points": 2},
-            "VP-03": {"max_points": 6, "partial_points": 4},
+            "VP-01": {"max_points": 4, "partial_points": 2},
+            "VP-02": {"max_points": 3, "partial_points": 1},
+            "VP-03": {"max_points": 4, "partial_points": 2},
+            "VP-04": {"max_points": 4, "partial_points": 2},
         },
     },
     "audio_alignment": {
-        "max_points": 5,
+        "max_points": 15,
         "criteria": {
-            "AA-01": {"max_points": 3, "partial_points": 2},
-            "AA-02": {"max_points": 2, "partial_points": 1},
+            "AA-01": {"max_points": 7, "partial_points": 4},
+            "AA-02": {"max_points": 5, "partial_points": 2},
+            "AA-03": {"max_points": 3, "partial_points": 1},
         },
     },
     "metadata": {
@@ -127,17 +133,22 @@ CRITERION_GUIDANCE = {
     "HQ-02": "The background strongly separates the dancer.",
     "HQ-03": "A bold visual or text pattern interrupt appears by 1.5 seconds.",
     "HQ-04": "Dance motion starts immediately with no title card or fade.",
+    "HQ-05": "Opening on-screen text uses second-person framing ('you'/'your').",
     "RL-01": "Duration is 13-15 seconds (16-18 is partial).",
     "RL-02": "The final pose and camera framing reconnect to frame 1.",
     "RL-03": "Motion remains active with no dead zones.",
+    "RL-04": "The promised payoff is withheld until the final ~15% of the video.",
+    "RL-05": "Script/text uses conflict transitions (But/However/Suddenly), not additive (And/Also).",
     "EB-01": "An on-screen question invites a meaningful typed response.",
     "EB-02": "The question remains legible for most of the video.",
     "EB-03": "The question invites ranking, comparison, or a specific opinion.",
     "VP-01": "The dancer is the clear visual focal point.",
     "VP-02": "Wardrobe has dynamic light interaction or strong contrast.",
     "VP-03": "The render is crisp without body, face, or motion artifacts.",
+    "VP-04": "A visual change (cut/zoom/pan/light shift) occurs at least every 2.5s.",
     "AA-01": "The supplied audio belongs to the approved current pool.",
     "AA-02": "Movement peaks align to distinct beat hits.",
+    "AA-03": "The chosen sound is rising / early-adopter, not saturated.",
     "MD-01": "The publishing title mirrors the on-screen question.",
     "MD-02": "Hashtags mix niche, broad, and audio-anchor tags.",
     "MD-03": "The description contains a relevant comment invitation.",
@@ -201,6 +212,7 @@ class RawJudgeResponse(BaseModel):
     revised_generation_prompt: str = ""
     policy_learning: PolicyLearning = Field(default_factory=PolicyLearning)
     needs_human_review: bool = False
+    brand_safety_violation: bool = False  # AF-05 — explicit content / hate speech / brand-safety breach
 
     @model_validator(mode="after")
     def require_every_criterion_once(self) -> "RawJudgeResponse":
@@ -649,7 +661,12 @@ def deterministic_prompt_preflight(
 
     title = str(metadata.get("title", ""))
     description = str(metadata.get("description", ""))
-    hashtags = list(metadata.get("hashtags") or concept.hashtag_set or [])
+    hashtags = list(
+        metadata.get("hashtags")
+        or (concept.execution.hashtag_set if concept.execution else None)
+        or concept.hashtag_set
+        or []
+    )
     assessments.append(
         _assessment(
             "MD-01",
@@ -686,6 +703,69 @@ def deterministic_prompt_preflight(
             CRITERION_GUIDANCE["MD-03"],
             "supplied_metadata",
         )
+    )
+
+    # ── ACOE v2 criteria ──
+    you_hook = bool(re.search(r"\byou(r|rs)?\b", (concept.on_screen_text or concept.hook or "").lower()))
+    assessments.append(
+        _assessment(
+            "HQ-05",
+            "pass" if you_hook else "fail",
+            "Opening text uses second-person framing." if you_hook else "No second-person ('you'/'your') framing in the opening.",
+            CRITERION_GUIDANCE["HQ-05"],
+        )
+    )
+
+    delayed = _contains(text, "wait for it", "by the end", "until the end", "final reveal", "reveal at the end", "saved for last", "don't skip", "payoff")
+    assessments.append(
+        _assessment(
+            "RL-04",
+            "pass" if delayed else "unknown",
+            "Prompt sets up a payoff withheld to the end." if delayed else "No explicit delayed-payoff structure in the prompt.",
+            CRITERION_GUIDANCE["RL-04"],
+            "predicted",
+        )
+    )
+
+    script_l = (concept.script or "").lower()
+    conflict = bool(re.search(r"\b(but|however|suddenly|yet|until|except)\b", script_l))
+    additive_only = (not conflict) and bool(re.search(r"\b(and|also|then|plus)\b", script_l))
+    assessments.append(
+        _assessment(
+            "RL-05",
+            "pass" if conflict else "fail",
+            "Script uses conflict/contrast transitions." if conflict
+            else "Script is additive-only (And/Also)." if additive_only
+            else "No narrative transition words in the script.",
+            CRITERION_GUIDANCE["RL-05"],
+        )
+    )
+
+    cf = concept.cut_frequency
+    if cf is None:
+        cut_status, cut_evidence = "unknown", "Cut/motion frequency is not specified."
+    elif cf >= 0.4:
+        cut_status, cut_evidence = "pass", f"A visual change about every {1 / cf:.1f}s (<= 2.5s)."
+    elif cf >= 0.25:
+        cut_status, cut_evidence = "partial", f"A visual change about every {1 / cf:.1f}s (2.5-4s)."
+    else:
+        cut_status, cut_evidence = "fail", (f"Visual changes slower than every 4s ({1 / cf:.1f}s)." if cf > 0 else "No cuts/motion changes.")
+    assessments.append(
+        _assessment("VP-04", cut_status, cut_evidence, CRITERION_GUIDANCE["VP-04"], "supplied_metadata")
+    )
+
+    if audio is None:
+        rising_status, rising_evidence = "unknown", "No audio supplied; sound momentum unknown."
+    elif audio.is_rising_sound is True:
+        rising_status, rising_evidence = "pass", f"{audio.name or 'Audio'} is supplied as a rising sound."
+    elif (audio.sound_recency or "").lower() == "established":
+        rising_status, rising_evidence = "partial", f"{audio.name or 'Audio'} is established-trending, not rising."
+    elif audio.is_rising_sound is False:
+        rising_status, rising_evidence = "fail", f"{audio.name or 'Audio'} is explicitly not rising."
+    else:
+        rising_status, rising_evidence = "unknown", "Sound momentum is not supplied."
+    assessments.append(
+        _assessment("AA-03", rising_status, rising_evidence, CRITERION_GUIDANCE["AA-03"], "supplied_metadata")
     )
 
     quality = _quality_from_prompt(text, concept)
@@ -813,6 +893,8 @@ def score_judgement(
         auto_fails.append("AF-03")
     if unapproved_audio:
         auto_fails.append("AF-04")
+    if raw.brand_safety_violation:
+        auto_fails.append("AF-05")
 
     known_criteria = 0
     for category_name, category in ACOE_RUBRIC.items():
@@ -843,7 +925,7 @@ def score_judgement(
         )
 
     supported_subtotal = sum(category.score for category in breakdown.values())
-    headline = 0 if "AF-01" in auto_fails else supported_subtotal
+    headline = 0 if ("AF-01" in auto_fails or "AF-05" in auto_fails) else supported_subtotal
     coverage = known_criteria / len(CRITERION_IDS)
     score_type: Literal["projected", "verified", "partial"]
     projected_score: Optional[int] = None

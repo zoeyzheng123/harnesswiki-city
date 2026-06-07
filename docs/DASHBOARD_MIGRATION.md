@@ -1,6 +1,6 @@
-# Dashboard Migration — ACOE-YT-SHORTS-v1.0
+# Dashboard Migration — ACOE-YT-SHORTS
 
-> **Status:** the migration is **done** (`14d59c4`, `9009931`) and the 8 `dimensions` are now optional + deprecated (DECISIONS.md **D14**). Remaining cleanup: drop `legacyDims()` from `src/ui/lib/synthetic.ts` and stop setting `dimensions:` on synthetic records. The spec below is retained for reference.
+> **Status:** the v1 migration is **done** (`14d59c4`, `9009931`). Open Eng 4 follow-ups: (1) **ACOE v2** (DECISIONS.md **D15**) — rebalance `src/ui/lib/format.ts` `CATEGORY_MAX` to the v2 maxes (audio **15**, engagement **10**; hook 30 / retention 25 / visual 15 / metadata 5), and label the new criteria if surfaced; (2) drop `legacyDims()` + stop setting `dimensions:` (now optional, D14) so the backend can delete `RewardDimensions`; (3) read hashtags/posting from `ContentConcept.execution` (`ExecutionMetadata`), not the deprecated top-level fields. Spec below retained for reference.
 
 Spec for Eng 4 to migrate `src/ui` from the legacy 0..1 founder rubric to ACOE
 short-form scoring. The contracts are already additive (DECISIONS.md D11), so the

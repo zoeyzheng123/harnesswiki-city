@@ -60,8 +60,9 @@ class ContentConcept(BaseModel):
     hook: str; format: str; angle: str; script: str; visual_prompt: str
     elements: list[str] = []; created_by: str = "content-generator"
     # + Eng 1: element_weights (inner-loop snapshot), storyboard, seedance_prompt, duration_sec, ...
-    # + short-form video: dance_style, audio (Audio: bpm/sound_recency/is_rising_sound), cut_frequency, hashtag_set, posting_time
+    # + short-form video: dance_style, audio (Audio), cut_frequency (scored, VP-04), execution (ExecutionMetadata)
     # + ACOE Shorts: comment_bait_question, on_screen_text, title, description
+    #   (top-level hashtag_set / posting_time deprecated (v2) -> use execution.*)
 
 class RewardDimensions(BaseModel):   # keys == docs/JUDGE_RUBRIC.md; risk dims higher = worse
     hook_strength: float; trend_fit: float; brand_fit: float; novelty: float
@@ -109,10 +110,11 @@ field on one model:
 
 | Attribute | Lives in |
 |---|---|
-| dance style, cut frequency, hashtag set, posting time | `ContentConcept` (new optional fields) |
+| dance style; cut frequency (scored, VP-04) | `ContentConcept` |
+| hashtag set, posting time | `ContentConcept.execution` (`ExecutionMetadata`; v2 — top-level fields deprecated) |
 | length | `ContentConcept.duration_sec` |
 | audio (BPM, recency, is-rising-sound) | `ContentConcept.audio` (`Audio`); a trend's sound is `TrendContext.audio` + `signals` |
-| hook strength in first 1–3s; trend-alignment | the rubric — `RewardDimensions.hook_strength` / `trend_fit` (see `docs/JUDGE_RUBRIC.md`) |
+| hook strength; trend-alignment | the rubric (ACOE categories — `hook_quality`, `audio_alignment`); see `docs/JUDGE_RUBRIC.md` |
 | posting result (engagement, url) | `GenerationRecord.actual_engagement` / `post_url` |
 
 The two scoring criteria refine existing rubric dimensions and are referenced by

@@ -3,27 +3,27 @@
 Owner of *scoring*. The Reward Critic and the Meta-Agent optimize against this
 doc. The rubric is the project's evaluation policy:
 
-> **ACOE-YT-SHORTS-v1.0** — canonical machine-readable form at
-> `data/policies/ACOE-YT-SHORTS-v1.0.json`. `HarnessState.rubric_version` points
-> at it. This doc is the human-readable explanation.
+> **ACOE-YT-SHORTS-v2.0** — canonical machine-readable form at
+> `data/policies/ACOE-YT-SHORTS-v2.0.json` (v1 retained for history).
+> `HarnessState.rubric_version` points at it. This doc is the human-readable explanation.
 
 ACOE scores an AI-generated YouTube Shorts **dance** video out of **100**, maps
 the total to a distribution tier, and applies hard auto-fails. Generation is kept
 separate from evaluation: the critic owns this rubric; the rest of the system
 references it only by `rubric_version`.
 
-## Categories (weights sum to 100)
+## Categories (weights sum to 100) — v2
 
-| Category | Max | Evaluates |
+| Category | Max | Evaluates (v2) |
 |----------|-----|-----------|
-| `hook_quality` | 30 | First 1.5s: peak motion in frame 1, high-contrast background, pattern-interrupt text, no build-up. |
-| `retention_and_loop` | 25 | 13–15s sweet spot, seamless final-frame→frame-1 loop, no dead zones. |
-| `engagement_bait` | 20 | A polarizing **typed-answer** on-screen question, legible full-duration, divisive enough to drive comments. |
-| `visual_production` | 15 | Dancer isolation, reflective/dynamic outfit, clean 4K render (no AI artifacts). |
-| `audio_alignment` | 5 | Track from the approved trending pool + beat-synced motion. |
-| `metadata` | 5 | Comment bait mirrored in title, 3-niche/4-broad/3-audio hashtag mix, description CTA. |
+| `hook_quality` | 30 | Peak motion in frame 1, high-contrast bg, pattern interrupt, no build-up, **HQ-05 "You" hook** (2nd-person in first 2s). |
+| `retention_and_loop` | 25 | 13–15s, seamless loop, no dead zones, **RL-04 delayed resolution** (payoff withheld to ~final 15%), **RL-05 conflict phrasing** (But/So, not And/Also). |
+| `engagement_bait` | **10** | Typed-answer on-screen question, legible, divisive — **down-weighted** in v2 (overt bait is penalized; balance with organic intrigue via RL-04). |
+| `visual_production` | 15 | Dancer isolation, reflective outfit, clean 4K render, **VP-04 cut/motion frequency** (a visual change ≤2.5s). |
+| `audio_alignment` | **15** | Approved trending pool + beat sync + **AA-03 rising sound** — audio is a primary distribution driver. |
+| `metadata` | 5 | Title mirrors the question, 3-niche/4-broad/1-audio hashtag mix, description CTA. |
 
-Per-criterion points and pass/partial/fail rules live in the JSON.
+Per-criterion points and pass/partial/fail rules live in the JSON. (v1→v2: audio 5→15, engagement 20→10; added HQ-05 / RL-04 / RL-05 / VP-04 / AA-03; added AF-05.)
 
 ## Distribution tiers
 
@@ -37,6 +37,7 @@ Per-criterion points and pass/partial/fail rules live in the JSON.
 - **AF-02 No On-Screen Text** (first 2s) → `hook_quality` + `engagement_bait` = 0.
 - **AF-03 Duration Violation** (<13s or >20s) → `retention_and_loop` = 0.
 - **AF-04 No Trending Audio** → `audio_alignment` = 0.
+- **AF-05 Brand Safety Violation** — explicit content / hate speech / brand-safety breach → total **overridden to 0**, regenerate (replaces vague cringe/brand-fit scoring with a hard boundary).
 
 ## Score surface
 
@@ -64,10 +65,10 @@ The judge runs in three **evaluation modes**: `prompt_preflight` (judge the
 generation prompt, offline-deterministic, no LLM needed), `rendered_video`, and
 `publishing_package` (also scores title/description/hashtags). It records a
 `score_type` — `projected` (preflight), `verified` (full rendered evidence), or
-`partial` — and maps the rubric onto the canonical 8 `RewardDimensions` (e.g.
-`hook_quality/30 → hook_strength`, `video_model_feasibility → visual_feasibility`)
-plus `weighted_total`, while preserving the full criterion detail in
-`RewardScore.rubric_breakdown`.
+`partial`. It emits `total_score` / `distribution_tier` / `category_breakdown`
+plus the scalar `weighted_total` (= `total_score/100` minus risk penalties), and
+preserves the full criterion detail in `RewardScore.rubric_breakdown`. (The legacy
+8-`RewardDimensions` mapping was retired — DECISIONS.md D14.)
 
 **Confidence-gated learning:** the critic proposes bounded element-weight deltas
 (±0.10) as `suggested_policy_updates` (+ `winning_elements`/`weak_elements`), but

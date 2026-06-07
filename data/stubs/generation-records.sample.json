@@ -9,16 +9,21 @@
       "generation_number": 1,
       "trend_context_id": "tc_0001",
       "harness_state_version": "v0",
-      "hook": "Frame 1: a mid-air freeze on the beat against a neon-magenta void.",
+      "hook": "Frame 1: a mid-air freeze \u2014 but you haven't seen the drop yet.",
       "format": "peak_motion_loop",
-      "angle": "A hip-hop power-move combo locked to the drop, looped invisibly.",
-      "script": "0:00 hard cut into a mid-air freeze, then a power-move combo locked to the beat; the final pose returns to the opening frame for an invisible loop.",
-      "visual_prompt": "A single dancer, hip-hop power moves, mid-peak motion, isolated on a solid neon-magenta background, metallic reflective outfit catching light, 4K, no artifacts. Loop-ready.",
+      "angle": "A hip-hop power-move combo with the signature move withheld until the final beat, looped invisibly.",
+      "script": "0:00 hard cut into a mid-air freeze, but the signature move is held back; power moves build on the beat, then suddenly the payoff pose lands at 0:13 and loops back to frame 1.",
+      "visual_prompt": "A single dancer, hip-hop power moves, mid-peak motion, isolated on a solid neon-magenta background, metallic reflective outfit catching light, a hard cut or light shift roughly every 2s, 4K, no artifacts. Loop-ready.",
       "elements": [
         "peak_motion_frame1",
+        "you_hook",
         "high_contrast_bg",
+        "delayed_resolution",
+        "conflict_phrasing",
+        "fast_cuts",
         "seamless_loop",
         "trending_audio",
+        "rising_audio",
         "beat_sync"
       ],
       "created_by": "content-generator",
@@ -32,50 +37,52 @@
         "sound_recency": "rising",
         "is_rising_sound": true
       },
-      "cut_frequency": 2.0,
-      "hashtag_set": [
-        "#aidance",
-        "#aiart",
-        "#aianimation",
-        "#shorts",
-        "#viral",
-        "#fyp",
-        "#trending",
-        "#brunomars"
-      ],
-      "posting_time": "2026-06-06T17:00:00Z",
+      "cut_frequency": 0.5,
+      "execution": {
+        "hashtag_set": [
+          "#aidance",
+          "#aiart",
+          "#aianimation",
+          "#shorts",
+          "#viral",
+          "#fyp",
+          "#trending",
+          "#brunomars"
+        ],
+        "posting_time": "2026-06-06T17:00:00Z"
+      },
       "comment_bait_question": "Name a song harder than this",
-      "on_screen_text": "Name a song harder than this",
-      "title": "Name a song harder than this #aidance #shorts",
-      "description": "AI dance to Bruno Mars - I Just Might. Drop the song you want next below."
+      "on_screen_text": "You won't guess the final pose",
+      "title": "You won't guess the final pose #aidance #shorts",
+      "description": "AI dance to Bruno Mars - I Just Might. But wait for the final pose \u2014 drop the song you want next below."
     },
     "score": {
       "id": "rs_0001",
       "concept_id": "cc_0001",
       "generation_number": 1,
       "harness_state_version": "v0",
-      "weighted_total": 0.76,
-      "predicted_win_prob": 0.62,
+      "weighted_total": 0.84,
+      "predicted_win_prob": 0.7,
       "policy_flag": false,
-      "judge_rationale": "Strong frame-1 peak motion, stark background, and a smooth loop. Weakest on engagement bait - the comment-bait question is present but not polarizing enough to force typed replies. Growing tier; one fix from viral.",
-      "predicted_score": 0.76,
-      "pairwise_winprob": 0.62,
+      "judge_rationale": "v2: strong rising-audio (13/15) and a second-person hook with a delayed payoff. The comment bait is present but overt bait is de-weighted in v2. Growing tier (84); marginal gains are in retention and audio, not more bait.",
+      "predicted_score": 0.84,
+      "pairwise_winprob": 0.7,
       "confidence": 0.7,
       "scored_by": "stub-critic-ACOE",
-      "rationale": "engagement_bait is the ceiling at 11/20; see category_breakdown.",
-      "total_score": 76.0,
+      "rationale": "engagement_bait is the lowest category (6/10) but only 10% of v2; see category_breakdown.",
+      "total_score": 84.0,
       "distribution_tier": "growing",
       "auto_fails_triggered": [],
       "category_breakdown": {
-        "hook_quality": 26,
-        "retention_and_loop": 18,
-        "engagement_bait": 11,
+        "hook_quality": 27,
+        "retention_and_loop": 21,
+        "engagement_bait": 6,
         "visual_production": 12,
-        "audio_alignment": 4,
+        "audio_alignment": 13,
         "metadata": 5
       },
       "lowest_scoring_category": "engagement_bait",
-      "recommended_fix_priority": "Sharpen the comment-bait question into a polarizing, typed-answer prompt and keep it on-screen the full duration (EB-01/EB-02/EB-03)."
+      "recommended_fix_priority": "engagement_bait is the lowest category (6/10) but only 10% of v2 \u2014 the higher-marginal levers are retention_and_loop (tighten the delayed-resolution gap, RL-04) and audio_alignment (rising sound, AA-03). Balance overt bait with organic intrigue."
     },
     "harness_state_version_before": "v0",
     "harness_state_version_after": "v1",
@@ -84,25 +91,26 @@
       "from_version": "v0",
       "to_version": "v1",
       "element_weight_changes": {
-        "comment_bait_question": 0.15,
-        "polarizing_angle": 0.1
+        "delayed_resolution": 0.1,
+        "rising_audio": 0.1,
+        "comment_bait_question": -0.05
       },
-      "script_prompt_change": "Require a polarizing, ranked/comparison typed-answer question burned on-screen for the full duration.",
-      "rationale": "engagement_bait was the lowest category (11/20); reinforce comment bait + polarization to lift the total toward the viral threshold.",
+      "script_prompt_change": "Tighten the micro-curiosity gap (withhold the signature move to ~0:13) and prefer a rising approved sound; ease off overt comment bait.",
+      "rationale": "Under v2 weights, retention (25%) and audio (15%) outweigh engagement bait (10%). Reinforce delayed_resolution + rising_audio rather than chasing the lowest raw category.",
       "accepted": true
     },
     "lesson": {
       "id": "ls_0001",
       "generation_number": 1,
-      "observation": "The video scored well on hook and loop but engagement_bait capped the total at 76 (growing) - the question was answerable with an emoji.",
-      "rule": "Use polarizing, typed-answer comment bait (ranking/comparison) kept on-screen the full duration.",
-      "evidence": "Generation 1 ACOE: hook_quality 26/30, engagement_bait 11/20, total 76 -> growing tier.",
-      "harness_change": "Raise comment_bait_question (+0.15) and polarizing_angle (+0.10); update script_prompt to demand a polarizing typed-answer question.",
-      "expected_effect": "engagement_bait climbs toward 18-20/20, pushing the total past 85 into the viral tier."
+      "observation": "engagement_bait was the lowest category (6/10), but under v2 it is only 10% weight; audio (13/15) and retention (21/25) carry far more of the total.",
+      "rule": "Prioritize fixes by category weight x gap, not by lowest raw category. v2 rewards rising audio and delayed-resolution retention over overt comment bait.",
+      "evidence": "Generation 1 (v2): total 84 -> growing; engagement_bait 6/10 (10% weight) vs retention 21/25 (25%) and audio 13/15 (15%).",
+      "harness_change": "Raise delayed_resolution (+0.10) and rising_audio (+0.10); ease comment_bait_question (-0.05); tighten the micro-curiosity gap in script_prompt.",
+      "expected_effect": "Total crosses 85 (viral) via retention + audio gains, not more bait; overt-bait penalty risk drops."
     },
     "harness_id": "hs_0001",
-    "predicted_score": 0.76,
-    "rubric_version": "ACOE-YT-SHORTS-v1.0",
+    "predicted_score": 0.84,
+    "rubric_version": "ACOE-YT-SHORTS-v2.0",
     "selected": true
   }
 ]

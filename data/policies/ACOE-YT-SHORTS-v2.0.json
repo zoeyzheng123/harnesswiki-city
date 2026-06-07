@@ -1,0 +1,129 @@
+{
+  "policy_id": "ACOE-YT-SHORTS-v2.0",
+  "policy_name": "Algorithmic Content Optimization Engine — Video Rating Policy (v2)",
+  "description": "Evaluation policy for AI-generated YouTube Shorts dance videos. v2 rebalances toward audio and visual pacing, de-weights overt engagement bait, and adds script/curiosity mechanics. Score each criterion, sum to a weighted total, map to a distribution tier.",
+  "max_score": 100,
+  "supersedes": "ACOE-YT-SHORTS-v1.0",
+  "changelog_from_v1": [
+    "audio_alignment 5 -> 15 (trending/rising sound is a primary distribution driver)",
+    "engagement_bait 20 -> 10 (overt typed-response bait is increasingly penalized)",
+    "hook_quality: added HQ-05 'You' hook (second-person framing in first 2s)",
+    "retention_and_loop: added RL-04 delayed resolution + RL-05 conflict phrasing (But/So)",
+    "visual_production: added VP-04 cut/motion frequency (a visual change every <= 2.5s)",
+    "audio_alignment: added AA-03 rising-sound / early-adopter bonus",
+    "added AF-05 brand-safety auto-fail (replaces vague cringe/brand-fit scoring with a hard boundary)"
+  ],
+
+  "distribution_tiers": {
+    "viral": { "min_score": 85, "expected_views": "14000+", "label": "Viral Tier" },
+    "growing": { "min_score": 65, "expected_views": "1000–13999", "label": "Growing" },
+    "seed_jail": { "min_score": 0, "expected_views": "0–199", "label": "Seed Audience Jail" }
+  },
+
+  "auto_fail_conditions": [
+    { "id": "AF-01", "label": "Standing Start", "description": "Frame 1 shows a static or near-static pose before movement begins.", "result": "Score overridden to 0. Video must be regenerated." },
+    { "id": "AF-02", "label": "No On-Screen Text", "description": "No text overlay present in the first 2 seconds.", "result": "Hook and Engagement Bait categories both score 0." },
+    { "id": "AF-03", "label": "Duration Violation", "description": "Video duration is below 13 seconds or above 20 seconds.", "result": "Retention/Loop category scores 0." },
+    { "id": "AF-04", "label": "No Trending Audio", "description": "Audio track is not sourced from the approved trending audio pool.", "result": "Audio Alignment category scores 0." },
+    { "id": "AF-05", "label": "Brand Safety Violation", "description": "Explicit content, hate speech, or any predefined brand-safety violation.", "result": "Score overridden to 0. Video must be regenerated." }
+  ],
+
+  "categories": {
+
+    "hook_quality": {
+      "weight_percent": 30,
+      "max_points": 30,
+      "description": "First 1.5–2 seconds. The hook must arrest scroll behavior and target the viewer immediately.",
+      "criteria": [
+        { "id": "HQ-01", "label": "Peak Motion in Frame 1", "description": "Frame 1 shows the dancer mid-peak movement, not a lead-in or static pose.", "points": 9, "evaluation": { "pass": "Frame 1 is a dynamic high-energy motion pose.", "fail": "Frame 1 is static, fading in, or pre-movement." } },
+        { "id": "HQ-02", "label": "High-Contrast Background", "description": "Background is visually stark (black, white, or single-color neon) to isolate the dancer.", "points": 6, "evaluation": { "pass": "Single solid or neon color, no visual noise.", "partial": "Minimal texture/gradient. Deduct 3.", "fail": "Busy, realistic, or indistinct." } },
+        { "id": "HQ-03", "label": "Pattern Interrupt Element", "description": "A bold visual or textual element in the first 1.5s that breaks scroll momentum.", "points": 5, "evaluation": { "pass": "Bold, large text/effect within 0–1.5s.", "partial": "Present but small/low-contrast. Deduct 3.", "fail": "None in first 1.5s." } },
+        { "id": "HQ-04", "label": "No Introductory Build-Up", "description": "Zero tolerance for fade-ins, title cards, logo animations, or any non-motion frame before the dance begins.", "points": 5, "evaluation": { "pass": "Dance motion begins at 0:00:00.", "fail": "Any non-dance frame before motion." } },
+        { "id": "HQ-05", "label": "The 'You' Hook", "description": "On-screen text in the first 2s uses second-person framing ('You', 'Your') to target the viewer directly.", "points": 5, "evaluation": { "pass": "Opening on-screen text addresses the viewer in second person.", "partial": "Second-person present but weak/indirect. Deduct 3.", "fail": "No second-person framing in the opening." } }
+      ]
+    },
+
+    "retention_and_loop": {
+      "weight_percent": 25,
+      "max_points": 25,
+      "description": "Length, loop engineering, pacing, payoff timing, and narrative tension to maximize rewatch.",
+      "criteria": [
+        { "id": "RL-01", "label": "Duration Sweet Spot", "description": "13–15 seconds to maximize forced-rewatch retention above 100%.", "points": 5, "evaluation": { "pass": "13–15s.", "partial": "16–18s. Deduct 3.", "fail": "<13s or >18s." } },
+        { "id": "RL-02", "label": "Seamless Loop — Final Frame Match", "description": "Final frame blends into frame 1 (body position and camera within ~5° identical) for an invisible loop.", "points": 9, "evaluation": { "pass": "Final frame ≈ frame 1; loop imperceptible.", "partial": "Minor mismatch but smooth. Deduct 4.", "fail": "Visible hard cut on loop." } },
+        { "id": "RL-03", "label": "Consistent Pacing — No Dead Zones", "description": "No static or low-energy segments; energy uniform or escalating.", "points": 4, "evaluation": { "pass": "All frames dynamic.", "partial": "One brief low-energy transition. Deduct 2.", "fail": "Two or more static/low-energy segments." } },
+        { "id": "RL-04", "label": "Delayed Resolution", "description": "The payoff promised in the first 2 seconds is withheld until the final ~15% of the video (≈ second 12–13).", "points": 4, "evaluation": { "pass": "Promised payoff is delivered only in the final ~15%.", "partial": "Payoff delivered in the back half but earlier than the final 15%. Deduct 2.", "fail": "Payoff delivered up front, or no setup/payoff structure." } },
+        { "id": "RL-05", "label": "Conflict Phrasing (But/So)", "description": "Script and multi-part on-screen text use contrast/conflict transitions ('But', 'However', 'Suddenly') rather than additive ones ('And', 'Also') to maintain narrative tension.", "points": 3, "evaluation": { "pass": "Uses conflict/contrast transitions.", "fail": "Additive-only phrasing, or no narrative transitions." } }
+      ]
+    },
+
+    "engagement_bait": {
+      "weight_percent": 10,
+      "max_points": 10,
+      "description": "Whether the video mechanically invites a typed comment — de-weighted in v2 because platforms penalize overt bait; balance with organic intrigue (see RL-04).",
+      "criteria": [
+        { "id": "EB-01", "label": "Typed-Response Question Present", "description": "An open-ended, polarizing, or completion-style on-screen question that demands a typed answer (emoji-only is a failure signal).", "points": 5, "evaluation": { "pass": "Specific, typed-response question (e.g. 'Name a song harder than this').", "partial": "Vague or one-tap/emoji answerable. Deduct 3.", "fail": "No question, or yes/no answerable." } },
+        { "id": "EB-02", "label": "Question Visibility", "description": "The comment-bait text is legible for the full duration, not a brief flash.", "points": 3, "evaluation": { "pass": "Present 0:00–end, large, bold, high-contrast.", "partial": "<70% of duration or small. Deduct 2.", "fail": "<3s or illegible." } },
+        { "id": "EB-03", "label": "Polarization Potential", "description": "The question/concept has a divisive or competitive angle that triggers disagreement.", "points": 2, "evaluation": { "pass": "Invites comparison, ranking, or opinion.", "fail": "Neutral or generic." } }
+      ]
+    },
+
+    "visual_production": {
+      "weight_percent": 15,
+      "max_points": 15,
+      "description": "AI-generation quality, composition, and in-between visual pacing.",
+      "criteria": [
+        { "id": "VP-01", "label": "Dancer Isolation", "description": "Dancer is the sole visual focal point; no environmental distractions.", "points": 4, "evaluation": { "pass": "Centered, depth-of-field isolates the dancer.", "partial": "Minor background elements. Deduct 2.", "fail": "Background competes for attention." } },
+        { "id": "VP-02", "label": "Reflective or Dynamic Outfit", "description": "Outfit catches and interacts with light dynamically.", "points": 3, "evaluation": { "pass": "Metallic/reflective/high-contrast with visible light interaction.", "partial": "Bold but not reflective. Deduct 2.", "fail": "Plain or low-contrast." } },
+        { "id": "VP-03", "label": "Render Quality", "description": "Crisp 4K-equivalent with no AI artifact distortion in motion.", "points": 4, "evaluation": { "pass": "No artifacts, blur, or morphing during peak motion.", "partial": "Minor artifacts in non-focal areas only. Deduct 2.", "fail": "Visible distortion/morphing on dancer body or face." } },
+        { "id": "VP-04", "label": "Cut / Motion Frequency", "description": "A visual change (hard cut, fast zoom, heavy pan, or dramatic lighting shift) occurs at least every 2.5 seconds to hold attention.", "points": 4, "evaluation": { "pass": "A distinct visual change at least every 2.5s.", "partial": "Visual changes every ~2.5–4s. Deduct 2.", "fail": "Static framing or changes slower than every 4s." } }
+      ]
+    },
+
+    "audio_alignment": {
+      "weight_percent": 15,
+      "max_points": 15,
+      "description": "Whether the audio is from the approved trending pool, rhythmically matched, and ideally a rising sound. v2 treats audio as a primary distribution driver.",
+      "criteria": [
+        { "id": "AA-01", "label": "Track Source — Trending Pool", "description": "Audio is from the approved trending pool (current Billboard Hot 100 or a recent major release).", "points": 7, "evaluation": { "pass": "Hot 100 top 20 or album released within 30 days.", "partial": "Hot 100 but ranked 21–50. Deduct 3.", "fail": "Not trending or unlicensed original audio." },
+          "approved_audio_pool_as_of": "2026-06-06",
+          "priority_tracks": [
+            { "rank": 1, "artist": "Bruno Mars", "title": "I Just Might", "chart_position": 8 },
+            { "rank": 2, "artist": "Drake", "title": "Shabang", "chart_position": 4 },
+            { "rank": 3, "artist": "Olivia Rodrigo", "title": "The Cure", "chart_position": 5 },
+            { "rank": 4, "artist": "Taylor Swift", "title": "The Fate of Ophelia", "chart_position": null, "note": "Dominant Spotify streams — peak hype window" },
+            { "rank": 5, "artist": "Ella Langley", "title": "Be Her", "chart_position": 3 }
+          ],
+          "avoid": [ { "artist": "Drake", "title": "Janice STFU", "reason": "Controversy-adjacent — unpredictable comment-section suppression risk" } ]
+        },
+        { "id": "AA-02", "label": "Beat Sync", "description": "Movement peaks align with audio beat drops or rhythmic accents.", "points": 5, "evaluation": { "pass": "Motion synced with at least 3 distinct beat hits.", "partial": "Loose sync only. Deduct 3.", "fail": "Out of sync or background-only audio." } },
+        { "id": "AA-03", "label": "Rising Sound / Early Adopter", "description": "The chosen sound is rising/early in its lifecycle (not saturated), giving an early-adopter distribution edge.", "points": 3, "evaluation": { "pass": "Sound is rising / early-adopter.", "partial": "Established-trending (not rising). Deduct 2.", "fail": "Stale, declining, or unknown momentum." } }
+      ]
+    },
+
+    "metadata": {
+      "weight_percent": 5,
+      "max_points": 5,
+      "description": "Title, description, and hashtag strategy for discoverability.",
+      "criteria": [
+        { "id": "MD-01", "label": "Comment Bait Mirrored in Title", "description": "Title echoes the on-screen question to reinforce the loop in the browse feed.", "points": 2, "evaluation": { "pass": "Title includes the comment-bait question or a direct variant.", "fail": "Generic title with no engagement prompt." } },
+        { "id": "MD-02", "label": "Hashtag Mix Ratio", "description": "3-niche / 4-broad / 1+ audio-anchor ratio.", "points": 2, "evaluation": { "pass": "≥3 niche, ≥4 broad, ≥1 audio-anchor tag.", "partial": "Missing one category. Deduct 1.", "fail": "Broad-only or audio-anchor-only." },
+          "required_hashtag_categories": { "niche": ["#aidance", "#aiart", "#aianimation"], "broad": ["#shorts", "#viral", "#fyp", "#trending"], "audio_anchor": "dynamic — must match the approved track used" }
+        },
+        { "id": "MD-03", "label": "Description CTA", "description": "Description contains a call-to-action reinforcing the comment bait.", "points": 1, "evaluation": { "pass": "Contains a comment CTA (e.g. 'Drop the song you want next below').", "fail": "Empty or no CTA." } }
+      ]
+    }
+  },
+
+  "scoring_engine": {
+    "method": "weighted_sum",
+    "formula": "sum of all earned points across all categories",
+    "auto_fail_override": "AF-01 and AF-05 override the total to 0. AF-02/03/04 zero their relevant category.",
+    "output_fields": ["total_score", "distribution_tier", "auto_fails_triggered", "category_breakdown", "lowest_scoring_category", "recommended_fix_priority"]
+  },
+
+  "post_rating_action_map": {
+    "score_85_to_100": "Publish immediately. Post a follow-up optimized video within 48 hours to compound the Honeymoon Phase.",
+    "score_65_to_84": "Fix the lowest-scoring category before publishing.",
+    "score_0_to_64": "Do not publish. Regenerate using the ACOE prompt with auto-fail corrections applied first."
+  }
+}

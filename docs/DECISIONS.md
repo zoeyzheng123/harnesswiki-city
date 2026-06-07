@@ -3,6 +3,22 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-07 — ACOE v2
+
+### D15. ACOE-YT-SHORTS-v2.0 — rebalanced weights + new criteria
+
+A second rubric version (`data/policies/ACOE-YT-SHORTS-v2.0.json`; v1 retained)
+rebalances and extends the proxy reward. (It is still a **proxy** — the
+ground-truth `actual_engagement` loop remains open; v2 is a better-shaped guess.)
+
+- **Weights:** audio 5→15 (trending/rising sound is a primary distribution driver); engagement_bait 20→10 (overt bait is penalized). hook 30 / retention 25 / visual 15 / metadata 5 unchanged.
+- **New criteria:** HQ-05 "You" hook (2nd-person), RL-04 delayed resolution + RL-05 conflict phrasing (But/So), VP-04 cut/motion frequency (≤2.5s), AA-03 rising sound.
+- **AF-05 brand-safety** auto-fail replaces vague cringe/brand-fit scoring with a hard boundary.
+- **ExecutionMetadata** submodel (`hashtag_set`, `posting_time`) separates platform execution from the creative concept; top-level `ContentConcept.hashtag_set`/`posting_time` are deprecated; `cut_frequency` is now scored (VP-04).
+- Prompt mechanics in `HarnessState.script_prompt`: "You" hook, micro-curiosity gap (premise 0:00 → payoff ~0:13), conflict phrasing, cut ≤2.5s, rising audio; 13–15s retained.
+
+Done **backend-additive** (build stays green): `RewardDimensions` stays demoted (D14, not deleted); `hashtag_set`/`posting_time` kept deprecated. Deferred to **Eng 4** (`docs/DASHBOARD_MIGRATION.md`): rebalance `CATEGORY_MAX` to v2 (audio 15, engagement 10), drop `legacyDims`, delete `dimensions`, migrate reads to `execution`. Deferred to **Eng 1**: the meta-agent micro-curiosity-gap prompt + consuming `suggested_policy_updates`.
+
 ## 2026-06-06 — Retire the transitional 8 dimensions
 
 ### D14. The 8 `RewardDimensions` are demoted to optional + deprecated

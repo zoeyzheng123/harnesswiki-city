@@ -3,20 +3,20 @@
 Live build state. Update this when the build state changes (AGENTS.md
 Definition of Done).
 
-_Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.0)._
+_Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.0)._
 
 ## Component status
 
 | Component | File(s) | Status |
 |-----------|---------|--------|
 | Shared contracts | `harness/contracts.py` (canonical) · `src/contracts/index.ts` (mirror) | ✅ Done — incl. ACOE outputs; round-trips + typechecks |
-| Evaluation policy | `data/policies/ACOE-YT-SHORTS-v1.0.json` | ✅ Done — validated (weights sum 100, tiers, auto-fails) |
+| Evaluation policy | `data/policies/ACOE-YT-SHORTS-v2.0.json` (v1 retained) | ✅ Done — v2 rebalanced (audio↑, engagement↓) + HQ-05/RL-04/RL-05/VP-04/AA-03 + AF-05; validated (DECISIONS D15) |
 | Stub data | `data/stubs/*.json` via `scripts/dump_stubs.py` | ✅ Done — dance-vertical, ACOE-scored, generated + validated |
 | Documentation pack | `README.md`, `AGENTS.md`, `docs/*` | ✅ Done — re-themed to the short-form pivot |
 | Harness loop (Workstream A) | `loop_core/` (PR #1) | 🟦 Landed — lean internal model + meta-agent; needs the canonical bridge (`docs/LOOP_CORE_BRIDGE.md`) |
 | Loop → canonical bridge | `harness/bridge.py` (planned) | ⬜ Not started — spec in `docs/LOOP_CORE_BRIDGE.md` (Eng 1) |
 | HarnessState + meta-agent | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
-| Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2) — applies ACOE; maps to the 8 dims + fills the structured outputs + learning signal; offline preflight + optional LLM judge |
+| Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2; v2 rubric) — applies ACOE-YT-SHORTS-v2.0 → total_score/tier/category_breakdown + learning signal; offline preflight + optional LLM judge |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
 | Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
 | Dashboard | `src/ui/` | 🟦 In progress — control-room UI built (founder-themed synthetic data). **Needs ACOE migration** (0–100 + tiers + 6 categories) per `docs/DASHBOARD_MIGRATION.md`. |
@@ -34,5 +34,6 @@ _Last updated: 2026-06-06. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v1.
 
 - `pnpm dev` points at `pnpm dev:ui`; the Python generation loop is not implemented.
 - The 8 `RewardScore.dimensions` are **demoted to optional + deprecated** (DECISIONS.md D14) — the dashboard migrated to ACOE `category_breakdown`/tiers; the critic and stubs no longer emit them. Follow-up (Eng 4): drop `legacyDims()` from `src/ui/lib/synthetic.ts`. Full `RewardDimensions` removal is post-demo.
+- **ACOE v2** is the active rubric (DECISIONS.md D15): audio↑ / engagement↓ + 5 new criteria + AF-05 + `ExecutionMetadata`. Eng 4 follow-up: rebalance `CATEGORY_MAX` to v2 (audio 15, engagement 10) — `docs/DASHBOARD_MIGRATION.md`.
 - `docs/WEAVE_TRACING.md` trace links are empty until the first traced runs.
 - `loop_core/` (Eng 1) runs against its own lean internal contracts; the canonical bridge adapter (`docs/LOOP_CORE_BRIDGE.md`) maps its output to `data/generations.latest.json` for the dashboard (DECISIONS.md D12).

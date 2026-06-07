@@ -82,6 +82,14 @@ class Audio(BaseModel):
     is_rising_sound: Optional[bool] = None
 
 
+# platform/execution details, separated from the creative idea (ACOE v2). The
+# canonical home for hashtags + posting time; ContentConcept's top-level
+# hashtag_set / posting_time are deprecated in favor of this.
+class ExecutionMetadata(BaseModel):
+    hashtag_set: Optional[list[str]] = None
+    posting_time: Optional[datetime] = None
+
+
 # 2. ContentConcept — produced by C (Generator + inner-loop policy), consumed by B & C
 class ContentConcept(BaseModel):
     # ── core (render-ready) ──
@@ -108,9 +116,10 @@ class ContentConcept(BaseModel):
     # ── short-form-video attributes (Eng 1's TikTok feature set; optional) ──
     dance_style: Optional[str] = None
     audio: Optional[Audio] = None
-    cut_frequency: Optional[float] = None  # cuts per second
-    hashtag_set: Optional[list[str]] = None
-    posting_time: Optional[datetime] = None  # recommended/planned post time
+    cut_frequency: Optional[float] = None  # cuts per second (scored by ACOE v2 VP-04)
+    execution: Optional[ExecutionMetadata] = None  # platform/execution details (ACOE v2)
+    hashtag_set: Optional[list[str]] = None  # deprecated (ACOE v2) — use execution.hashtag_set
+    posting_time: Optional[datetime] = None  # deprecated (ACOE v2) — use execution.posting_time
     # ── ACOE Shorts generation attributes (optional) ──
     comment_bait_question: Optional[str] = None  # EB-01 typed-response question
     on_screen_text: Optional[str] = None  # HQ-03 / AF-02 overlay
@@ -149,7 +158,7 @@ class RewardScore(BaseModel):
     scored_by: Optional[str] = None
     rationale: Optional[str] = None  # ≡ judge_rationale
     scored_at: Optional[datetime] = None
-    # ── ACOE-YT-SHORTS-v1.0 outputs (rubric_version; additive — see DECISIONS.md D11) ──
+    # ── ACOE outputs (rubric_version-scoped; additive — see DECISIONS.md D11/D15) ──
     total_score: Optional[float] = None  # 0–100
     distribution_tier: Optional[str] = None  # "viral" | "growing" | "seed_jail"
     auto_fails_triggered: Optional[list[str]] = None  # e.g. ["AF-02"]
@@ -263,10 +272,10 @@ def stub_harness(generation: int = 0) -> HarnessState:
         element_weights={"peak_motion_frame1": 0.6, "seamless_loop": 0.55, "comment_bait_question": 0.4},
         script_prompt="Generate an 8-15s AI dance Short: peak motion in frame 1, stark background, on-screen comment bait, seamless loop, beat-synced to an approved track.",
         seedance_prompt_template="A single dancer, {{dance_style}}, mid-peak motion, isolated on a {{background}} background. On-screen text: \"{{on_screen_text}}\". Loop-ready.",
-        judge_rubric="Score with ACOE-YT-SHORTS-v1.0 (data/policies/ACOE-YT-SHORTS-v1.0.json). See docs/JUDGE_RUBRIC.md.",
+        judge_rubric="Score with ACOE-YT-SHORTS-v2.0 (data/policies/ACOE-YT-SHORTS-v2.0.json). See docs/JUDGE_RUBRIC.md.",
         policy_rules=["AF-01 no static frame 1", "AF-02 on-screen text in first 2s", "AF-03 duration 13-20s", "AF-04 approved trending audio only"],
         element_taxonomy=["peak_motion_frame1", "high_contrast_bg", "seamless_loop", "trending_audio", "beat_sync", "comment_bait_question", "polarizing_angle"],
-        rubric_version="ACOE-YT-SHORTS-v1.0",
+        rubric_version="ACOE-YT-SHORTS-v2.0",
         generation=generation,
     )
 

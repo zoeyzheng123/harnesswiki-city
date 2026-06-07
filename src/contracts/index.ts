@@ -47,6 +47,12 @@ export type Audio = {
   is_rising_sound?: boolean;
 };
 
+// platform/execution details, separated from the creative idea (ACOE v2)
+export type ExecutionMetadata = {
+  hashtag_set?: string[];
+  posting_time?: string; // ISO-8601
+};
+
 export type ContentConcept = {
   // core (render-ready)
   id: string;
@@ -72,9 +78,10 @@ export type ContentConcept = {
   // short-form-video attributes (Eng 1's TikTok feature set; optional)
   dance_style?: string;
   audio?: Audio;
-  cut_frequency?: number; // cuts per second
-  hashtag_set?: string[];
-  posting_time?: string; // ISO-8601, recommended/planned post time
+  cut_frequency?: number; // cuts per second (scored by ACOE v2 VP-04)
+  execution?: ExecutionMetadata; // platform/execution details (ACOE v2)
+  hashtag_set?: string[]; // deprecated (ACOE v2) — use execution.hashtag_set
+  posting_time?: string; // deprecated (ACOE v2) — use execution.posting_time
   // ACOE Shorts generation attributes (optional)
   comment_bait_question?: string;
   on_screen_text?: string;
