@@ -57,7 +57,7 @@ export const VideoPlayer = forwardRef<
           loop
           playsInline
           preload="metadata"
-          className="absolute inset-0 h-full w-full object-contain"
+          className="absolute inset-0 h-full w-full object-cover"
           onError={() => setErrored(true)}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}

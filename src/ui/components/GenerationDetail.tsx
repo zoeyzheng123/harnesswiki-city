@@ -37,8 +37,15 @@ export function GenerationDetail({
   useEffect(() => {
     if (!record) return;
     restoreRef.current = document.activeElement;
+    // Inert the background so the dialog is the only reachable region (SR + focus).
+    const inertTargets = [document.querySelector("header"), document.querySelector("main")].filter(
+      (el): el is HTMLElement => el instanceof HTMLElement,
+    );
+    inertTargets.forEach((el) => el.setAttribute("inert", ""));
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // Let an open rubric popover close first; don't collapse the drawer too.
+        if (document.querySelector("[popover]:popover-open")) return;
         onClose();
         return;
       }
@@ -68,6 +75,7 @@ export function GenerationDetail({
     return () => {
       window.removeEventListener("keydown", onKey);
       window.clearTimeout(id);
+      inertTargets.forEach((el) => el.removeAttribute("inert"));
       if (restoreRef.current instanceof HTMLElement) restoreRef.current.focus();
     };
   }, [record, onClose]);

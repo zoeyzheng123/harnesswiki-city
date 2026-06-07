@@ -21,6 +21,9 @@ export function CriticLearning({
   const suggested = score.suggested_policy_updates;
   const applied = diff?.element_weight_changes ?? {};
   const suggestedEntries = suggested ? Object.entries(suggested) : [];
+  // The honest bridge is the UNION of what the critic suggested and what the
+  // harness applied, so harness-initiated changes aren't silently dropped.
+  const allDeltaKeys = Array.from(new Set([...Object.keys(suggested ?? {}), ...Object.keys(applied)]));
 
   if (suggestedEntries.length === 0 && winning.length === 0 && weak.length === 0) {
     return (
@@ -75,32 +78,38 @@ export function CriticLearning({
         <div>
           <MetricLabel>Suggested → applied</MetricLabel>
           <div className="mt-1.5 flex flex-col gap-1.5">
-            {suggestedEntries.map(([key, delta]) => {
-              const appliedDelta = applied[key];
-              const diverged = appliedDelta !== undefined && appliedDelta !== delta;
+            {allDeltaKeys.map((key) => {
+              const s = suggested?.[key];
+              const a = applied[key];
+              const harnessAdded = s === undefined && a !== undefined;
+              const amplified = s !== undefined && a !== undefined && a !== s;
+              const appliedColor =
+                a === undefined ? "text-faint" : harnessAdded || amplified ? "text-accent" : "text-positive";
               return (
                 <div key={key} className="flex items-center gap-2.5 text-sm">
                   <span className="min-w-0 flex-1 truncate text-muted">{elementLabel(key)}</span>
                   <span
-                    className={`w-12 text-right font-mono text-xs tabular-nums ${delta > 0 ? "text-positive" : delta < 0 ? "text-negative" : "text-faint"}`}
+                    className={`w-12 text-right font-mono text-xs tabular-nums ${s === undefined ? "text-faint" : s > 0 ? "text-positive" : "text-negative"}`}
                   >
-                    {signedDelta(delta)}
+                    {s === undefined ? "·" : signedDelta(s)}
                   </span>
                   <span className="font-mono text-xs text-faint">→</span>
-                  <span
-                    className={`w-28 text-right font-mono text-xs tabular-nums ${appliedDelta === undefined ? "text-faint" : diverged ? "text-accent" : "text-positive"}`}
-                  >
-                    {appliedDelta === undefined
+                  <span className={`w-32 text-right font-mono text-xs tabular-nums ${appliedColor}`}>
+                    {a === undefined
                       ? "not applied"
-                      : `${signedDelta(appliedDelta)}${diverged ? " amplified" : ""}`}
+                      : `${signedDelta(a)}${harnessAdded ? " harness-added" : amplified ? " amplified" : ""}`}
                   </span>
                 </div>
               );
             })}
           </div>
-          {suggestedEntries.some(([k, d]) => applied[k] !== undefined && applied[k] !== d) && (
+          {allDeltaKeys.some((k) => {
+            const s = suggested?.[k];
+            const a = applied[k];
+            return (s === undefined && a !== undefined) || (s !== undefined && a !== undefined && a !== s);
+          }) && (
             <p className="mt-2 text-xs leading-relaxed text-muted">
-              The meta-agent set its own magnitude where it amplified the critic's suggestion.
+              The meta-agent applies its own judgment: it amplifies some deltas and adds changes the critic did not suggest.
             </p>
           )}
         </div>

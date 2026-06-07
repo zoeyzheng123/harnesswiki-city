@@ -79,7 +79,7 @@ export const TREND_CONTEXTS: TrendContext[] = [
   {
     id: "tc_0002",
     captured_at: "2026-06-07T09:05:00.000Z",
-    platform: "tiktok",
+    platform: "youtube",
     audience: "dance-creators",
     trend_summary:
       "Loop-bait dances where the final frame snaps back to frame 1 are driving rewatches and crossing into the viral tier.",
