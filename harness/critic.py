@@ -29,10 +29,7 @@ from harness.contracts import (
     TrendContext,
 )
 
-try:
-    import weave
-except ImportError:  # The MVP keeps Weave optional until credentials are wired.
-    weave = None
+from harness.weave_trace import init_weave, op  # the single W&B Weave surface (offline-safe)
 
 
 EvaluationMode = Literal[
@@ -47,12 +44,6 @@ EvidenceType = Literal[
     "observed",
     "supplied_metadata",
 ]
-
-
-def _weave_op(function):
-    if weave is None:
-        return function
-    return weave.op()(function)
 
 
 RUBRIC_VERSION = "ACOE-YT-SHORTS-v2.0"  # must match data/policies/<policy_id>.json
@@ -978,7 +969,7 @@ def score_judgement(
     )
 
 
-@_weave_op
+@op
 def judge_concept(
     concept: ContentConcept,
     *,
@@ -1048,7 +1039,7 @@ def _filter_policy_learning(
     return winning, weak, deltas
 
 
-@_weave_op
+@op
 def score_concept(
     concept: ContentConcept,
     *,
@@ -1061,6 +1052,7 @@ def score_concept(
 ) -> RewardScore:
     """Score a concept and return the canonical RewardScore used by the loop."""
 
+    init_weave()  # enable Weave tracing once (idempotent; no-op without weave/creds)
     result = judge_concept(
         concept,
         evaluation_mode=evaluation_mode,

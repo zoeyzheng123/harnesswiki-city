@@ -3,9 +3,15 @@
 Owner of *instrumentation*. Makes W&B Weave central and reliable — the demo
 should never depend on hunting through Weave live.
 
-Init `weave.init(WEAVE_PROJECT)` (default `harnesswiki-city`); auth via
-`WANDB_API_KEY`. See `.env.example`. Each loop function is a `@weave.op()` in
-`harness/weave_trace.py` (wrappers) / the module that owns it.
+> **Status: landed (offline-safe).** `harness/weave_trace.py` is the single Weave surface —
+> `op` (≡ `weave.op`, or a no-op when Weave is absent) + an idempotent `init_weave()`. The
+> loop (`loop_core/loop.py`: generate / score / meta) and the critic (`harness/critic.py`:
+> `score_concept` / `judge_concept`) are traced. With `weave` uninstalled, no W&B creds, or
+> `WEAVE_DISABLE` set, everything runs unchanged.
+
+Init via `init_weave()` (wraps `weave.init`); project = `WEAVE_PROJECT` env, default
+`sia-social-loop` (matches the loop). Auth via `wandb login` or `WANDB_API_KEY`. Enable live
+tracing: `pip install weave` (now in `requirements.txt`) + log in.
 
 ## Required traced ops
 

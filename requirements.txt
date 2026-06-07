@@ -2,8 +2,9 @@
 # Install:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 pydantic>=2,<3
+weave            # W&B Weave tracing (sponsor) — offline-safe via harness/weave_trace.py
 
-# Planned (added when the real loop lands — see docs/STATUS.md):
-#   weave            # W&B Weave tracing (sponsor)
-#   tavily-python    # trend scouting
-#   anthropic        # content generator + reward critic
+# Optional (offline fallbacks exist; install for the live paths — see docs/STATUS.md):
+#   tavily-python    # trend scouting (harness/scout.py live path)
+#   openai           # generator squad + meta-agent live paths
+#   anthropic        # alternate generator/critic LLM

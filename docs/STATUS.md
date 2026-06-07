@@ -20,7 +20,7 @@ _Last updated: 2026-06-07. Vertical: AI YouTube Shorts dance (ACOE-YT-SHORTS-v2.
 | HarnessState + meta-agent (canonical) | `harness/state.py`, `harness/meta.py` | ⬜ Not started |
 | Reward critic (ACOE) | `harness/critic.py` · `tests/test_critic.py` | ✅ Landed (PR #2; v2 rubric) — applies ACOE-YT-SHORTS-v2.0 → total_score/tier/category_breakdown + learning signal; emits `score_type`/`evidence_coverage` (D17); offline preflight + optional LLM judge |
 | Content generator + scout | `harness/generator.py`, `harness/scout.py`, `harness/seedance.py` | ⬜ Not started |
-| Weave tracing | `harness/weave_trace.py` | ⬜ Not started |
+| Weave tracing | `harness/weave_trace.py` · `loop_core/loop.py` | ✅ Done — `op` + idempotent `init_weave()`, offline-safe; the loop (generate/score/meta) + critic (`score_concept`/`judge_concept`) trace. Enable: `pip install weave` + `wandb login` (`WEAVE_PROJECT`, default `sia-social-loop`). |
 | Dashboard | `src/ui/` | ✅ Done — ACOE v2 control room (0–100, tiers, 6 categories, auto-fail badges, critic-learning panel); data seam reads `VITE_GENERATIONS_URL` with synthetic fallback (DECISIONS D15). Stage-1 UI panels (outcome / candidates batch / provenance badges) pending Eng-1 producers. |
 
 ## Next up — the critical path to a "show the climb" demo
@@ -34,7 +34,7 @@ concepts (AF-02/AF-03). Per-engineer TO-DOs are in **`docs/TODO.md`**; the criti
 3. **Candidate-batch capture** (Eng 1) — ~5-line `on_generation` extension → `GenerationRecord.candidates` (the contrastive signal).
 4. **Wire `VITE_GENERATIONS_URL`** (Eng 4) — point the dashboard at the real bridge output (1-line; today it falls back to synthetic).
 5. **Stage 2 (ground truth):** outcome ingestion (render→post→metrics → `Outcome`, Eng 1/3) + real-data calibration & the LLM judge (Eng 2).
-6. `harness/weave_trace.py` — `weave.init` + `@weave.op` wrappers (observability; optional for the demo).
+6. ~~`harness/weave_trace.py`~~ — ✅ **done**: Weave wired (loop + critic trace; offline-safe; the WeaveHacks gate).
 
 ## Known placeholders
 
