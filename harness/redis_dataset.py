@@ -115,10 +115,10 @@ def publish_rows(
             row.get("label_source") == "synthetic"
             for row in materialized
         ),
-        "score_min": min(float(row["total_score"]) for row in materialized),
-        "score_max": max(float(row["total_score"]) for row in materialized),
-        "views_min": min(int(row["views_at_168h"]) for row in materialized),
-        "views_max": max(int(row["views_at_168h"]) for row in materialized),
+        "score_min": min((float(row["total_score"]) for row in materialized if row.get("total_score") is not None), default=None),
+        "score_max": max((float(row["total_score"]) for row in materialized if row.get("total_score") is not None), default=None),
+        "views_min": min((int(row["views_at_168h"]) for row in materialized if row.get("views_at_168h") is not None), default=None),
+        "views_max": max((int(row["views_at_168h"]) for row in materialized if row.get("views_at_168h") is not None), default=None),
         "published_at": datetime.now(timezone.utc).isoformat(),
     }
     final = client.pipeline(transaction=True)
