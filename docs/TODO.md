@@ -18,6 +18,11 @@ trip auto-fails (AF-02, AF-03), so scores **plateau in seed_jail** instead of cl
 candidate-capture → Eng 4 wire real data → (Stage 2) outcome ingestion + real-data
 calibration.
 
+**Reward representation (Stage 3, D18):** 0–100 is display/diagnosis; the *learning* target
+moves to a **Bradley-Terry preference reward**. The offline prototype is landed
+(`scripts/calibrate.py` — it beats the absolute proxy on held-out pairwise winners,
+0.64 vs 0.55); the live wiring is the Eng-2 + Eng-1 🟡 items below.
+
 ---
 
 ## Eng 1 — Loop Core (`loop_core/`, `harness/bridge.py`)
@@ -48,6 +53,12 @@ Loop, meta-agent, inner-loop policy, and bridge are **landed and working**. Rema
    `make_acoe_critic()` + the bridge hook; assert `raw/gen_*.json` and
    `data/generations.latest.json` round-trip with the ACOE fields + (once #1 lands)
    populated `candidates`. *Why:* protect the spine from regressions.
+
+5. 🟡 **Optimize win-probability, not the absolute scalar** (M, Stage 3 / D18) — switch
+   `update_policy` from `advantage = predicted_score − baseline` to a **Bradley-Terry
+   win-probability** advantage over the generation's K candidates (depends on #1
+   candidate-capture). Keep 0–100 for the dashboard. The offline prototype + benchmark are
+   in `scripts/calibrate.py` (`fit_bradley_terry`).
 
 _Done, no action:_ inner-loop RL fixes (eta 0.4, moving-mean baseline, auto-fail shield,
 `suggested_policy_updates` consumption), the bridge + `make_acoe_critic`, wiki persistence.
@@ -82,6 +93,13 @@ and the Stage-1 calibration seed are **landed**. Remaining:
    `AVOID_AUDIO_TITLES`, `AS_OF 2026-06-06`) is hardcoded in `critic.py`. Add a refresh
    path (a `data/policies/` file or small admin step) so AA-01 stays current.
    *Why:* AA-01 gates audio scoring + real distribution; trends move weekly.
+
+5. 🟡 **Pairwise / Bradley-Terry reward** (M, Stage 3 / D18) — add an LLM
+   `judge_pairwise(a, b)` ("which is better, and why?") in `harness/critic.py` and fit a
+   Bradley-Terry model over each generation's K candidates; feed `_pairwise_probability` a
+   real baseline (today it returns 0.5 because the loop never passes one). LLMs rank far more reliably than they
+   score 0–100. The offline prototype on synthetic data is landed in `scripts/calibrate.py`
+   (`fit_bradley_terry` / `benchmark_preference`) and beats the absolute proxy on held-out pairs.
 
 _Done, no action:_ ACOE v2 rubric, 23-criterion preflight, AF-01..05, the learning signal,
 `score_type`/`evidence_coverage`, and the synth + calibrate + `test_calibrate` seed.

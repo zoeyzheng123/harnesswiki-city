@@ -3,6 +3,37 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-07 — Preference-based reward (Stage 3 design)
+
+### D18. Bradley-Terry preference reward is the learning target; 0–100 stays for display + diagnosis
+
+The 0–100 ACOE score is the right interface for the dashboard, the tiers, the auto-fail
+gates, and the meta-agent's "what to fix" — but the wrong **learning target**: LLMs/humans
+rank more reliably than they score, the cardinal scale has no interval meaning and
+mismatches heavy-tailed views, and the weighted sum hard-codes a category trade-off the
+calibration showed is wrong (audio under-weighted, engagement-bait negative). So: **keep
+0–100 for display / diagnosis / guardrails; move the optimization target to a
+preference/outcome reward.**
+
+Offline proof (landed — `scripts/calibrate.py`, `tests/test_calibrate.py`): a feature-based
+**Bradley-Terry** model — `P(A≻B)=σ(w·(x_A−x_B))`, pure-Python logistic regression on the
+synthetic candidate batches' pairwise outcome comparisons — recovers the hidden
+`TRUE_WEIGHTS` ranking (Spearman **0.76** vs a 0.53 ACOE-echo baseline) and **out-predicts
+the absolute ACOE proxy at picking the real held-out winner** (pairwise accuracy **0.64 vs
+0.55**, grouped-by-generation split). *Honest caveat:* a plain OLS-on-log-views regressor
+also beats ACOE here (**0.62**, near-tie with BT), so this synthetic benchmark mainly shows
+that *any* learned/calibrated reward beats the hand-set proxy; the case for *preference*
+specifically is the **live-judge regime** — LLMs rank far more reliably than they score, and
+pairwise sidesteps the heavy-tailed cardinal scale. `harness/critic.py::_pairwise_probability`
+is the existing seed: it returns 0.5 unless a baseline score is supplied, and the loop never
+supplies one — so no real pairwise signal is wired in yet.
+
+**Deferred to Stage 3 (see `docs/TODO.md`):** the live wiring — an LLM `judge_pairwise(a,b)`
+in the critic + fitting BT over each generation's K candidates, and switching the inner
+loop's `update_policy` from `predicted_score − baseline` to the BT win-probability advantage
+(blocked on Eng-1 candidate-batch capture). This pass is the **offline prototype only**;
+nothing in the live loop changed.
+
 ## 2026-06-07 — Ground-truth contracts (Stage 1)
 
 ### D17. Typed `Outcome`, the candidate batch, score provenance + the calibration seed

@@ -21,7 +21,7 @@ import json
 import math
 import pathlib
 import sys
-from typing import Optional
+from typing import Any, Optional
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -278,6 +278,99 @@ def held_out_comparison(
     }
 
 
+# ─────────────────── Bradley-Terry preference reward ───────────────────
+# A feature-based Bradley-Terry model: P(A ≻ B) = sigmoid(w · (x_A − x_B)), fit from
+# PAIRWISE outcome comparisons (which candidate actually got more views). This is the
+# representation that suits a learning signal better than an absolute 0–100 score —
+# rankings are what judges/outcomes give reliably; the scale is "A vs B", not points.
+# Pure-Python logistic regression on feature differences; no intercept (it's a difference).
+
+def build_pairs(records: list[GenerationRecord]) -> list[tuple[list[float], int]]:
+    """Within-generation pairs: (x_A − x_B, label=1 if A's real views beat B's).
+
+    Uses the contrastive batch the loop already generates (`rec.candidates`). Skips ties
+    and candidates lacking a stashed criterion vector or a real outcome.
+    """
+    pairs: list[tuple[list[float], int]] = []
+    for rec in records:
+        items: list[tuple[list[float], float]] = []
+        for cand in (rec.candidates or []):
+            rb = cand.score.rubric_breakdown or {}
+            cv = rb.get("criterion_vector")
+            outcome = cand.outcome
+            if cv and outcome is not None and outcome.views is not None:
+                items.append(([float(cv[c]) for c in CRITERION_ORDER], float(outcome.views)))
+        for i in range(len(items)):
+            for j in range(i + 1, len(items)):
+                (xi, vi), (xj, vj) = items[i], items[j]
+                if vi == vj:
+                    continue
+                pairs.append(([a - b for a, b in zip(xi, xj)], 1 if vi > vj else 0))
+    return pairs
+
+
+def fit_bradley_terry(
+    pairs: list[tuple[list[float], int]],
+    ridge: float = 1e-4,
+    iters: int = 3000,
+    lr: float = 0.5,
+) -> dict[str, float]:
+    """Logistic regression on the feature differences (no intercept) via batch gradient
+    descent. Deterministic (weights start at 0, no randomness). Returns {criterion: weight}."""
+    if not pairs:
+        raise ValueError("no pairs to fit")
+    n_features = len(pairs[0][0])
+    w = [0.0] * n_features
+    n = len(pairs)
+    for _ in range(iters):
+        grad = [0.0] * n_features
+        for x, y in pairs:
+            z = max(-30.0, min(30.0, sum(w[k] * x[k] for k in range(n_features))))
+            err = 1.0 / (1.0 + math.exp(-z)) - y
+            for k in range(n_features):
+                grad[k] += err * x[k]
+        for k in range(n_features):
+            w[k] -= lr * (grad[k] / n + ridge * w[k])
+    return {c: w[i] for i, c in enumerate(CRITERION_ORDER)}
+
+
+def pairwise_accuracy(weights: dict[str, float], pairs: list[tuple[list[float], int]]) -> float:
+    """Fraction of pairs whose real winner is correctly predicted by sign(w · x_diff)."""
+    if not pairs:
+        return 0.0
+    w = [weights[c] for c in CRITERION_ORDER]
+    correct = sum(1 for x, y in pairs if (1 if sum(w[k] * x[k] for k in range(len(w))) > 0 else 0) == y)
+    return correct / len(pairs)
+
+
+def benchmark_preference(
+    records: list[GenerationRecord],
+    test_fraction: float = 0.3,
+    bt_ridge: float = 1e-4,
+) -> dict[str, Any]:
+    """Held-out (grouped-by-generation) comparison of three rankers on real pairwise
+    winners: the Bradley-Terry model (fit on train pairs), the OLS-on-log-views
+    calibrator (fit on the same split), and the raw ACOE proxy (the absolute 0–100
+    scoring baseline). Reports test pairwise accuracy + Spearman vs the hidden TRUE_WEIGHTS."""
+    stride = max(2, round(1.0 / test_fraction))
+    train_recs = [r for i, r in enumerate(records) if i % stride != 0]
+    test_recs = [r for i, r in enumerate(records) if i % stride == 0]
+    train_pairs = build_pairs(train_recs)
+    test_pairs = build_pairs(test_recs)
+
+    bt = fit_bradley_terry(train_pairs, ridge=bt_ridge)
+    ols = fit_weights(train_recs)      # OLS on log1p(views), same split
+    acoe = acoe_points()               # the absolute 0–100 proxy, used as a ranker
+
+    return {
+        "bt":   {"acc": pairwise_accuracy(bt, test_pairs),   "spearman": spearman_vs_true(bt)},
+        "ols":  {"acc": pairwise_accuracy(ols, test_pairs),  "spearman": spearman_vs_true(ols)},
+        "acoe": {"acc": pairwise_accuracy(acoe, test_pairs), "spearman": spearman_vs_true(acoe)},
+        "n_train_pairs": len(train_pairs),
+        "n_test_pairs": len(test_pairs),
+    }
+
+
 # ─────────────────────────── reporting ───────────────────────────
 def _fmt_table(fitted: dict[str, float]) -> str:
     points = acoe_points()
@@ -307,7 +400,19 @@ def main() -> None:
     # mse_fitted < mse_acoe are equivalent — report the single condition.
     beats = comp["r2_fitted"] > comp["r2_acoe"]
     print(f"\nCalibration beats raw ACOE proxy: {beats}")
-    print(f"Recovers latent ranking (Spearman >= 0.5): {rho >= 0.5}")
+    print(f"Recovers latent ranking (Spearman >= 0.70): {rho >= 0.70}")
+
+    # Preference (Bradley-Terry) reward vs the absolute proxy, on held-out pairwise winners.
+    pref = benchmark_preference(records)
+    print(
+        "\n=== Preference reward: held-out pairwise-winner accuracy (grouped split) ===\n"
+        f"  bradley-terry : acc = {pref['bt']['acc']:.3f}  spearman(TRUE) = {pref['bt']['spearman']:.3f}\n"
+        f"  OLS log-views : acc = {pref['ols']['acc']:.3f}  spearman(TRUE) = {pref['ols']['spearman']:.3f}\n"
+        f"  raw ACOE 0-100: acc = {pref['acoe']['acc']:.3f}  spearman(TRUE) = {pref['acoe']['spearman']:.3f}\n"
+        f"  (n_train_pairs={pref['n_train_pairs']}, n_test_pairs={pref['n_test_pairs']})\n"
+        f"  -> preference learning beats the absolute proxy at predicting real winners: "
+        f"{pref['bt']['acc'] > pref['acoe']['acc']}"
+    )
 
 
 if __name__ == "__main__":
