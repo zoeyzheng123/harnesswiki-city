@@ -6,6 +6,8 @@ import { Badge, MetricLabel } from "./primitives";
 import { ScoreDimensions } from "./ScoreDimensions";
 import { HarnessDiffView } from "./HarnessDiffView";
 import { LessonCard } from "./LessonCard";
+import { VideoPlayer } from "./VideoPlayer";
+import { videoForRecord } from "../lib/videos";
 import { DURATION, EASE_OUT_EXPO } from "../styles/motion";
 
 function SectionHeading({ index, children }: { index: string; children: string }) {
@@ -44,6 +46,8 @@ export function GenerationDetail({
       if (restoreRef.current instanceof HTMLElement) restoreRef.current.focus();
     };
   }, [record, onClose]);
+
+  const video = record ? videoForRecord(record) : undefined;
 
   return (
     <AnimatePresence>
@@ -108,6 +112,14 @@ export function GenerationDetail({
                       </Badge>
                     ))}
                 </div>
+                {video && (
+                  <div className="mt-4">
+                    <MetricLabel>Rendered clip</MetricLabel>
+                    <div className="mt-1.5 w-36">
+                      <VideoPlayer src={video.src} hook={record.concept.hook} accent="var(--color-primary)" />
+                    </div>
+                  </div>
+                )}
                 <div className="mt-4">
                   <MetricLabel>Script</MetricLabel>
                   <p className="mt-1 text-sm leading-relaxed text-muted">{record.concept.script}</p>

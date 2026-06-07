@@ -5,7 +5,7 @@ import "./styles/theme.css";
 import { App } from "./App";
 
 const rootEl = document.getElementById("root");
-if (!rootEl) throw new Error("HarnessWiki City: #root element is missing from index.html");
+if (!rootEl) throw new Error("Shortform City: #root element is missing from index.html");
 
 createRoot(rootEl).render(
   <StrictMode>

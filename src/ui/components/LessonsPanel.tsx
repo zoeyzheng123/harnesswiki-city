@@ -14,10 +14,10 @@ export function LessonsPanel({ lessons }: { lessons: LessonEntry[] }) {
     >
       {ordered.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted">
-          Lessons appear here as the loop runs — one rule per generation.
+          Lessons appear here as the loop runs. One rule per generation.
         </p>
       ) : (
-        <motion.div layout className="flex flex-col gap-3">
+        <motion.div layout className="flex flex-col gap-3 lg:max-h-[27rem] lg:overflow-y-auto lg:pr-1">
           <AnimatePresence initial={false}>
             {ordered.map((entry) => (
               <motion.div

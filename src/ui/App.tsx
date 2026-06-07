@@ -21,6 +21,7 @@ import { GenerationTable } from "./components/GenerationTable";
 import { LessonsPanel } from "./components/LessonsPanel";
 import { GenerationDetail } from "./components/GenerationDetail";
 import { DemoLoopControls } from "./components/DemoLoopControls";
+import { OutputCompare } from "./components/OutputCompare";
 
 export function App() {
   const [records, setRecords] = useState<GenerationRecord[] | null>(null);
@@ -111,6 +112,8 @@ export function App() {
   const refusedCount = records
     .slice(0, step)
     .filter((r) => r.harness_diff && !r.harness_diff.accepted).length;
+  const baseline = records.find((r) => r.generation_number === 1);
+  const best = records.find((r) => r.generation_number === 5);
 
   // Announced to assistive tech on each generation (the visual update is silent otherwise).
   const liveMessage = currentRecord
@@ -126,12 +129,12 @@ export function App() {
       <div role="status" aria-live="polite" className="sr-only">
         {liveMessage}
       </div>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1680px] px-4 py-6 sm:px-6 lg:px-8">
         {/* Top bar */}
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">
-              HarnessWiki <span className="text-primary-bright">City</span>
+              Shortform <span className="text-primary-bright">City</span>
             </h1>
             <p className="mt-1 font-mono text-xs tracking-wide text-muted">
               control room · a content harness that rewrites itself each generation
@@ -150,6 +153,13 @@ export function App() {
         <div className="mt-4">
           <HeroCurve points={curve} revealed={step} total={total} />
         </div>
+
+        {/* Output: baseline vs best video */}
+        {baseline && best && (
+          <div className="mt-4">
+            <OutputCompare baseline={baseline} best={best} bestUnlocked={step >= best.generation_number} />
+          </div>
+        )}
 
         {/* State row */}
         <motion.div
