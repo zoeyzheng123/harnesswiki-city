@@ -150,9 +150,23 @@ The ACOE v2 control room is **done**. Remaining is small and mostly blocked on E
 1. 🔴 **Wire `VITE_GENERATIONS_URL`** (XS) — point `src/ui/lib/data.ts` at the real bridge
    output (`data/generations.latest.json`, copied to `public/` or served). One line + a
    copy; today it falls back to the synthetic arc.
-2. 🟡 **Stage-1 UI panels** (M, blocked on Eng-1 #1/#2) — an outcome panel (APV/views vs
-   proxy `total_score`), the candidates contrastive batch, and `score_type` /
-   `evidence_coverage` provenance badges.
+2. **Display-layer viz upgrades** — full spec + rationale table in
+   `docs/DASHBOARD_MIGRATION.md` ("Display-layer viz upgrades"). Keep 0–100 + tiers as the
+   headline (decomposable + legible); layer around it. **Now-doable** (fields already
+   populated by the critic/stubs):
+   - 🔴 **Provenance band on `HeroCurve`** — confidence band + projected-vs-verified
+     (dashed/solid) from `score_type` / `evidence_coverage` / `confidence`.
+   - 🔴 **`CategoryTrajectory`** — stacked-area / bump chart of the 6 `category_breakdown`
+     across generations (the *causal* climb — which lever moved, not just the total).
+   - 🔴 **Soften tier cliffs** — gradient bands, not a step-change at 84→85.
+
+   **Gated on Eng-1 producers:**
+   - 🟡 **Proxy-vs-truth panel** — predicted `total_score` vs `outcome` APV/views + a
+     calibration line (log / percentile axis). Needs outcome ingestion.
+   - 🟡 **Candidate-batch view** — ranked dot-plot / slopegraph of the K `candidates`
+     (relative encoding). Needs candidate-capture.
+
+   *(Headline stays 0–100 — don't swap for Elo; DECISIONS D18.)*
 
 ---
 
