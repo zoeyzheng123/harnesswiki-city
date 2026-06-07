@@ -19,8 +19,9 @@ that get better every generation.
 
 ## What's in this repo
 
-- **Canonical data contracts** as Pydantic (`harness/contracts.py`), mirrored in TypeScript (`src/contracts/index.ts`) for the dashboard, with stubs generated from the models.
+- **Canonical data contracts** as Pydantic (`harness/contracts.py`), mirrored in TypeScript (`src/contracts/index.ts`) for the dashboard, with stubs generated from the models. The schema is a *superset* that serves both the Python loop and the dashboard without breaking either (DECISIONS.md D8).
 - **A control-room dashboard** (Vite + React) that renders the generation arc: score curve, element-weight shift, generation history, and living memory.
+- **Short-form-video-ready contracts** — examples use an AI-founder narrative (matching the dashboard), while the schema also carries Seedance/Tavily fields for the TikTok direction (DECISIONS.md D9–D10).
 - **The full harness design** as docs that double as coordination state for humans and coding agents (see `docs/`).
 
 ## The build (tracked in `docs/STATUS.md`)
@@ -64,7 +65,10 @@ decision has exactly one owner file — see the ownership table in `AGENTS.md`.
 | `docs/ARCHITECTURE.md` | `docs/DATA_CONTRACTS.md` |
 | `docs/DEMO_SCRIPT.md` | `docs/HARNESS_LOOP.md` |
 | `docs/WEAVE_TRACING.md` | `docs/JUDGE_RUBRIC.md` |
-| `DESIGN.md` · `PRODUCT.md` (dashboard) | `docs/AGENT_ROLES.md` · `docs/HARNESS_MEMORY.md` · `docs/STATUS.md` |
+| `DESIGN.md` · `PRODUCT.md` (dashboard) | `docs/AGENT_ROLES.md` · `docs/HARNESS_MEMORY.md` · `docs/STATUS.md` · `docs/DECISIONS.md` |
+
+`docs/DECISIONS.md` is the ADR log (D1–D10) — read it to see why the stack,
+contracts, and merge landed where they did.
 
 ## Sponsor Usage
 
