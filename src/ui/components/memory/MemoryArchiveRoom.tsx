@@ -100,13 +100,16 @@ export function MemoryArchiveRoom({
   const entries = useMemo(() => memoryArchive(records, step), [records, step]);
   const stored = useMemo(() => entries.filter((entry) => entry.status !== "empty"), [entries]);
   const newestStored = stored.length ? stored[stored.length - 1] : undefined;
+  const newestEntry = entries.length ? entries[entries.length - 1] : undefined;
   const currentVersion = lineage[lineage.length - 1]?.version ?? "v0";
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null);
   const [flash, setFlash] = useState<InspectTarget | null>(null);
 
-  const selected = entries.find((entry) => entry.id === selectedId) ?? newestStored ?? null;
+  // Fall back to the newest revealed generation (even a lesson-less one) so an
+  // all-empty archive still shows the window rail + empty slot, not "quiet".
+  const selected = entries.find((entry) => entry.id === selectedId) ?? newestStored ?? newestEntry ?? null;
 
   const closeRef = useRef<HTMLButtonElement>(null);
   const restoreRef = useRef<Element | null>(null);
@@ -115,18 +118,37 @@ export function MemoryArchiveRoom({
   const diffRef = useRef<HTMLDivElement>(null);
   const lessonRef = useRef<HTMLDivElement>(null);
   const lineageRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
 
-  // On open (and as the focus target / revealed set changes), select the focused
-  // generation's belief, else the newest stored lesson.
+  // Keep the latest onClose in a ref so the focus-trap effect can depend on
+  // `open` alone. The parent passes an inline arrow that changes identity on
+  // every render (e.g. each demo-loop tick), which would otherwise tear down
+  // and rebuild the trap mid-session (inert flicker, focus flash).
+  const onCloseRef = useRef(onClose);
   useEffect(() => {
-    if (!open) return;
-    const focusEntry =
-      focusRecord && entries.find((entry) => entry.record.id === focusRecord.id && entry.status !== "empty");
-    const next = focusEntry || (stored.length ? stored[stored.length - 1] : undefined);
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  // Initialize the selection once per open session: the focused generation's
+  // belief (its own entry, even an empty slot), else the newest stored lesson,
+  // else the newest revealed generation. The guard keeps a loop that advances
+  // `step` while the room is open (auto-play) from clobbering the belief the
+  // user is browsing — new generations still join the rail, the selection holds.
+  useEffect(() => {
+    if (!open) {
+      initializedRef.current = false;
+      return;
+    }
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    const focusEntry = focusRecord
+      ? entries.find((entry) => entry.record.id === focusRecord.id)
+      : undefined;
+    const next = focusEntry ?? newestStored ?? newestEntry;
     setSelectedId(next?.id ?? null);
     setHighlightedElement(null);
     setFlash(null);
-  }, [open, focusRecord, entries, stored]);
+  }, [open, focusRecord, entries, newestStored, newestEntry]);
 
   // Focus trap + Escape, mirroring GenerationDetail (inert background, Tab wrap,
   // close-button focus on open, restore focus on close).
@@ -140,7 +162,7 @@ export function MemoryArchiveRoom({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (document.querySelector("[popover]:popover-open")) return;
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key === "Tab" && asideRef.current) {
@@ -171,7 +193,7 @@ export function MemoryArchiveRoom({
       inertTargets.forEach((el) => el.removeAttribute("inert"));
       if (restoreRef.current instanceof HTMLElement) restoreRef.current.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   function handleInspect(target: InspectTarget) {
     const el = { score: scoreRef, diff: diffRef, lesson: lessonRef, lineage: lineageRef }[target].current;
