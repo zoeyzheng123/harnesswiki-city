@@ -124,9 +124,13 @@ function recordStatus(record: GenerationRecord, previous: GenerationRecord | und
   return "ok";
 }
 
+// The wiki/lesson surface describes the harness rewrite, so a refused diff is the
+// salient outcome and must win over a policy / auto-fail flag (a generation can be
+// both, e.g. a policy_flag that causes the refusal). `recordStatus` keeps flag-first
+// because the score/window surfaces are about the content, not the rewrite.
 function lessonStatus(record: GenerationRecord, previous: GenerationRecord | undefined): WikiArchiveEntry["status"] {
-  if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
   if (record.harness_diff && !record.harness_diff.accepted) return "refused";
+  if ((record.score.auto_fails_triggered?.length ?? 0) > 0 || record.score.policy_flag) return "flag";
   if (previous && totalScore(record) < totalScore(previous)) return "review";
   return "ok";
 }
