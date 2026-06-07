@@ -11,7 +11,7 @@ import {
   stateAtGeneration,
 } from "./lib/selectors";
 import { useDemoLoop } from "./lib/useDemoLoop";
-import { dec, pct } from "./lib/format";
+import { tierFor, TIER_LABELS } from "./lib/format";
 import { staggerContainer } from "./styles/motion";
 import { DistrictsHeader } from "./components/DistrictsHeader";
 import { HeroCurve } from "./components/HeroCurve";
@@ -116,13 +116,16 @@ export function App() {
   const best = records.find((r) => r.generation_number === 5);
 
   // Announced to assistive tech on each generation (the visual update is silent otherwise).
-  const liveMessage = currentRecord
-    ? `Generation ${currentRecord.generation_number} of ${total}. ` +
-      `Weighted total ${dec(currentRecord.score.weighted_total)}, win probability ${pct(currentRecord.score.predicted_win_prob ?? 0.5)}. ` +
-      (currentRecord.score.policy_flag
-        ? "Policy flag raised; the proposed harness change was refused."
-        : `Harness updated to ${state.version}.`)
-    : "Idle. Run the loop to generate the first concept.";
+  const liveMessage = (() => {
+    if (!currentRecord) return "Idle. Run the loop to generate the first Short.";
+    const sc = currentRecord.score;
+    const totalScore = sc.total_score ?? Math.round((sc.weighted_total ?? 0) * 100);
+    const af = sc.auto_fails_triggered ?? [];
+    if (af.length > 0) {
+      return `Generation ${currentRecord.generation_number} of ${total}. Auto-fail ${af[0]}: total score overridden to 0.`;
+    }
+    return `Generation ${currentRecord.generation_number} of ${total}. Total score ${totalScore} of 100, ${TIER_LABELS[tierFor(totalScore)]} tier. Harness updated to ${state.version}.`;
+  })();
 
   return (
     <div className="min-h-dvh">

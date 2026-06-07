@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { GenerationRecord, TrendContext } from "../lib/contracts";
-import { dec, elementLabel } from "../lib/format";
+import { elementLabel, pts, tierFor, TIER_LABELS } from "../lib/format";
 
 type DistrictState = "idle" | "active" | "done" | "rejected";
 
@@ -10,7 +10,7 @@ const SWEEP_MS = 280;
 const DISTRICTS = [
   { key: "scout", name: "Trend Scout", role: "reads the signal", color: "var(--color-scout)" },
   { key: "generator", name: "Content Gen", role: "drafts the concept", color: "var(--color-generator)" },
-  { key: "critic", name: "Reward Critic", role: "scores 8 dims", color: "var(--color-critic)" },
+  { key: "critic", name: "Reward Critic", role: "scores out of 100", color: "var(--color-critic)" },
   { key: "meta", name: "Meta-Agent", role: "rewrites the harness", color: "var(--color-meta)" },
 ] as const;
 
@@ -21,8 +21,12 @@ function valueFor(key: string, record: GenerationRecord | null, trend: TrendCont
       return trend ? `${trend.platform} · ${trend.audience}` : "—";
     case "generator":
       return elementLabel(record.concept.format);
-    case "critic":
-      return `wt ${dec(record.score.weighted_total)}`;
+    case "critic": {
+      const af = record.score.auto_fails_triggered ?? [];
+      if (af.length > 0) return `${af[0]} · 0`;
+      const total = record.score.total_score ?? Math.round((record.score.weighted_total ?? 0) * 100);
+      return `${pts(total)} · ${TIER_LABELS[tierFor(total)]}`;
+    }
     case "meta":
       return record.harness_diff?.accepted
         ? `${record.harness_diff.from_version} → ${record.harness_diff.to_version}`
@@ -80,6 +84,7 @@ export function DistrictsHeader({
   }, [record, reduce]);
 
   const rejectedMeta = record?.harness_diff && !record.harness_diff.accepted;
+  const autoFailed = (record?.score.auto_fails_triggered?.length ?? 0) > 0;
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -87,6 +92,7 @@ export function DistrictsHeader({
         let state: DistrictState =
           record === null ? "idle" : i < active ? "done" : i === active ? "active" : "idle";
         if (state === "done" && d.key === "meta" && rejectedMeta) state = "rejected";
+        if ((state === "done" || state === "active") && d.key === "critic" && autoFailed) state = "rejected";
 
         const lit = state === "done" || state === "active" || state === "rejected";
         const accentColor = state === "rejected" ? "var(--color-flag)" : d.color;

@@ -120,6 +120,59 @@ export function GenerationDetail({
                     </div>
                   </div>
                 )}
+                {record.concept.on_screen_text && (
+                  <div className="mt-4">
+                    <MetricLabel>On-screen text</MetricLabel>
+                    <p className="mt-1 font-display text-base text-ink">“{record.concept.on_screen_text}”</p>
+                  </div>
+                )}
+                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted">
+                  {record.concept.dance_style && (
+                    <span>
+                      <span className="text-faint">style </span>
+                      {record.concept.dance_style}
+                    </span>
+                  )}
+                  {record.concept.audio?.name && (
+                    <span>
+                      <span className="text-faint">audio </span>
+                      {record.concept.audio.name}
+                      {record.concept.audio.bpm ? ` · ${record.concept.audio.bpm} bpm` : ""}
+                      {record.concept.audio.is_rising_sound ? " · rising" : ""}
+                    </span>
+                  )}
+                  {record.concept.cut_frequency !== undefined && (
+                    <span>
+                      <span className="text-faint">cuts </span>
+                      {record.concept.cut_frequency}/s
+                    </span>
+                  )}
+                </div>
+                {record.concept.hashtag_set && record.concept.hashtag_set.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {record.concept.hashtag_set.map((h) => (
+                      <span key={h} className="rounded-md bg-surface-1 px-2 py-0.5 font-mono text-xs text-accent">
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {(record.concept.title || record.concept.description) && (
+                  <div className="mt-4 flex flex-col gap-2">
+                    {record.concept.title && (
+                      <div>
+                        <MetricLabel>Title</MetricLabel>
+                        <p className="mt-0.5 text-sm text-ink">{record.concept.title}</p>
+                      </div>
+                    )}
+                    {record.concept.description && (
+                      <div>
+                        <MetricLabel>Description</MetricLabel>
+                        <p className="mt-0.5 text-sm text-muted">{record.concept.description}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="mt-4">
                   <MetricLabel>Script</MetricLabel>
                   <p className="mt-1 text-sm leading-relaxed text-muted">{record.concept.script}</p>

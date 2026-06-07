@@ -82,17 +82,15 @@ export function lineageThroughGeneration(
 
 export type CurvePoint = {
   generation_number: number;
-  weighted_total: number;
-  predicted_win_prob: number;
-  policy_flag: boolean;
+  total_score: number; // 0–100 ACOE total
+  auto_failed: boolean;
 };
 
 export function curvePoints(records: GenerationRecord[]): CurvePoint[] {
   return records.map((r) => ({
     generation_number: r.generation_number,
-    weighted_total: r.score.weighted_total,
-    predicted_win_prob: r.score.predicted_win_prob ?? 0.5,
-    policy_flag: r.score.policy_flag,
+    total_score: r.score.total_score ?? Math.round((r.score.weighted_total ?? 0) * 100),
+    auto_failed: (r.score.auto_fails_triggered?.length ?? 0) > 0,
   }));
 }
 
@@ -107,7 +105,10 @@ export function indexTrends(contexts: TrendContext[]): Map<string, TrendContext>
   return new Map(contexts.map((t) => [t.id, t]));
 }
 
-/** Peak weighted_total across the run so far (for the hero headline). */
-export function peakWeightedTotal(records: GenerationRecord[]): number {
-  return records.reduce((max, r) => Math.max(max, r.score.weighted_total), 0);
+/** Peak total_score across the run so far (for the hero headline). */
+export function peakTotalScore(records: GenerationRecord[]): number {
+  return records.reduce(
+    (max, r) => Math.max(max, r.score.total_score ?? Math.round((r.score.weighted_total ?? 0) * 100)),
+    0,
+  );
 }

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { useCountUp } from "../lib/useCountUp";
-import { signedDelta } from "../lib/format";
+import { signedDelta, TIER_COLOR, TIER_LABELS, type Tier } from "../lib/format";
 import { fadeRise } from "../styles/motion";
 
 /** A small mono, tracked label for the telemetry register. */
@@ -145,6 +145,20 @@ export function DeltaPill({ value, className = "" }: { value: number; className?
   return (
     <span className={`font-mono text-xs tabular-nums ${tone} ${className}`}>
       {signedDelta(value)}
+    </span>
+  );
+}
+
+/** Distribution-tier pill, colored by the ordinal tier ramp. */
+export function TierBadge({ tier, className = "" }: { tier: Tier; className?: string }) {
+  const color = TIER_COLOR[tier];
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[0.6875rem] font-medium tracking-wide uppercase ${className}`}
+      style={{ borderColor: color, color, backgroundColor: `color-mix(in oklch, ${color} 14%, transparent)` }}
+    >
+      <span className="size-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
+      {TIER_LABELS[tier]}
     </span>
   );
 }

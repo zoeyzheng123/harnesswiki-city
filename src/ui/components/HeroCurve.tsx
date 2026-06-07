@@ -1,16 +1,14 @@
-import { useId } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { CurvePoint } from "../lib/selectors";
-import { dec, pct } from "../lib/format";
-import { CountUp, MetricLabel } from "./primitives";
+import { GROWING_AT, VIRAL_AT, TIER_COLOR, pts, signedPts, tierFor } from "../lib/format";
+import { CountUp, MetricLabel, TierBadge } from "./primitives";
 import { DURATION, EASE_OUT_EXPO, springSoft } from "../styles/motion";
 
 const W = 760;
 const H = 300;
-const PAD = { t: 28, r: 30, b: 36, l: 46 };
-const Y_MIN = 0.4;
-const Y_MAX = 0.95;
-const BASELINE = 0.5;
+const PAD = { t: 28, r: 64, b: 36, l: 40 };
+const Y_MIN = 0;
+const Y_MAX = 100;
 
 const INNER_W = W - PAD.l - PAD.r;
 const INNER_H = H - PAD.t - PAD.b;
@@ -26,14 +24,6 @@ function yFor(v: number): number {
 function linePath(coords: { x: number; y: number }[]): string {
   return coords.map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(" ");
 }
-function areaPath(coords: { x: number; y: number }[]): string {
-  if (coords.length === 0) return "";
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  if (!first || !last) return "";
-  const base = H - PAD.b;
-  return `${linePath(coords)} L ${last.x.toFixed(1)} ${base} L ${first.x.toFixed(1)} ${base} Z`;
-}
 
 export function HeroCurve({
   points,
@@ -44,64 +34,66 @@ export function HeroCurve({
   revealed: number;
   total: number;
 }) {
-  const gid = useId().replace(/:/g, "");
   const reduce = useReducedMotion();
   const shown = points.slice(0, revealed);
   const latest = shown[shown.length - 1];
+  const prev = shown[shown.length - 2];
 
-  const win = (p: CurvePoint) => ({ x: xFor(p.generation_number, total), y: yFor(p.predicted_win_prob) });
-  const wt = (p: CurvePoint) => ({ x: xFor(p.generation_number, total), y: yFor(p.weighted_total) });
-  const winCoords = shown.map(win);
-  const wtCoords = shown.map(wt);
+  const xy = (p: CurvePoint) => ({ x: xFor(p.generation_number, total), y: yFor(p.total_score) });
+  const coords = shown.map(xy);
 
-  const winLatest = latest ? latest.predicted_win_prob : BASELINE;
-  const delta = winLatest - BASELINE;
+  const score = latest ? latest.total_score : 0;
+  const tier = tierFor(score);
+  const delta = latest && prev ? latest.total_score - prev.total_score : null;
 
-  const gridLines = [0.5, 0.6, 0.7, 0.8, 0.9];
+  const bands: { from: number; to: number; color: string; opacity: number }[] = [
+    { from: 0, to: GROWING_AT, color: "var(--color-negative)", opacity: 0.07 },
+    { from: GROWING_AT, to: VIRAL_AT, color: "var(--color-critic)", opacity: 0.07 },
+    { from: VIRAL_AT, to: 100, color: "var(--color-positive)", opacity: 0.08 },
+  ];
+  const thresholds = [
+    { at: GROWING_AT, label: "growing", color: "var(--color-critic)" },
+    { at: VIRAL_AT, label: "viral", color: "var(--color-positive)" },
+  ];
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-line/80 bg-surface-0/70 p-5 backdrop-blur-sm sm:p-6" style={{ boxShadow: "var(--glow-soft)" }}>
-      {/* Headline readout */}
+    <div
+      className="relative overflow-hidden rounded-xl border border-line/80 bg-surface-0/70 p-5 backdrop-blur-sm sm:p-6"
+      style={{ boxShadow: "var(--glow-soft)" }}
+    >
+      {/* Headline */}
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div>
-          <MetricLabel>Predicted win probability</MetricLabel>
+          <MetricLabel>Total score</MetricLabel>
           <div className="mt-1 flex items-baseline gap-3">
-            <span className="font-mono text-5xl text-primary-bright tabular-nums sm:text-6xl">
-              {latest ? <CountUp value={winLatest} format={pct} /> : "—"}
+            <span className="font-mono text-5xl tabular-nums sm:text-6xl" style={{ color: latest ? TIER_COLOR[tier] : "var(--color-muted)" }}>
+              {latest ? <CountUp value={score} format={pts} /> : "—"}
+              <span className="text-2xl text-faint">/100</span>
             </span>
             {latest ? (
-              <span
-                className={`font-mono text-sm tabular-nums ${delta >= 0 ? "text-positive" : "text-negative"}`}
-              >
-                {delta >= 0 ? "▲" : "▼"} {delta >= 0 ? "+" : "−"}
-                {Math.abs(delta).toFixed(2).replace(/^0/, "")} vs baseline
+              <span className="flex flex-col gap-1.5">
+                <TierBadge tier={tier} />
+                {delta !== null && (
+                  <span className={`font-mono text-xs tabular-nums ${delta >= 0 ? "text-positive" : "text-negative"}`}>
+                    {delta >= 0 ? "▲" : "▼"} {signedPts(delta)} from gen {prev?.generation_number}
+                  </span>
+                )}
               </span>
             ) : (
               <span className="font-mono text-sm text-faint">awaiting first generation</span>
             )}
           </div>
         </div>
-        <div className="flex items-end gap-6">
-          <div className="text-right">
-            <MetricLabel>Weighted total</MetricLabel>
-            <div className="mt-1 font-mono text-3xl text-accent tabular-nums">
-              {latest ? <CountUp value={latest.weighted_total} format={(n) => dec(n)} /> : "—"}
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="flex items-center gap-2 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
-              <svg width="18" height="6" aria-hidden="true">
-                <line x1="0" y1="3" x2="18" y2="3" stroke="var(--color-primary-bright)" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-              win prob
-            </span>
-            <span className="flex items-center gap-2 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
-              <svg width="18" height="6" aria-hidden="true">
-                <line x1="0" y1="3" x2="18" y2="3" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="4 3" />
-              </svg>
-              weighted total
-            </span>
-          </div>
+        <div className="flex flex-col gap-1.5 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
+          <span className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-positive" /> viral 85+
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-critic" /> growing 65+
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-negative" /> seed jail
+          </span>
         </div>
       </div>
 
@@ -112,82 +104,72 @@ export function HeroCurve({
         style={{ height: "auto" }}
         role="img"
         aria-label={
-          `Score curve across ${total} generations. ` +
+          `ACOE total score across ${total} generations. ` +
           (latest
-            ? `Generation ${latest.generation_number}: win probability ${pct(latest.predicted_win_prob)} (solid line), weighted total ${dec(latest.weighted_total)} (dashed line), versus a 0.50 baseline.`
+            ? `Generation ${latest.generation_number}: ${pts(score)} of 100, ${tier === "seed_jail" ? "seed jail" : tier} tier.`
             : "Awaiting the first generation.") +
-          (shown.some((p) => p.policy_flag)
-            ? " One generation was policy-flagged and its harness change was refused."
+          (shown.some((p) => p.auto_failed)
+            ? " One generation auto-failed (AF-01) and its total was overridden to 0."
             : "")
         }
       >
-        <defs>
-          <linearGradient id={`area-${gid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="var(--color-primary)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
+        {/* tier bands */}
+        {bands.map((b) => (
+          <rect
+            key={b.from}
+            x={PAD.l}
+            width={INNER_W}
+            y={yFor(b.to)}
+            height={yFor(b.from) - yFor(b.to)}
+            fill={b.color}
+            opacity={b.opacity}
+          />
+        ))}
 
-        {/* gridlines + y labels */}
-        {gridLines.map((g) => (
-          <g key={g}>
-            <line
-              x1={PAD.l}
-              x2={W - PAD.r}
-              y1={yFor(g)}
-              y2={yFor(g)}
-              stroke="var(--color-line)"
-              strokeOpacity={g === BASELINE ? 0 : 0.4}
-              strokeWidth={1}
-            />
-            <text x={PAD.l - 10} y={yFor(g) + 3} textAnchor="end" className="fill-faint font-mono" style={{ fontSize: 11 }}>
-              {dec(g, 1)}
+        {/* y labels at 0 / 100 */}
+        {[0, 100].map((g) => (
+          <text key={g} x={PAD.l - 8} y={yFor(g) + 3} textAnchor="end" className="fill-faint font-mono" style={{ fontSize: 11 }}>
+            {g}
+          </text>
+        ))}
+
+        {/* tier thresholds */}
+        {thresholds.map((t) => (
+          <g key={t.at}>
+            <line x1={PAD.l} x2={W - PAD.r} y1={yFor(t.at)} y2={yFor(t.at)} stroke={t.color} strokeOpacity={0.55} strokeWidth={1} strokeDasharray="2 5" />
+            <text x={W - PAD.r + 6} y={yFor(t.at) + 3} className="font-mono" style={{ fontSize: 10, fill: t.color, letterSpacing: "0.04em" }}>
+              {t.label}
+            </text>
+            <text x={W - PAD.r + 6} y={yFor(t.at) + 14} className="fill-faint font-mono" style={{ fontSize: 9 }}>
+              {t.at}
             </text>
           </g>
         ))}
 
-        {/* baseline at 0.50 */}
-        <line x1={PAD.l} x2={W - PAD.r} y1={yFor(BASELINE)} y2={yFor(BASELINE)} stroke="var(--color-muted)" strokeOpacity={0.5} strokeWidth={1} strokeDasharray="2 5" />
-        <text x={W - PAD.r} y={yFor(BASELINE) - 7} textAnchor="end" className="fill-muted font-mono" style={{ fontSize: 10, letterSpacing: "0.08em" }}>
-          BASELINE 0.50
-        </text>
-
-        {/* x labels: all generation slots, dim for the future */}
+        {/* x labels */}
         {Array.from({ length: total }, (_, i) => i + 1).map((g) => (
           <text
             key={g}
             x={xFor(g, total)}
             y={H - PAD.b + 22}
             textAnchor="middle"
-            className={g <= revealed ? "fill-muted font-mono" : "fill-faint font-mono"}
+            className="fill-faint font-mono"
             style={{ fontSize: 11, opacity: g <= revealed ? 1 : 0.5 }}
           >
             g{g}
           </text>
         ))}
 
-        {/* empty state: ghost the full win-prob arc so the climb is previewed before the first click */}
+        {/* empty-state ghost arc + hint */}
         {shown.length === 0 && points.length > 0 && (
           <g aria-hidden="true">
-            <path
-              d={linePath(points.map(win))}
-              fill="none"
-              stroke="var(--color-primary-bright)"
-              strokeOpacity={0.16}
-              strokeWidth={2}
-              strokeDasharray="2 6"
-              strokeLinecap="round"
-            />
+            <path d={linePath(points.map(xy))} fill="none" stroke="var(--color-primary-bright)" strokeOpacity={0.16} strokeWidth={2} strokeDasharray="2 6" strokeLinecap="round" />
             {points.map((p) => {
-              const c = win(p);
-              return (
-                <circle key={`ghost-${p.generation_number}`} cx={c.x} cy={c.y} r={2.5} fill="var(--color-primary-bright)" opacity={0.22} />
-              );
+              const c = xy(p);
+              return <circle key={`ghost-${p.generation_number}`} cx={c.x} cy={c.y} r={2.5} fill="var(--color-primary-bright)" opacity={0.22} />;
             })}
           </g>
         )}
-
-        {/* empty-state hint */}
         {shown.length === 0 && (
           <text
             x={PAD.l + INNER_W / 2}
@@ -200,28 +182,10 @@ export function HeroCurve({
           </text>
         )}
 
-        {/* area under win-prob */}
-        {winCoords.length > 0 && <path d={areaPath(winCoords)} fill={`url(#area-${gid})`} />}
-
-        {/* weighted_total line (accent, dashed — distinct from win-prob by line style,
-            not hue alone, so the two series read apart for colorblind viewers) */}
-        {wtCoords.length > 0 && (
-          <path
-            d={linePath(wtCoords)}
-            fill="none"
-            stroke="var(--color-accent)"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray="7 5"
-            strokeOpacity={0.9}
-          />
-        )}
-
-        {/* predicted_win_prob line (primary) */}
-        {winCoords.length > 0 && (
+        {/* total_score line */}
+        {coords.length > 0 && (
           <motion.path
-            d={linePath(winCoords)}
+            d={linePath(coords)}
             fill="none"
             stroke="var(--color-primary-bright)"
             strokeWidth={2.5}
@@ -234,20 +198,18 @@ export function HeroCurve({
           />
         )}
 
-        {/* markers */}
+        {/* markers (auto-fail = flag ring + flag fill at the crater) */}
         {shown.map((p, i) => {
-          const c = win(p);
+          const c = xy(p);
           const isLatest = i === shown.length - 1;
           return (
-            <g key={`win-${p.generation_number}`}>
-              {p.policy_flag && (
-                <circle cx={c.x} cy={c.y} r={11} fill="none" stroke="var(--color-flag)" strokeWidth={1.5} strokeOpacity={0.8} />
-              )}
+            <g key={`pt-${p.generation_number}`}>
+              {p.auto_failed && <circle cx={c.x} cy={c.y} r={11} fill="none" stroke="var(--color-flag)" strokeWidth={1.5} strokeOpacity={0.85} />}
               <motion.circle
                 cx={c.x}
                 cy={c.y}
                 r={isLatest ? 6 : 4}
-                fill={p.policy_flag ? "var(--color-flag)" : "var(--color-primary-bright)"}
+                fill={p.auto_failed ? "var(--color-flag)" : "var(--color-primary-bright)"}
                 stroke="var(--color-bg)"
                 strokeWidth={2}
                 initial={isLatest ? { scale: 0 } : false}
@@ -257,47 +219,18 @@ export function HeroCurve({
             </g>
           );
         })}
-        {shown.map((p, i) => {
-          const c = wt(p);
-          const isLatest = i === shown.length - 1;
-          return (
-            <motion.circle
-              key={`wt-${p.generation_number}`}
-              cx={c.x}
-              cy={c.y}
-              r={isLatest ? 4.5 : 3}
-              fill="var(--color-bg)"
-              stroke="var(--color-accent)"
-              strokeWidth={2}
-              initial={isLatest ? { scale: 0 } : false}
-              animate={{ scale: 1 }}
-              transition={springSoft}
-            />
-          );
-        })}
-        {/* direct end-labels: name each series at its leading point so the
-            encoding never depends on matching colors to the corner legend */}
+
+        {/* end-label */}
         {latest && (
-          <>
-            <text
-              x={wt(latest).x - 9}
-              y={wt(latest).y - 9}
-              textAnchor="end"
-              className="fill-accent font-mono"
-              style={{ fontSize: 11, fontWeight: 600, paintOrder: "stroke", stroke: "var(--color-bg)", strokeWidth: 3 }}
-            >
-              wt {dec(latest.weighted_total)}
-            </text>
-            <text
-              x={win(latest).x - 9}
-              y={win(latest).y + 16}
-              textAnchor="end"
-              className="fill-primary-bright font-mono"
-              style={{ fontSize: 11, fontWeight: 600, paintOrder: "stroke", stroke: "var(--color-bg)", strokeWidth: 3 }}
-            >
-              win {pct(latest.predicted_win_prob)}
-            </text>
-          </>
+          <text
+            x={xy(latest).x - 9}
+            y={yFor(latest.total_score) - 10}
+            textAnchor="end"
+            className="font-mono"
+            style={{ fontSize: 11, fontWeight: 600, fill: TIER_COLOR[tier], paintOrder: "stroke", stroke: "var(--color-bg)", strokeWidth: 3 }}
+          >
+            score {pts(latest.total_score)}
+          </text>
         )}
       </svg>
     </div>

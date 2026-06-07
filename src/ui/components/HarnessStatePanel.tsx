@@ -60,7 +60,7 @@ export function HarnessStatePanel({
       <PromptBlock label="Script prompt" value={current.script_prompt} />
 
       <div>
-        <MetricLabel>Policy rules</MetricLabel>
+        <MetricLabel>Auto-fail rules</MetricLabel>
         <ul className="mt-1.5 flex flex-col gap-1">
           {current.policy_rules.map((rule, i) => (
             <li key={i} className="flex gap-2 text-xs leading-relaxed text-muted">

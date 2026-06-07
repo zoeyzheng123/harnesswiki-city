@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import type { Ref } from "react";
 import type { GenerationRecord } from "../lib/contracts";
 import { videoForRecord } from "../lib/videos";
-import { dec, elementLabel, pct, signedDelta } from "../lib/format";
-import { MetricLabel, Panel } from "./primitives";
+import { elementLabel, pts, signedPts, tierFor } from "../lib/format";
+import { MetricLabel, Panel, TierBadge } from "./primitives";
 import { VideoPlayer, type VideoPlayerHandle } from "./VideoPlayer";
 
 function ScoreChip({ label, value, tone }: { label: string; value: string; tone: string }) {
@@ -27,6 +27,8 @@ function Side({
   playerRef: Ref<VideoPlayerHandle>;
 }) {
   const video = videoForRecord(record);
+  const total = record.score.total_score ?? Math.round((record.score.weighted_total ?? 0) * 100);
+  const tier = tierFor(total);
   return (
     <div className="flex flex-col gap-4 sm:flex-row">
       <div className="mx-auto w-40 shrink-0 sm:mx-0">
@@ -36,9 +38,9 @@ function Side({
         <MetricLabel>
           Generation {record.generation_number} · {label}
         </MetricLabel>
-        <div className="flex flex-wrap gap-1.5">
-          <ScoreChip label="wt" value={dec(record.score.weighted_total)} tone="text-accent" />
-          <ScoreChip label="win" value={pct(record.score.predicted_win_prob ?? 0.5)} tone="text-primary-bright" />
+        <div className="flex flex-wrap items-center gap-1.5">
+          <ScoreChip label="score" value={pts(total)} tone="text-ink" />
+          <TierBadge tier={tier} />
           <span className="rounded-md border border-line px-2 py-0.5 font-mono text-xs text-muted">
             {elementLabel(record.concept.format)}
           </span>
@@ -84,8 +86,11 @@ export function OutputCompare({
   const bestRef = useRef<VideoPlayerHandle>(null);
   const [playingBoth, setPlayingBoth] = useState(false);
 
-  const winDelta = (best.score.predicted_win_prob ?? 0.5) - (baseline.score.predicted_win_prob ?? 0.5);
-  const wtDelta = best.score.weighted_total - baseline.score.weighted_total;
+  const baseTotal = baseline.score.total_score ?? Math.round((baseline.score.weighted_total ?? 0) * 100);
+  const bestTotal = best.score.total_score ?? Math.round((best.score.weighted_total ?? 0) * 100);
+  const scoreDelta = bestTotal - baseTotal;
+  const baseTier = tierFor(baseTotal);
+  const bestTier = tierFor(bestTotal);
 
   const playBoth = () => {
     if (!bestUnlocked) return;
@@ -118,12 +123,18 @@ export function OutputCompare({
           >
             {playingBoth ? "Pause both" : "Play both"}
           </button>
-          <div className="text-center font-mono text-sm tabular-nums">
-            <div className="text-positive">▲ {signedDelta(winDelta)} <span className="text-faint">win</span></div>
-            <div className="text-positive">▲ {signedDelta(wtDelta)} <span className="text-faint">wt</span></div>
+          <div className="flex flex-col items-center gap-2 font-mono text-sm tabular-nums">
+            <div className="text-positive">
+              ▲ {signedPts(scoreDelta)} <span className="text-faint">score</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <TierBadge tier={baseTier} />
+              <span className="text-faint">→</span>
+              <TierBadge tier={bestTier} />
+            </div>
           </div>
           <p className="max-w-[15rem] text-center text-xs leading-relaxed text-muted">
-            Same audience, five generations apart: a sharper hook, the listicle bias gone, win probability up.
+            Same sound, five generations apart: a peak-motion open, a seamless loop, and a question worth arguing about.
           </p>
         </div>
 
