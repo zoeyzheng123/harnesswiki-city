@@ -76,24 +76,33 @@ export function CriticLearning({
           <MetricLabel>Suggested → applied</MetricLabel>
           <div className="mt-1.5 flex flex-col gap-1.5">
             {suggestedEntries.map(([key, delta]) => {
-              const wasApplied = Object.prototype.hasOwnProperty.call(applied, key);
+              const appliedDelta = applied[key];
+              const diverged = appliedDelta !== undefined && appliedDelta !== delta;
               return (
-                <div key={key} className="flex items-center gap-3 text-sm">
+                <div key={key} className="flex items-center gap-2.5 text-sm">
                   <span className="min-w-0 flex-1 truncate text-muted">{elementLabel(key)}</span>
                   <span
-                    className={`w-10 text-right font-mono text-xs tabular-nums ${delta > 0 ? "text-positive" : delta < 0 ? "text-negative" : "text-faint"}`}
+                    className={`w-12 text-right font-mono text-xs tabular-nums ${delta > 0 ? "text-positive" : delta < 0 ? "text-negative" : "text-faint"}`}
                   >
                     {signedDelta(delta)}
                   </span>
+                  <span className="font-mono text-xs text-faint">→</span>
                   <span
-                    className={`w-20 text-right font-mono text-[0.625rem] tracking-wide uppercase ${wasApplied ? "text-positive" : "text-faint"}`}
+                    className={`w-28 text-right font-mono text-xs tabular-nums ${appliedDelta === undefined ? "text-faint" : diverged ? "text-accent" : "text-positive"}`}
                   >
-                    {wasApplied ? "✓ applied" : "not applied"}
+                    {appliedDelta === undefined
+                      ? "not applied"
+                      : `${signedDelta(appliedDelta)}${diverged ? " amplified" : ""}`}
                   </span>
                 </div>
               );
             })}
           </div>
+          {suggestedEntries.some(([k, d]) => applied[k] !== undefined && applied[k] !== d) && (
+            <p className="mt-2 text-xs leading-relaxed text-muted">
+              The meta-agent set its own magnitude where it amplified the critic's suggestion.
+            </p>
+          )}
         </div>
       )}
     </div>

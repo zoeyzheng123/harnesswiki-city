@@ -1,6 +1,16 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { CurvePoint } from "../lib/selectors";
-import { GROWING_AT, VIRAL_AT, TIER_COLOR, pts, signedPts, tierFor } from "../lib/format";
+import {
+  CATEGORY_LABELS,
+  GROWING_AT,
+  VIRAL_AT,
+  TIER_COLOR,
+  humanize,
+  pts,
+  signedPts,
+  tierFor,
+  type CategoryKey,
+} from "../lib/format";
 import { CountUp, MetricLabel, TierBadge } from "./primitives";
 import { DURATION, EASE_OUT_EXPO, springSoft } from "../styles/motion";
 
@@ -24,6 +34,41 @@ function yFor(v: number): number {
 function linePath(coords: { x: number; y: number }[]): string {
   return coords.map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(" ");
 }
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+function categoryLabel(key: string | undefined): string {
+  if (!key) return "rubric ceiling";
+  return CATEGORY_LABELS[key as CategoryKey] ?? humanize(key);
+}
+function beatFor(point: CurvePoint, prev: CurvePoint | undefined): { title: string; detail: string; color: string } {
+  if (point.auto_failed) {
+    return {
+      title: point.auto_fail_code ?? "auto-fail",
+      detail: "score override",
+      color: "var(--color-flag)",
+    };
+  }
+  if (prev?.auto_failed) {
+    return { title: "recovery", detail: "auto-fail cleared", color: "var(--color-positive)" };
+  }
+  if (point.total_score >= VIRAL_AT) {
+    const delta = prev ? point.total_score - prev.total_score : 0;
+    return {
+      title: "viral tier",
+      detail: delta ? `${signedPts(delta)} after rewrite` : "cleared 85",
+      color: "var(--color-positive)",
+    };
+  }
+  if (prev && prev.total_score < GROWING_AT && point.total_score >= GROWING_AT) {
+    return { title: "growing tier", detail: "crossed 65", color: "var(--color-critic)" };
+  }
+  return {
+    title: point.generation_number === 1 ? "baseline" : "ceiling",
+    detail: categoryLabel(point.lowest_scoring_category),
+    color: point.generation_number === 1 ? "var(--color-primary-bright)" : "var(--color-critic)",
+  };
+}
 
 export function HeroCurve({
   points,
@@ -45,6 +90,7 @@ export function HeroCurve({
   const score = latest ? latest.total_score : 0;
   const tier = tierFor(score);
   const delta = latest && prev ? latest.total_score - prev.total_score : null;
+  const latestBeat = latest ? beatFor(latest, prev) : null;
 
   const bands: { from: number; to: number; color: string; opacity: number }[] = [
     { from: 0, to: GROWING_AT, color: "var(--color-negative)", opacity: 0.07 },
@@ -74,8 +120,8 @@ export function HeroCurve({
               <span className="flex flex-col gap-1.5">
                 <TierBadge tier={tier} />
                 {delta !== null && (
-                  <span className={`font-mono text-xs tabular-nums ${delta >= 0 ? "text-positive" : "text-negative"}`}>
-                    {delta >= 0 ? "▲" : "▼"} {signedPts(delta)} from gen {prev?.generation_number}
+                  <span className={`font-mono text-xs tabular-nums ${delta > 0 ? "text-positive" : delta < 0 ? "text-negative" : "text-faint"}`}>
+                    {delta > 0 ? "▲" : delta < 0 ? "▼" : "·"} {delta === 0 ? "unchanged" : signedPts(delta)} from gen {prev?.generation_number}
                   </span>
                 )}
               </span>
@@ -83,6 +129,14 @@ export function HeroCurve({
               <span className="font-mono text-sm text-faint">awaiting first generation</span>
             )}
           </div>
+          {latestBeat && (
+            <p className="mt-2 max-w-xl text-sm text-muted">
+              <span className="font-mono text-xs text-faint">current beat: </span>
+              <span className="text-ink">{latestBeat.title}</span>
+              <span className="text-faint"> · </span>
+              {latestBeat.detail}
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1.5 font-mono text-[0.6875rem] tracking-wide text-muted uppercase">
           <span className="flex items-center gap-2">
@@ -160,26 +214,28 @@ export function HeroCurve({
           </text>
         ))}
 
-        {/* empty-state ghost arc + hint */}
-        {shown.length === 0 && points.length > 0 && (
-          <g aria-hidden="true">
-            <path d={linePath(points.map(xy))} fill="none" stroke="var(--color-primary-bright)" strokeOpacity={0.16} strokeWidth={2} strokeDasharray="2 6" strokeLinecap="round" />
-            {points.map((p) => {
-              const c = xy(p);
-              return <circle key={`ghost-${p.generation_number}`} cx={c.x} cy={c.y} r={2.5} fill="var(--color-primary-bright)" opacity={0.22} />;
-            })}
-          </g>
-        )}
         {shown.length === 0 && (
-          <text
-            x={PAD.l + INNER_W / 2}
-            y={PAD.t + INNER_H / 2}
-            textAnchor="middle"
-            className="fill-muted font-mono"
-            style={{ fontSize: 13, letterSpacing: "0.12em", paintOrder: "stroke", stroke: "var(--color-surface-0)", strokeWidth: 5 }}
-          >
-            press “Run loop” to watch the score climb
-          </text>
+          <g aria-hidden="true">
+            {points.map((p) => (
+              <circle
+                key={`dormant-${p.generation_number}`}
+                cx={xy(p).x}
+                cy={yFor(0)}
+                r={2}
+                fill="var(--color-primary-bright)"
+                opacity={0.18}
+              />
+            ))}
+            <text
+              x={PAD.l + INNER_W / 2}
+              y={PAD.t + INNER_H / 2}
+              textAnchor="middle"
+              className="fill-muted font-mono"
+              style={{ fontSize: 13, letterSpacing: "0.12em", paintOrder: "stroke", stroke: "var(--color-surface-0)", strokeWidth: 5 }}
+            >
+              press “Run loop” to reveal each generation
+            </text>
+          </g>
         )}
 
         {/* total_score line */}
@@ -216,6 +272,36 @@ export function HeroCurve({
                 animate={{ scale: 1 }}
                 transition={springSoft}
               />
+            </g>
+          );
+        })}
+
+        {/* causal labels: what changed at this point in the run */}
+        {shown.map((p, i) => {
+          const c = xy(p);
+          const beat = beatFor(p, shown[i - 1]);
+          const labelW = 116;
+          const labelH = 32;
+          const labelX = clamp(c.x - labelW / 2, PAD.l + 2, W - PAD.r - labelW - 4);
+          const labelY = c.y < PAD.t + 54 ? c.y + 14 : c.y - labelH - 14;
+          return (
+            <g key={`beat-${p.generation_number}`} opacity={i === shown.length - 1 ? 1 : 0.78}>
+              <rect
+                x={labelX}
+                y={labelY}
+                width={labelW}
+                height={labelH}
+                rx={6}
+                fill="var(--color-bg)"
+                stroke={beat.color}
+                strokeOpacity={i === shown.length - 1 ? 0.8 : 0.42}
+              />
+              <text x={labelX + 8} y={labelY + 13} className="font-mono" style={{ fontSize: 9, fill: beat.color, letterSpacing: "0.04em" }}>
+                g{p.generation_number} · {beat.title}
+              </text>
+              <text x={labelX + 8} y={labelY + 25} className="fill-muted font-mono" style={{ fontSize: 9 }}>
+                {beat.detail}
+              </text>
             </g>
           );
         })}

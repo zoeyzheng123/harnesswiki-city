@@ -84,6 +84,8 @@ export type CurvePoint = {
   generation_number: number;
   total_score: number; // 0–100 ACOE total
   auto_failed: boolean;
+  auto_fail_code?: string;
+  lowest_scoring_category?: string;
 };
 
 export function curvePoints(records: GenerationRecord[]): CurvePoint[] {
@@ -91,6 +93,8 @@ export function curvePoints(records: GenerationRecord[]): CurvePoint[] {
     generation_number: r.generation_number,
     total_score: r.score.total_score ?? Math.round((r.score.weighted_total ?? 0) * 100),
     auto_failed: (r.score.auto_fails_triggered?.length ?? 0) > 0,
+    auto_fail_code: r.score.auto_fails_triggered?.[0],
+    lowest_scoring_category: r.score.lowest_scoring_category,
   }));
 }
 

@@ -12,6 +12,7 @@ import {
   type Tier,
 } from "../lib/format";
 import { Badge, MetricLabel, TierBadge } from "./primitives";
+import { RubricHelp } from "./RubricHelp";
 
 function CategoryRow({
   catKey,
@@ -57,7 +58,10 @@ export function ScoreDimensions({ score }: { score: RewardScore }) {
     <div>
       <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
         <div>
-          <MetricLabel>Total score</MetricLabel>
+          <div className="flex items-center gap-1.5">
+            <MetricLabel>Total score</MetricLabel>
+            <RubricHelp />
+          </div>
           <div className="mt-0.5 font-mono text-2xl tabular-nums" style={{ color: TIER_COLOR[tier] }}>
             {pts(total)}
             <span className="text-base text-faint">/100</span>

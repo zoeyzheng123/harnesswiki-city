@@ -51,22 +51,21 @@ function Side({
   );
 }
 
-function LockedBest({ generationNumber }: { generationNumber: number }) {
+function WaitingComparison({ nextGeneration }: { nextGeneration: number }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row">
       <div className="mx-auto grid aspect-[9/16] w-40 shrink-0 place-items-center rounded-xl border border-dashed border-line bg-surface-1/40 p-3 text-center sm:mx-0">
         <div>
           <svg width="22" height="22" viewBox="0 0 24 24" className="mx-auto text-faint" fill="none" aria-hidden="true">
-            <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.6" />
-            <path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" strokeWidth="1.6" />
+            <path d="M4 12h16M14 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <p className="mt-2 font-mono text-[0.625rem] text-faint">reach gen {generationNumber}</p>
+          <p className="mt-2 font-mono text-[0.625rem] text-faint">step to gen {nextGeneration}</p>
         </div>
       </div>
       <div className="flex min-w-0 flex-col justify-center gap-2">
-        <MetricLabel>Generation {generationNumber} · best</MetricLabel>
+        <MetricLabel>Current comparison pending</MetricLabel>
         <p className="text-sm leading-snug text-muted">
-          The improved cut unlocks as the harness climbs. Run the loop to generation {generationNumber}.
+          The first cut establishes the baseline. Step once to compare the next output against it.
         </p>
       </div>
     </div>
@@ -75,40 +74,56 @@ function LockedBest({ generationNumber }: { generationNumber: number }) {
 
 export function OutputCompare({
   baseline,
+  current,
   best,
   bestUnlocked,
 }: {
   baseline: GenerationRecord;
+  current: GenerationRecord;
   best: GenerationRecord;
   bestUnlocked: boolean;
 }) {
   const baseRef = useRef<VideoPlayerHandle>(null);
-  const bestRef = useRef<VideoPlayerHandle>(null);
+  const comparisonRef = useRef<VideoPlayerHandle>(null);
   const [playingBoth, setPlayingBoth] = useState(false);
 
+  const comparison = bestUnlocked ? best : current;
+  const comparisonLabel = bestUnlocked ? "best" : "current";
+  const sameAsBaseline = comparison.id === baseline.id;
   const baseTotal = baseline.score.total_score ?? Math.round((baseline.score.weighted_total ?? 0) * 100);
-  const bestTotal = best.score.total_score ?? Math.round((best.score.weighted_total ?? 0) * 100);
-  const scoreDelta = bestTotal - baseTotal;
+  const comparisonTotal = comparison.score.total_score ?? Math.round((comparison.score.weighted_total ?? 0) * 100);
+  const scoreDelta = comparisonTotal - baseTotal;
   const baseTier = tierFor(baseTotal);
-  const bestTier = tierFor(bestTotal);
+  const comparisonTier = tierFor(comparisonTotal);
+  const canPlayBoth = !sameAsBaseline;
 
   const playBoth = () => {
-    if (!bestUnlocked) return;
+    if (!canPlayBoth) return;
     if (playingBoth) {
       baseRef.current?.pause();
-      bestRef.current?.pause();
+      comparisonRef.current?.pause();
       setPlayingBoth(false);
     } else {
       baseRef.current?.restart();
-      bestRef.current?.restart();
+      comparisonRef.current?.restart();
       setPlayingBoth(true);
     }
   };
 
   return (
     <Panel
-      title="Output: baseline vs best"
-      subtitle="The short-form video the harness produced, first generation versus last"
+      title={
+        bestUnlocked
+          ? "Output: baseline vs best"
+          : sameAsBaseline
+            ? "Output: first generated cut"
+            : "Output: baseline vs current"
+      }
+      subtitle={
+        bestUnlocked
+          ? "The short-form video the harness produced, first generation versus last"
+          : "The active generation compared with the original baseline"
+      }
     >
       <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-5">
         <Side record={baseline} label="baseline" accent="var(--color-muted)" playerRef={baseRef} />
@@ -117,31 +132,38 @@ export function OutputCompare({
           <button
             type="button"
             onClick={playBoth}
-            disabled={!bestUnlocked}
+            disabled={!canPlayBoth}
             className="rounded-md px-3.5 py-1.5 font-mono text-xs font-semibold tracking-wide text-ink uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-40"
             style={{ backgroundColor: "var(--color-primary)", boxShadow: "0 6px 22px -8px var(--color-primary)" }}
           >
             {playingBoth ? "Pause both" : "Play both"}
           </button>
           <div className="flex flex-col items-center gap-2 font-mono text-sm tabular-nums">
-            <div className="text-positive">
-              ▲ {signedPts(scoreDelta)} <span className="text-faint">score</span>
+            <div className={scoreDelta > 0 ? "text-positive" : scoreDelta < 0 ? "text-negative" : "text-faint"}>
+              {scoreDelta === 0 ? "baseline" : `${scoreDelta > 0 ? "▲" : "▼"} ${signedPts(scoreDelta)}`}{" "}
+              <span className="text-faint">score</span>
             </div>
             <div className="flex items-center gap-1.5">
               <TierBadge tier={baseTier} />
               <span className="text-faint">→</span>
-              <TierBadge tier={bestTier} />
+              <TierBadge tier={comparisonTier} />
             </div>
           </div>
           <p className="max-w-[15rem] text-center text-xs leading-relaxed text-muted">
-            Same sound, five generations apart: a peak-motion open, a seamless loop, and a question worth arguing about.
+            {bestUnlocked
+              ? "Same sound, five generations apart: a peak-motion open, a seamless loop, and a question worth arguing about."
+              : sameAsBaseline
+                ? "The baseline is the reference cut. The next generation shows whether the first rewrite paid off."
+                : "Current output is the receipt for the latest rewrite, before the final best cut is unlocked."}
           </p>
         </div>
 
-        {bestUnlocked ? (
-          <Side record={best} label="best" accent="var(--color-primary)" playerRef={bestRef} />
+        {sameAsBaseline ? (
+          <WaitingComparison nextGeneration={baseline.generation_number + 1} />
+        ) : bestUnlocked ? (
+          <Side record={best} label={comparisonLabel} accent="var(--color-primary)" playerRef={comparisonRef} />
         ) : (
-          <LockedBest generationNumber={best.generation_number} />
+          <Side record={current} label={comparisonLabel} accent="var(--color-primary)" playerRef={comparisonRef} />
         )}
       </div>
     </Panel>

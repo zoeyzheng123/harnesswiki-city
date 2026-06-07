@@ -22,6 +22,7 @@ import { LessonsPanel } from "./components/LessonsPanel";
 import { GenerationDetail } from "./components/GenerationDetail";
 import { DemoLoopControls } from "./components/DemoLoopControls";
 import { OutputCompare } from "./components/OutputCompare";
+import { LearningBridgePanel } from "./components/LearningBridgePanel";
 
 export function App() {
   const [records, setRecords] = useState<GenerationRecord[] | null>(null);
@@ -101,6 +102,7 @@ export function App() {
   }
 
   const currentRecord = step > 0 ? (records[step - 1] ?? null) : null;
+  const previousRecord = step > 1 ? (records[step - 2] ?? null) : null;
   const currentTrend = currentRecord ? trends.get(currentRecord.trend_context_id) : undefined;
   const currentDiff = currentRecord?.harness_diff ?? null;
 
@@ -157,10 +159,20 @@ export function App() {
           <HeroCurve points={curve} revealed={step} total={total} />
         </div>
 
-        {/* Output: baseline vs best video */}
-        {baseline && best && (
+        {/* Cause-and-effect bridge */}
+        <div className="mt-4">
+          <LearningBridgePanel record={currentRecord} previous={previousRecord} />
+        </div>
+
+        {/* Output: generated video evidence */}
+        {baseline && best && currentRecord && (
           <div className="mt-4">
-            <OutputCompare baseline={baseline} best={best} bestUnlocked={step >= best.generation_number} />
+            <OutputCompare
+              baseline={baseline}
+              current={currentRecord}
+              best={best}
+              bestUnlocked={step >= best.generation_number}
+            />
           </div>
         )}
 

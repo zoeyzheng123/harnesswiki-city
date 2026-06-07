@@ -32,12 +32,36 @@ export function GenerationDetail({
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const restoreRef = useRef<Element | null>(null);
+  const asideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!record) return;
     restoreRef.current = document.activeElement;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      // Focus trap: keep Tab / Shift+Tab inside the dialog (ARIA modal contract).
+      if (e.key === "Tab" && asideRef.current) {
+        const focusables = asideRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (!first || !last) return;
+        const active = document.activeElement;
+        if (active instanceof Node && !asideRef.current.contains(active)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first).focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     const id = window.setTimeout(() => closeRef.current?.focus(), 50);
@@ -63,6 +87,7 @@ export function GenerationDetail({
             transition={{ duration: DURATION.fast }}
           />
           <motion.aside
+            ref={asideRef}
             role="dialog"
             aria-modal="true"
             aria-label={`Generation ${record.generation_number} detail`}
