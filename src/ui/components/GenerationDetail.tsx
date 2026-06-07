@@ -81,6 +81,11 @@ export function GenerationDetail({
   }, [record, onClose]);
 
   const video = record ? videoForRecord(record) : undefined;
+  // ACOE v2 moved hashtags under `execution`; fall back to the deprecated
+  // top-level field for not-yet-migrated/real data.
+  const hashtags = record
+    ? (record.concept.execution?.hashtag_set ?? record.concept.hashtag_set)
+    : undefined;
 
   return (
     <AnimatePresence>
@@ -182,9 +187,9 @@ export function GenerationDetail({
                     </span>
                   )}
                 </div>
-                {record.concept.hashtag_set && record.concept.hashtag_set.length > 0 && (
+                {hashtags && hashtags.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
-                    {record.concept.hashtag_set.map((h) => (
+                    {hashtags.map((h) => (
                       <span key={h} className="rounded-md bg-surface-1 px-2 py-0.5 font-mono text-xs text-accent">
                         {h}
                       </span>

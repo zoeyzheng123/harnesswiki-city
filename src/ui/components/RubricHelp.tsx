@@ -40,7 +40,7 @@ export function RubricHelp() {
         className="fixed top-1/2 left-1/2 max-h-[85vh] max-w-[22rem] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-line bg-surface-1 p-5 text-ink backdrop:bg-bg/60"
         style={{ boxShadow: "0 24px 60px -20px oklch(0 0 0 / 0.8)" }}
       >
-        <h3 className="font-display text-base text-ink">ACOE-YT-SHORTS-v1.0</h3>
+        <h3 className="font-display text-base text-ink">ACOE-YT-SHORTS-v2.0</h3>
         <p className="mt-1 text-sm leading-relaxed text-muted">
           A Short scores out of 100, maps to a distribution tier, and is voided by hard auto-fails.
         </p>

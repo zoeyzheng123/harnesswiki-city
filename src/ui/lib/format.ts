@@ -1,5 +1,5 @@
 /**
- * Formatting + label maps for the ACOE-YT-SHORTS-v1.0 rubric.
+ * Formatting + label maps for the ACOE-YT-SHORTS-v2.0 rubric.
  *
  * Three vocabularies are kept in SEPARATE maps and this is the only module that
  * holds any of them, so the conflation DECISIONS.md D3 warns about is
@@ -85,9 +85,9 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
 export const CATEGORY_MAX: Record<CategoryKey, number> = {
   hook_quality: 30,
   retention_and_loop: 25,
-  engagement_bait: 20,
+  engagement_bait: 10,
   visual_production: 15,
-  audio_alignment: 5,
+  audio_alignment: 15,
   metadata: 5,
 };
 
@@ -124,6 +124,7 @@ export const AUTO_FAIL_LABELS: Record<string, string> = {
   "AF-02": "No on-screen text in the first 2s, hook + engagement zeroed",
   "AF-03": "Duration violation (under 13s or over 20s), retention zeroed",
   "AF-04": "No trending audio, audio alignment zeroed",
+  "AF-05": "Brand-safety violation: explicit/unsafe content, total score overridden to 0",
 };
 
 export function autoFailLabel(code: string): string {
@@ -135,6 +136,7 @@ export function autoFailLabel(code: string): string {
 export const ELEMENT_LABELS: Record<string, string> = {
   peak_motion_frame1: "Peak motion (frame 1)",
   seamless_loop: "Seamless loop",
+  delayed_resolution: "Delayed resolution",
   typed_question: "Typed question",
   trending_audio: "Trending audio",
   reflective_outfit: "Reflective outfit",
