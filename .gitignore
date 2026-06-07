@@ -11,3 +11,6 @@ __pycache__/
 # Tool/agent artifacts
 .playwright-mcp/
 .impeccable/
+
+# Synthetic learning data (generated on demand by scripts/synth_outcomes.py)
+data/synthetic/

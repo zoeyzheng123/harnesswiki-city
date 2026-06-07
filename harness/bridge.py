@@ -108,6 +108,8 @@ def map_reward_to_canonical(
             weak_elements=getattr(reward, "weak_elements", None),
             suggested_policy_updates=getattr(reward, "suggested_policy_updates", None),
             rubric_breakdown=getattr(reward, "rubric_breakdown", None),
+            score_type=getattr(reward, "score_type", None),
+            evidence_coverage=getattr(reward, "evidence_coverage", None),
         )
 
     # Stub reward: derive what we can.
@@ -130,6 +132,8 @@ def map_reward_to_canonical(
         scored_at=getattr(reward, "scored_at", None),
         total_score=total,
         distribution_tier=tier,
+        score_type=getattr(reward, "score_type", None),
+        evidence_coverage=getattr(reward, "evidence_coverage", None),
     )
 
 
@@ -180,6 +184,8 @@ def build_canonical_record(
         harness_diff=diff,
         predicted_score=score.weighted_total,
         actual_engagement=lean_record.actual_engagement,
+        outcome=getattr(lean_record, "outcome", None),
+        candidates=getattr(lean_record, "candidates", None),
         rubric_version=lean_record.rubric_version,
         selected=lean_record.selected,
         post_url=lean_record.post_url,

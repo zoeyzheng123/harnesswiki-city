@@ -33,6 +33,7 @@ from harness.contracts import (  # noqa: E402
     HarnessDiff,
     HarnessState,
     Lesson,
+    Outcome,
     RewardScore,
     TrendContext,
     TrendSignal,
@@ -183,6 +184,8 @@ GENERATION_ONE = GenerationRecord(
         },
         lowest_scoring_category="engagement_bait",
         recommended_fix_priority="engagement_bait is the lowest category (6/10) but only 10% of v2 — the higher-marginal levers are retention_and_loop (tighten the delayed-resolution gap, RL-04) and audio_alignment (rising sound, AA-03). Balance overt bait with organic intrigue.",
+        score_type="projected",
+        evidence_coverage=0.78,
     ),
     harness_state_version_before="v0",
     harness_state_version_after="v1",
@@ -208,6 +211,11 @@ GENERATION_ONE = GenerationRecord(
     predicted_score=0.84,
     rubric_version="ACOE-YT-SHORTS-v2.0",
     selected=True,
+    outcome=Outcome(
+        collected_at=t(20, 0), maturity_hours=72.0, platform="youtube_shorts", source="stub",
+        impressions=42000, views=14800, avg_percent_viewed=1.12,
+        likes=2100, comments=380, shares=290, follows=120,
+    ),
 )
 
 

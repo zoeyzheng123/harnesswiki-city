@@ -1121,4 +1121,7 @@ def score_concept(
         weak_elements=weak,
         suggested_policy_updates=deltas,
         rubric_breakdown=result.model_dump(mode="json"),
+        # ── score provenance (Stage 1 / D17) ──
+        score_type=result.score_type,
+        evidence_coverage=result.evidence_coverage,
     )

@@ -31,7 +31,7 @@ Conventions:
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Literal, Optional
 
 import uuid
 from pydantic import BaseModel, Field
@@ -157,6 +157,9 @@ class RewardScore(BaseModel):
     weak_elements: Optional[list[str]] = None
     suggested_policy_updates: Optional[dict[str, float]] = None
     rubric_breakdown: Optional[dict] = None
+    # ── score provenance (Stage 1 / D17): the evidence behind this score ──
+    score_type: Optional[Literal["projected", "verified", "partial"]] = None  # prompt vs rendered evidence
+    evidence_coverage: Optional[float] = Field(default=None, ge=0, le=1)  # fraction with non-projected evidence
 
 
 # 4. HarnessState — the mutable scaffold. Read by C (Generator). Rewritten by A (Meta-agent).
@@ -208,6 +211,36 @@ class Lesson(BaseModel):
     expected_effect: str
 
 
+# the real-world result of a posted concept — the ground truth the proxy is judged against
+# (Stage 1 / DECISIONS.md D17). None until rendered + posted + metrics collected.
+# avg_percent_viewed (APV) is the Shorts loop metric that drives distribution.
+class Outcome(BaseModel):
+    collected_at: datetime = Field(default_factory=_now)
+    maturity_hours: Optional[float] = None  # hours since posting when collected
+    platform: str = "youtube_shorts"
+    source: str = "stub"  # "youtube_api" | "manual" | "synthetic" | "stub"
+    impressions: Optional[int] = None
+    views: Optional[int] = None
+    avg_percent_viewed: Optional[float] = None  # APV (0..1+); >1 means rewatch loops
+    likes: Optional[int] = None
+    comments: Optional[int] = None
+    shares: Optional[int] = None
+    follows: Optional[int] = None
+    retention_curve: Optional[list[float]] = None  # optional per-segment retention
+
+
+# one of the N concepts considered in a generation — the contrastive batch (D17). The loop
+# keeps only the argmax today; persisting all N is the signal for credit assignment +
+# preference learning.
+class Candidate(BaseModel):
+    variant_id: str
+    concept: ContentConcept
+    score: RewardScore
+    selected: bool = False
+    exploration: bool = False  # an exploratory (non-greedy) pick?
+    outcome: Optional[Outcome] = None
+
+
 # 5. GenerationRecord — produced by A (Loop core), persisted as JSON (the "wiki" row).
 #    Render-ready: embeds the concept + score + diff + lesson so the dashboard needs no joins.
 class GenerationRecord(BaseModel):
@@ -229,7 +262,9 @@ class GenerationRecord(BaseModel):
     concept_id: Optional[str] = None  # ≡ concept.id
     harness_id: Optional[str] = None
     predicted_score: Optional[float] = None  # ≡ score.weighted_total
-    actual_engagement: Optional[dict] = None  # {views, likes}; None until posted
+    actual_engagement: Optional[dict] = None  # deprecated (D17) — use `outcome`; legacy {views, likes}
+    outcome: Optional[Outcome] = None  # typed ground truth; None until rendered + posted + collected
+    candidates: Optional[list[Candidate]] = None  # the full per-generation batch (contrastive signal, D17)
     rubric_version: Optional[str] = None
     diff_summary: Optional[str] = None
     selected: bool = True

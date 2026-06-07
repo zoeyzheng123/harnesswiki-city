@@ -73,6 +73,8 @@ class RewardScore(BaseModel):
     #   auto_fails_triggered, category_breakdown, lowest_scoring_category, recommended_fix_priority
     # + critic learning signal (PR #2): winning_elements, weak_elements,
     #   suggested_policy_updates, rubric_breakdown (full criterion-level detail)
+    # + score provenance (D17): score_type ('projected'|'verified'|'partial'),
+    #   evidence_coverage (0..1 — fraction of criteria with non-projected evidence)
 
 class HarnessState(BaseModel):
     id: str; version: str; element_weights: dict; script_prompt: str
@@ -90,12 +92,28 @@ class Lesson(BaseModel):
     id: str; generation_number: int
     observation: str; rule: str; evidence: str; harness_change: str; expected_effect: str
 
+class Outcome(BaseModel):            # ground truth — what the post actually did (D17)
+    collected_at: datetime; maturity_hours: float | None = None
+    platform: str = "youtube_shorts"; source: str = "stub"  # youtube_api|manual|synthetic|stub
+    impressions: int | None = None; views: int | None = None
+    avg_percent_viewed: float | None = None     # APV (0..1+; >1 = rewatch loops) — the Shorts loop metric
+    likes: int | None = None; comments: int | None = None; shares: int | None = None
+    follows: int | None = None; retention_curve: list[float] | None = None
+
+class Candidate(BaseModel):          # one of the N concepts a generation considered (D17)
+    variant_id: str; concept: ContentConcept; score: RewardScore
+    selected: bool = False; exploration: bool = False    # greedy argmax vs exploratory pick
+    outcome: Outcome | None = None
+
 class GenerationRecord(BaseModel):   # render-ready: embeds concept + score
     id: str; generation_number: int; created_at: datetime; trend_context_id: str
     concept: ContentConcept; score: RewardScore
     harness_state_version_before: str; harness_state_version_after: str | None = None
     harness_diff: HarnessDiff | None = None; lesson: Lesson | None = None
-    # + Eng 1: harness_id, predicted_score, actual_engagement, post_url, selected, rubric_version, diff_summary, ...
+    outcome: Outcome | None = None               # ground truth for the selected concept (D17)
+    candidates: list[Candidate] | None = None    # the full contrastive batch (D17)
+    # + Eng 1: harness_id, predicted_score, post_url, selected, rubric_version, diff_summary, ...
+    # actual_engagement: deprecated (D16/D17) -> use `outcome` (legacy {views, likes} dict)
 ```
 
 ## Short-form-video attributes (Eng 1's feature set)
@@ -110,7 +128,7 @@ field on one model:
 | length | `ContentConcept.duration_sec` |
 | audio (BPM, recency, is-rising-sound) | `ContentConcept.audio` (`Audio`); a trend's sound is `TrendContext.audio` + `signals` |
 | hook strength; trend-alignment | the rubric (ACOE categories — `hook_quality`, `audio_alignment`); see `docs/JUDGE_RUBRIC.md` |
-| posting result (engagement, url) | `GenerationRecord.actual_engagement` / `post_url` |
+| posting result (the ground truth) | `GenerationRecord.outcome` (typed `Outcome`; `actual_engagement` deprecated, D17) + `post_url` |
 
 The refined scoring criteria are scoped by `rubric_version` and surface through
 the ACOE `category_breakdown` (six categories) and `rubric_breakdown`, not as
@@ -128,6 +146,29 @@ additively: `total_score` (0–100), `distribution_tier` (viral/growing/seed_jai
 optimizes. The legacy 8 `dimensions` / `RewardDimensions` type were **removed**
 (DECISIONS.md D14) — the dashboard, critic, and stubs use `category_breakdown`
 and tiers.
+
+## Ground truth & the contrastive batch (Stage 1, D17)
+
+The reward critic produces a **proxy** score; `Outcome` is the **ground truth** it
+is judged against. It is `None` until a concept is rendered, posted, and its
+metrics are collected, so it carries `source` (`youtube_api`/`manual`/`synthetic`/`stub`)
+and `maturity_hours` (metrics drift as a post ages). `avg_percent_viewed` (APV) is
+the Shorts loop metric that drives distribution — values `>1` mean rewatch loops.
+
+- **`GenerationRecord.outcome`** holds the result for the *selected* concept;
+  `actual_engagement` (a loose `{views, likes}` dict) is **deprecated (D16/D17)** — use
+  the typed `Outcome` instead. Both stay optional, so the build is unaffected.
+- **`GenerationRecord.candidates`** persists the *full per-generation batch* of N
+  `Candidate`s (each = `concept` + `score` + `selected`/`exploration` flags + its own
+  `outcome`). The loop still acts on the argmax today; persisting all N is the
+  **contrastive signal** for credit assignment and preference learning later. Each
+  candidate can also carry its own `Outcome` once posted.
+
+**Score provenance** lives on `RewardScore`: `score_type` is `projected` (prompt
+preflight — no rendered evidence), `verified` (full rendered evidence), or `partial`;
+`evidence_coverage` (0..1) is the fraction of criteria backed by non-projected evidence.
+Together they say *how much to trust this proxy* — a projection must never mutate
+policy (DECISIONS.md D13).
 
 ## Conventions
 

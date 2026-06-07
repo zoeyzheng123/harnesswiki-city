@@ -5,6 +5,10 @@ to the **canonical render-ready** `GenerationRecord[]` (`harness/contracts.py`) 
 the dashboard reads. One-way, no refactor of the tested loop. **Implemented** in
 `harness/bridge.py` (DECISIONS.md **D16**). Rationale: DECISIONS.md **D12**.
 
+The bridge now also carries the Stage-1 ground-truth fields (DECISIONS.md **D17**):
+`score_type` / `evidence_coverage` on the score, and `outcome` / `candidates` on the
+record — all passthrough, populated once the producers below exist.
+
 ## The two contracts
 
 | | `loop_core/contracts.py` (internal) | `harness/contracts.py` (canonical) |
@@ -69,17 +73,40 @@ Either way the adapter has the winning `ContentConcept` + `RewardScore` + the
 | `confidence` ← `confidence`; `scored_by` ← `scored_by`; `rationale` / `judge_rationale` ← `rationale`; `policy_flag` ← `False` |
 | `total_score` ← `round(predicted_score * 100)` *(interim — see ACOE gap)* |
 | `distribution_tier` ← tier from `total_score` (≥85 `viral`, ≥65 `growing`, else `seed_jail`) |
-| `dimensions` (**required**) ← synthesize until B lands: e.g. positives ≈ `predicted_score`, risk dims low |
+| `score_type` / `evidence_coverage` ← passed through from the ACOE critic (D17); on stub-loop records these are `None` |
+| `outcome` / `candidates` ← passed through (D17); `None` on live records until the producers below land |
 | `category_breakdown`, `auto_fails_triggered`, `lowest_scoring_category`, `recommended_fix_priority` ← `None` until ACOE |
+
+*(The legacy 8 `dimensions` / `RewardDimensions` were removed — DECISIONS.md D14 — so the bridge no longer synthesizes them.)*
 
 ## The ACOE gap (important)
 
 The loop's **stub** critic emits only `predicted_score`. Real ACOE outputs
 (`category_breakdown`, tiers from the real total, `auto_fails_triggered`) require
-**Workstream B's critic** to apply `data/policies/ACOE-YT-SHORTS-v1.0.json`. Until
+**Workstream B's critic** to apply `data/policies/ACOE-YT-SHORTS-v2.0.json` (now wired via `make_acoe_critic()`). Until
 then the adapter derives `total_score`/`distribution_tier` from `predicted_score`
 and leaves the breakdown empty. When B's critic produces a canonical (ACOE)
 `RewardScore`, the adapter passes those fields straight through — no further change.
+
+## Producers (pending)
+
+The contracts for ground truth are landed (DECISIONS.md **D17**); two **real
+producers** are specced, not built. Both are additive — the bridge already
+passes `outcome`/`candidates` through, so populating them needs no bridge change.
+
+1. **Loop candidate-capture (Eng 1, ~5 lines, additive).** In
+   `loop_core/loop.py → run_generation_loop`, accumulate the K `(concept, reward)`
+   pairs already computed per generation (not just the `best` argmax) and extend the
+   `on_generation` hook payload with that list. The adapter wraps each into a
+   `Candidate` (`selected=True` for the argmax, `exploration` for non-greedy picks) so
+   `GenerationRecord.candidates` populates — the contrastive batch. The winning pair
+   path is unchanged.
+
+2. **Outcome ingestion.** render → post → fetch real metrics → build an `Outcome`
+   (`source="youtube_api"`, real `avg_percent_viewed`/`views`/…) and attach it to the
+   record (`GenerationRecord.outcome`) and/or the matching `Candidate.outcome`. Until
+   this lands, outcomes are `stub`/`synthetic` (the D17 calibration seed) and
+   `outcome` stays `None` on live records.
 
 ## Validate
 

@@ -3,6 +3,57 @@
 Lightweight ADR log. Newest first. Record a decision here when it would
 otherwise get re-litigated or drift across files.
 
+## 2026-06-07 — Ground-truth contracts (Stage 1)
+
+### D17. Typed `Outcome`, the candidate batch, score provenance + the calibration seed
+
+The proxy reward (ACOE critic) is not the target — the target is what a post
+actually does. Stage 1 lands the **typed ground-truth contracts** the loop needs to
+start measuring "proxy vs truth", plus a synthetic-data + calibration seed that
+*proves the gap is learnable* before any real metrics exist.
+
+- **`Outcome`** (`harness/contracts.py` + TS mirror): the real-world result of a
+  posted concept — `collected_at`, `maturity_hours`, `platform`, `source`
+  (`youtube_api`/`manual`/`synthetic`/`stub`), `impressions`, `views`,
+  `avg_percent_viewed` (APV — the Shorts loop metric; `>1` = rewatch loops), `likes`,
+  `comments`, `shares`, `follows`, `retention_curve`. `None` until rendered + posted +
+  collected.
+- **`Candidate`** = one of the N concepts a generation considered (`variant_id`,
+  `concept`, `score`, `selected`, `exploration`, `outcome`). The loop keeps only the
+  **argmax** today; persisting all N is the **contrastive batch** — the signal for
+  credit assignment and preference learning.
+- **`RewardScore`** gains `score_type` (`projected`/`verified`/`partial`) +
+  `evidence_coverage` (0..1) — *how much to trust this proxy*. The critic
+  (`harness/critic.py score_concept`) emits both; the bridge (`harness/bridge.py`)
+  carries them plus `outcome`/`candidates` through to the canonical record.
+- **`GenerationRecord`** gains `outcome` + `candidates`; **`actual_engagement` is
+  deprecated** (loose dict) in favor of the typed `Outcome`.
+
+All additive — every field optional, `actual_engagement` retained — so the build
+stays green (round-trips + `pnpm typecheck:ui`).
+
+**The calibration seed (Stage-2 seed) — landed.** `scripts/synth_outcomes.py`
+deterministically generates `Outcome`s from a **hidden model deliberately ≠ the ACOE
+weights** (cosine 0.73 — audio + delayed-resolution weighted high, overt
+engagement-bait ≈ 0/negative), and `scripts/calibrate.py` (pure-Python OLS, no new
+deps) fits weights from those outcomes to show the gap is *learnable*: fitted weights
+recover the latent ranking (Spearman **0.76** vs a **0.53** ACOE-echo baseline) and beat
+raw ACOE on a held-out, grouped-by-generation split (R² **0.18** vs **0.11**).
+`tests/test_calibrate.py` guards both **non-vacuously** (it asserts recovery clears the
+ACOE-echo baseline, not just chance). This is the concrete demonstration that **proxy ≠
+truth** and the seed for Stage 2 (learning the reward from real outcomes). Synthetic data
+lives in `data/synthetic/` (gitignored, regenerated on demand).
+
+**Real producers are specced, not built.** Two remain (see
+`docs/LOOP_CORE_BRIDGE.md` "Producers (pending)"): (1) Eng 1 loop
+candidate-capture — accumulate the K `(concept, reward)` pairs per generation so
+`GenerationRecord.candidates` populates (~5 lines, additive, via the `on_generation`
+hook); (2) outcome ingestion — render → post → fetch real metrics → attach `Outcome`
+to the record/variant. Until then `source` stays `stub`/`synthetic`.
+
+Rationale chain: D16 (bridge) carries the fields; D13 (score provenance gating) is
+why a `projected` score can never mutate policy.
+
 ## 2026-06-07 — Bridge + inner-loop + v2 meta-agent (Eng 1)
 
 ### D16. Bridge landed + inner loop fixed + meta-agent v2 levers

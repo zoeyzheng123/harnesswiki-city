@@ -118,6 +118,9 @@ export type RewardScore = {
   weak_elements?: string[];
   suggested_policy_updates?: Record<string, number>;
   rubric_breakdown?: Record<string, unknown>;
+  // score provenance (Stage 1 / D17)
+  score_type?: "projected" | "verified" | "partial";
+  evidence_coverage?: number;
 };
 
 export type HarnessState = {
@@ -164,6 +167,33 @@ export type Lesson = {
   expected_effect: string;
 };
 
+// real-world result of a posted concept — ground truth (D17). None until posted + collected.
+// avg_percent_viewed (APV) is the Shorts loop metric.
+export type Outcome = {
+  collected_at: string; // ISO-8601
+  maturity_hours?: number;
+  platform: string; // "youtube_shorts"
+  source: string; // "youtube_api" | "manual" | "synthetic" | "stub"
+  impressions?: number;
+  views?: number;
+  avg_percent_viewed?: number; // APV (0..1+); >1 = rewatch loops
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  follows?: number;
+  retention_curve?: number[];
+};
+
+// one of the N concepts considered in a generation — the contrastive batch (D17)
+export type Candidate = {
+  variant_id: string;
+  concept: ContentConcept;
+  score: RewardScore;
+  selected?: boolean;
+  exploration?: boolean;
+  outcome?: Outcome;
+};
+
 export type GenerationRecord = {
   // core (render-ready — embeds concept + score so the dashboard needs no joins)
   id: string;
@@ -183,7 +213,9 @@ export type GenerationRecord = {
   concept_id?: string; // ≡ concept.id
   harness_id?: string;
   predicted_score?: number; // ≡ score.weighted_total
-  actual_engagement?: Record<string, number>;
+  actual_engagement?: Record<string, number>; // @deprecated (D17) — use `outcome`
+  outcome?: Outcome; // typed ground truth; populated after posting
+  candidates?: Candidate[]; // the full per-generation batch (contrastive signal, D17)
   rubric_version?: string;
   diff_summary?: string;
   selected?: boolean;
